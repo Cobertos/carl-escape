@@ -1,11 +1,12 @@
 export default {
     name : "testTree",
-    speaker : "carl",
-    background : "background.png",
-    nodes : {
-        0 : {
+    nodes : [
+        {
+            id : 0,
             prompt : "Favorite color?",
-            options[
+            speaker: "carl",
+            background : "background.png",
+            options : [
                 {
                     destination : 1,
                     text : 'Green',
@@ -21,9 +22,12 @@ export default {
 
             ]
         },
-        1 : {
+        {
+            id : 1,
             prompt : "Good choice",
-            options[
+            speaker: "carl",
+            background : "background.png",
+            options : [
                 {
                     destination : 3,
                     text : 'thanks',
@@ -33,9 +37,11 @@ export default {
 
             ]
         },
-        2 : {
+        {   id : 2,
             prompt : "Bad choice",
-            options[
+            speaker: "carl",
+            background : "background.png",
+            options : [
                 {
                     destination : 3,
                     text : 'Drat',
@@ -45,9 +51,12 @@ export default {
 
             ]
         },
-        3 : {
+        {
+            id : 3,
             prompt : "Ok, gameover now.",
-            options[
+            speaker: "carl",
+            background : "background.png",
+            options : [
                 {
                     destination : -1,
                     text : '<continue>',
@@ -55,6 +64,6 @@ export default {
                     checks : [],
                 }
             ]
-        },
-    }
+        }
+    ]  
 };

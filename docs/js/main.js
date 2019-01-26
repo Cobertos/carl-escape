@@ -44293,57 +44293,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/js/MockDialogTree.js":
+/***/ "./src/js/PowerMeterGame.js":
 /*!**********************************!*\
-  !*** ./src/js/MockDialogTree.js ***!
+  !*** ./src/js/PowerMeterGame.js ***!
   \**********************************/
-/*! exports provided: DialogTree */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DialogTree", function() { return DialogTree; });
-var DialogTree = {
-  counter: -1,
-  getPrompt: function getPrompt() {
-    this.counter++;
-    return [{
-      placement: "left",
-      name: "MC",
-      phrase: "Wow I wish I had a friend for my birthday",
-      background: "bedroom"
-    }, {
-      placement: "right",
-      name: "CrepyCarl",
-      phrase: "HEy man ill be your friend",
-      background: "bedroom"
-    }, {
-      placement: "left",
-      name: "MC",
-      phrase: "Not you carl :(",
-      background: "bedroom"
-    }, {
-      placement: "left",
-      name: "MC",
-      phrase: "Time to summon that demon",
-      background: "bedroom"
-    }, {
-      placement: "left",
-      name: "MC",
-      phrase: "Make a choice",
-      options: ["amd", "hello"],
-      background: "bedroom"
-    }][this.counter];
-  }
-};
-
-
-/***/ }),
-
-/***/ "./src/js/chat.js":
-/*!************************!*\
-  !*** ./src/js/chat.js ***!
-  \************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -44361,7 +44314,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _MockDialogTree_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./MockDialogTree.js */ "./src/js/MockDialogTree.js");
+/* harmony import */ var _engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./engine/WithPhysics.js */ "./src/js/engine/WithPhysics.js");
 
 
 
@@ -44369,210 +44322,374 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var TYPING_SPEED = 10; //ms between letter
+/**Along with normal PIXI.Application options
+ * oscillationTime The time it takes the sweeper to do one pass over the width in MS
+ * greenAreaWidth 0-1 of the width of the screen
+ */
 
-var SCREEN_PADDING = 20;
-
-var DialogSceneApp =
+var PowerMeterGameApp =
 /*#__PURE__*/
 function (_PIXI$Application) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(DialogSceneApp, _PIXI$Application);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(PowerMeterGameApp, _PIXI$Application);
 
-  function DialogSceneApp(options, dialogTree) {
+  function PowerMeterGameApp(options) {
     var _this;
 
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DialogSceneApp);
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PowerMeterGameApp);
 
-    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(DialogSceneApp).call(this, options));
-    _this.dialogTree = dialogTree;
-    _this._currentPrompt = undefined; //Add all the elements
+    options.transparent = true;
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(PowerMeterGameApp).call(this, options));
+    _this.oscillationTime = options.oscillationTime || 1000;
+    _this.greenAreaWidth = options.greenAreaWidth || 0.5;
+    _this.greenAreaPixelWidth = _this.screen.width * _this.greenAreaWidth; //Add all the elements
 
-    var background = _this._background = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.bedroom.texture);
-    var backgroundAspect = background.height / background.width;
-    background.width = _this.screen.width;
-    background.height = background.width * backgroundAspect;
+    _this._redArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
 
-    _this.stage.addChild(background);
+    _this._redArea.beginFill(0xAA5555);
 
-    var box = _this._dialogBox = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
-    box.beginFill(0xFFF0CC);
-    box.lineStyle(4, 0xFF3300, 1);
-    box.drawRect(0, 0, 500, 200);
-    box.endFill();
+    _this._redArea.drawRectBound = _this._redArea.drawRect.bind(_this._redArea, 0, _this.screen.height / 6, _this.screen.width, 2 * _this.screen.height / 3);
 
-    _this.stage.addChild(box);
+    _this._redArea.drawRectBound();
 
-    var frame = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.dialogFrame.texture, 117, 117, 117, 117);
-    frame.width = 1000;
-    frame.height = 400;
-    frame.scale.x = 0.5;
-    frame.scale.y = 0.5;
+    _this._redArea.endFill();
 
-    _this._dialogBox.addChild(frame);
+    _this.stage.addChild(_this._redArea);
 
-    var name = _this._dialogName = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("NAME", {
-      fontFamily: 'Arial',
-      fontSize: 24,
-      fill: 0xff1010,
+    _this._greenArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._greenArea.beginFill(0x55AA55);
+
+    _this._greenArea.drawRectBound = _this._greenArea.drawRect.bind(_this._greenArea, (_this.screen.width - _this.greenAreaPixelWidth) / 2, _this.screen.height / 6, _this.greenAreaPixelWidth, 2 * _this.screen.height / 3);
+
+    _this._greenArea.drawRectBound();
+
+    _this._greenArea.endFill();
+
+    _this.stage.addChild(_this._greenArea);
+
+    _this._stopBar = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._stopBar.beginFill(0xFFFFFF);
+
+    _this._stopBar.lineStyle(4, 0x000000, 1);
+
+    _this._stopBar.drawRect(0, 0, 20, _this.screen.height);
+
+    _this._stopBar.endFill();
+
+    _this.stage.addChild(_this._stopBar);
+
+    var text = _this._skillCheckText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("SKILL CHECK", {
+      fontFamily: 'Impact',
+      fontSize: 200,
+      fill: 0xffffff,
       align: 'center'
     });
-    name.position.x = 50;
-    name.position.y = 50;
+    text.position.x = _this.screen.width / 2;
+    text.position.y = _this.screen.height / 2;
+    text._initialWidth = text.width;
+    text._initialHeight = text.height;
+    text.visible = false;
 
-    _this._dialogBox.addChild(name);
+    _this._skillCheckText.anchor.set(0.5);
 
-    var text = _this._dialogText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("Initial Text", {
-      fontFamily: 'Arial',
-      fontSize: 24,
-      fill: 0xff1010,
-      align: 'left',
-      wordWrap: true,
-      wordWrapWidth: 400
-    });
-    text.position.x = 50;
-    text.position.y = 80;
-    _this._dialogInterval = undefined;
+    _this.stage.addChild(text);
 
-    _this._dialogBox.addChild(text);
-
-    var face1 = _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.mc.texture);
-    var face1Aspect = face1.height / face1.width;
-    face1.width = 400;
-    face1.height = face1.width * face1Aspect;
-
-    _this.stage.addChild(face1);
-
-    var face2 = _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.carl.texture);
-    var face2Aspect = face2.height / face2.width;
-    face2.width = 400;
-    face2.height = face2.width * face2Aspect;
-
-    _this.stage.addChild(face2);
-
+    _this._barPos = 0;
+    _this._initialTime = Date.now();
+    _this._started = false;
+    _this._startTime;
+    _this._stopped = false;
+    _this._hitGreenArea = undefined;
     return _this;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogSceneApp, [{
-    key: "nextScene",
-    value: function nextScene() {
-      var _this2 = this;
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PowerMeterGameApp, [{
+    key: "onUpdate",
+    value: function onUpdate() {
+      if (!this._started || this._skillCheckText.visible) {
+        var now = Date.now() - this._initialTime;
 
-      this._currentPrompt = this.dialogTree.getPrompt();
-      var _this$_currentPrompt = this._currentPrompt,
-          placement = _this$_currentPrompt.placement,
-          name = _this$_currentPrompt.name,
-          options = _this$_currentPrompt.options;
+        if (now < 300) {
+          //0 - 300ms
+          this._skillCheckText.visible = true;
+          this._skillCheckText.width = this._skillCheckText._initialWidth * 0.5;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * 0.5;
+        } else if (now < 600) {
+          //300 - 600ms
+          var tween = (now - 300) / 300;
+          tween = tween * 0.5 + 0.5;
+          console.log(tween);
+          this._skillCheckText.width = this._skillCheckText._initialWidth * tween;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * tween;
+        } else if (now < 1000) {
+          //600 - 1000ms
+          var _tween = (now - 600) / 400;
 
-      var boxBounds = this._dialogBox.getBounds();
+          _tween = 1 - _tween;
+          this._skillCheckText.width = this._skillCheckText._initialWidth * _tween;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * _tween;
+        } else if (now > 1000) {
+          this._skillCheckText.visible = false;
+        }
 
-      this._dialogBox.x = placement === "left" ? SCREEN_PADDING : this.screen.width - SCREEN_PADDING - boxBounds.width;
-      this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
-      this._dialogName.text = name;
-      this._leftFace.x = 20;
-      this._leftFace.y = this.screen.height / 3;
-      this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
-      this._rightFace.x = this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width;
-      this._rightFace.y = this.screen.height / 3;
-      this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
+        if (now > 800) {
+          this._started = true;
+          this._startTime = Date.now();
+        }
+      } else {
+        if (!this._stopped) {
+          var _now = Date.now() - this._startTime;
 
-      if (options) {
-        options.forEach(function (option, idx) {
-          var button = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.buttonFrame.texture, 117, 117, 117, 117);
-          button.width = 200 * 4;
-          button.height = 70 * 4;
-          button.scale.x = 0.25;
-          button.scale.y = 0.25;
-          button.position.x = 30;
-          button.position.y = 30 + 50 * idx;
+          var shouldMirror = Math.floor(_now / this.oscillationTime) % 2 === 0;
+          this._barPos = Math.abs((shouldMirror ? 0 : 1) - _now % this.oscillationTime / this.oscillationTime);
+          this._stopBar.x = this.screen.width * this._barPos - this._stopBar.width / 2;
+        } else if (this._stopped) {
+          var blinkInterval = Math.floor(Date.now() / 300) % 2 === 0; //every 1 second
 
-          _this2._dialogBox.addChild(button);
+          if (this._hitGreenArea) {
+            this._greenArea.beginFill(blinkInterval ? 0x00FF00 : 0x55AA55);
 
-          var buttonText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"](option, {
-            fontFamily: 'Arial',
-            fontSize: 24,
-            fill: 0xff1010,
-            align: 'left'
-          });
-          buttonText.position.x = 20 * 4;
-          buttonText.position.y = 20 * 4;
-          buttonText.scale.x = 4;
-          buttonText.scale.y = 4;
-          button.addChild(buttonText);
-        });
+            this._greenArea.drawRectBound();
+
+            this._greenArea.endFill();
+          } else {
+            this._redArea.beginFill(blinkInterval ? 0xFF0000 : 0xAA5555);
+
+            this._redArea.drawRectBound();
+
+            this._redArea.endFill();
+          }
+        }
+      }
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      if (!this._started) {
+        return;
       }
 
-      this.startTyping();
-    }
+      this._stopped = true;
+      var stopPos = this._barPos;
+      var greenBoxX = (this.screen.width - this.greenAreaPixelWidth) / 2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
+
+      var greenAreaStart = greenBoxX / this.screen.width;
+      var greenAreaEnd = (greenBoxX + this._greenArea.width) / this.screen.width;
+      this._hitGreenArea = stopPos > greenAreaStart && stopPos < greenAreaEnd;
+    } //Whether the player has won, undefiend if not finished
+
   }, {
-    key: "startTyping",
-    value: function startTyping() {
-      var _this3 = this;
-
-      if (this._dialogInterval) {
-        //Clear previous dialog
-        this.stopTyping();
-      } //Start a new dialog
-
-
-      var letters = this._currentPrompt.phrase.split("");
-
-      var currLetter = 0;
-      this._dialogInterval = setInterval(function () {
-        _this3._dialogText.text = letters.slice(0, currLetter).join("");
-        currLetter++;
-
-        if (currLetter > _this3._currentPrompt.phrase.length) {
-          _this3.stopTyping();
-
-          return;
-        }
-      }, TYPING_SPEED);
-    }
-  }, {
-    key: "stopTyping",
-    value: function stopTyping() {
-      clearInterval(this._dialogInterval);
-      this._dialogInterval = undefined;
-    }
-  }, {
-    key: "endCurrentTypingPhrase",
-    value: function endCurrentTypingPhrase() {
-      this.stopTyping();
-      this._dialogText.text = this._currentPrompt.phrase;
-    }
-  }, {
-    key: "isTyping",
+    key: "won",
     get: function get() {
-      return !!this._dialogInterval;
+      return this._hitGreenArea;
     }
   }]);
 
-  return DialogSceneApp;
+  return PowerMeterGameApp;
 }(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Application"]);
 
 document.addEventListener("DOMContentLoaded", function () {
-  pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
-  .add("bedroom", "images/bedroom.png") //Characters
-  .add("carl", "images/crepycarl.png").add("mc", "images/mc.png") //Other assets
-  .add("dialogFrame", "images/frameyboi.png").add("buttonFrame", "images/frameyboi.png").load(function () {
+  pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].load(function () {
     //WIRE UP THE APP
-    var app = new DialogSceneApp({
+    var app = new PowerMeterGameApp({
       antialias: true,
       width: window.innerWidth,
-      height: window.innerHeight
-    }, _MockDialogTree_js__WEBPACK_IMPORTED_MODULE_6__["DialogTree"]);
+      height: window.innerHeight,
+      oscillationTime: 1000,
+      greenAreaWidth: 0.4
+    });
     document.body.appendChild(app.view);
-    ["mouseup", "touchend"].forEach(function (eventName) {
-      app.view.addEventListener(eventName, function () {
-        if (app.isTyping) {
-          app.endCurrentTypingPhrase();
-        } else {
-          app.nextScene();
-        }
-      });
+    var raf;
+
+    var loop = function loop() {
+      app.onUpdate();
+      raf = requestAnimationFrame(loop);
+    };
+
+    raf = requestAnimationFrame(loop);
+
+    var stop = function stop() {
+      app.stop();
+    };
+
+    app.view.addEventListener("pointerdown", function () {
+      stop();
+    });
+    window.addEventListener("keydown", function (e) {
+      if (e.key === " ") {
+        stop();
+        e.preventDefault(); //Stop the scrolling  
+      }
     });
   });
 });
+
+/***/ }),
+
+/***/ "./src/js/engine/WithPhysics.js":
+/*!**************************************!*\
+  !*** ./src/js/engine/WithPhysics.js ***!
+  \**************************************/
+/*! exports provided: WithPhysics, physicsLoop */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WithPhysics", function() { return WithPhysics; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "physicsLoop", function() { return physicsLoop; });
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+
+/**Returns the passed PIXI class wrapped in a class that supports physics simulation
+ * Usage:
+ * class MyNewPhysicsClass extends WithPhysics(PIXI.Sprite) {
+ *     //...
+ * }
+ */
+function WithPhysics(pixiCls) {
+  var _WithPhysicsCls =
+  /*#__PURE__*/
+  function (_pixiCls) {
+    _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(_WithPhysicsCls, _pixiCls);
+
+    _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(_WithPhysicsCls, [{
+      key: "hasPhysics",
+      get: function get() {
+        return true;
+      }
+    }]);
+
+    function _WithPhysicsCls() {
+      var _getPrototypeOf2;
+
+      var _this;
+
+      _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, _WithPhysicsCls);
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1___default()(this, (_getPrototypeOf2 = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2___default()(_WithPhysicsCls)).call.apply(_getPrototypeOf2, [this].concat(args))); //Units per second
+
+      _this.velocity = new PIXI.Point();
+      _this.acceleration = new PIXI.Point();
+      _this.angularVelocity = 0;
+      _this.angularAcceleration = 0;
+      return _this;
+    }
+    /**Override with your things to do when physics is updating
+     * and super call to do normal stuff
+     */
+
+
+    _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(_WithPhysicsCls, [{
+      key: "onPhysicsUpdate",
+      value: function onPhysicsUpdate(time, deltaTime) {
+        this.velocity.x += this.acceleration.x * deltaTime / 1000;
+        this.velocity.y += this.acceleration.y * deltaTime / 1000;
+        this.position.x += this.velocity.x * deltaTime / 1000;
+        this.position.y -= this.velocity.y * deltaTime / 1000;
+        this.angularVelocity += this.angularAcceleration;
+        this.rotation += this.angularVelocity;
+      }
+      /**Override to do things when we collide with an object
+       */
+
+    }, {
+      key: "onCollision",
+      value: function onCollision(otherObjects) {}
+    }]);
+
+    return _WithPhysicsCls;
+  }(pixiCls);
+
+  return _WithPhysicsCls;
+}
+/* Stub tests...
+let physicsCls = WithPhysics(PIXI.Container);
+it("has a velocity and an acceleration", ()=>{
+  //arrange
+  let container = new physicsCls();
+
+  //assert
+  expect(container.velocity instanceof PIXI.Point);
+  expect(container.acceleration instanceof PIXI.Point);
+});*/
+
+function depthFirstIterate(obj, func) {
+  if (!obj) {
+    return;
+  }
+
+  obj.children.forEach(function (child) {
+    return depthFirstIterate(child, func);
+  });
+  func(obj);
+}
+
+var lastTime = Date.now();
+/**From a given rootNode, loops through all children and
+ * does the physics simulation on them
+ */
+
+function physicsLoop(rootNode) {
+  var time = Date.now();
+  var deltaTime = time - lastTime;
+  lastTime = time; //Iterate over all objects, collect the physics objects
+  //and call the physics simulation
+
+  var physObjs = [];
+  depthFirstIterate(rootNode, function (obj) {
+    if (!obj.hasPhysics) {
+      return;
+    }
+
+    obj.onPhysicsUpdate(time, deltaTime);
+    physObjs.push(obj);
+  }); //Determine whether any objects
+  //are colliding, O(n^2/2) it's not that smart
+
+  physObjs.forEach(function (obj1, idx) {
+    //.slice(idx to NOT REPEAT), should also never get
+    //obj1 === obj2
+    physObjs.slice(idx + 1).forEach(function (obj2) {
+      //Box test with pixi.rectangle
+      var rect1 = obj1.getBounds();
+      var rect2 = obj2.getBounds();
+      var instersects = //x direction
+      rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && //y direction
+      rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y;
+
+      if (intersects) {
+        //Let them know
+        obj1.onCollision(obj2);
+        obj2.onCollision(obj1); //General collision event
+
+        var evt = new Event("collision");
+        evt.obj1 = obj1;
+        evt.obj2 = obj2;
+        evt.time = time;
+        window.dispatchEvent(evt);
+      }
+    });
+  });
+}
+setInterval(physicsLoop, 100);
 
 /***/ }),
 
@@ -44585,7 +44702,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _chat_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chat.js */ "./src/js/chat.js");
+/* harmony import */ var _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PowerMeterGame.js */ "./src/js/PowerMeterGame.js");
 /* harmony import */ var _data_story__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data/story */ "./src/data/story/index.js");
 
 

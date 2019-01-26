@@ -29,10 +29,21 @@ class DialogSceneApp extends PIXI.Application {
     this._dialogInterval = undefined;
     this._dialogBox.addChild(text);
 
-    /*let face1 = this._leftFace = new PIXI.Sprite(
-      PIXI.loader.resources.creepCarl.texture
+    let face1 = this._leftFace = new PIXI.Sprite(
+      PIXI.loader.resources.mc.texture
     );
-    this.stage.addChild(sprite);*/
+    let face1Aspect = face1.height/face1.width;
+    face1.width = 200;
+    face1.height= 200*face1Aspect;
+    this.stage.addChild(face1);
+
+    let face2 = this._rightFace = new PIXI.Sprite(
+      PIXI.loader.resources.carl.texture
+    );
+    let face2Aspect = face2.height/face2.width;
+    face2.width = 200;
+    face2.height= 200*face2Aspect;
+    this.stage.addChild(face2);
   }
 
   get isTyping(){
@@ -46,6 +57,12 @@ class DialogSceneApp extends PIXI.Application {
     this._dialogBox.x = placement === "left" ? SCREEN_PADDING : (this.screen.width - SCREEN_PADDING - boxBounds.width);
     this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
     this._dialogName.text = name;
+
+    this._leftFace.x = 20;
+    this._leftFace.y = this.screen.height/2;
+
+    this._rightFace.x = (this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width);
+    this._rightFace.y = this.screen.height/2;
 
     this.startTyping();
   }
@@ -85,9 +102,8 @@ PIXI.loader
   //Backgrounds
   .add("bedroom", "images/bedroom.png")
   //Characters
-  .add("creepCarl", "images/creepyCarl.png")
+  .add("carl", "images/crepycarl.png")
   .add("mc", "images/mc.png")
-  .add("creepyCarlWindow", "images/creepyCarlWindow.png")
   .load(()=>{
     //WIRE UP THE APP
     const app = new DialogSceneApp({

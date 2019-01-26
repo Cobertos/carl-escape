@@ -44288,11 +44288,20 @@ function (_PIXI$Application) {
     _this._dialogInterval = undefined;
 
     _this._dialogBox.addChild(text);
-    /*let face1 = this._leftFace = new PIXI.Sprite(
-      PIXI.loader.resources.creepCarl.texture
-    );
-    this.stage.addChild(sprite);*/
 
+    var face1 = _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.mc.texture);
+    var face1Aspect = face1.height / face1.width;
+    face1.width = 200;
+    face1.height = 200 * face1Aspect;
+
+    _this.stage.addChild(face1);
+
+    var face2 = _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.carl.texture);
+    var face2Aspect = face2.height / face2.width;
+    face2.width = 200;
+    face2.height = 200 * face2Aspect;
+
+    _this.stage.addChild(face2);
 
     return _this;
   }
@@ -44310,6 +44319,10 @@ function (_PIXI$Application) {
       this._dialogBox.x = placement === "left" ? SCREEN_PADDING : this.screen.width - SCREEN_PADDING - boxBounds.width;
       this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
       this._dialogName.text = name;
+      this._leftFace.x = 20;
+      this._leftFace.y = this.screen.height / 2;
+      this._rightFace.x = this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width;
+      this._rightFace.y = this.screen.height / 2;
       this.startTyping();
     }
   }, {
@@ -44362,7 +44375,7 @@ function (_PIXI$Application) {
 document.addEventListener("DOMContentLoaded", function () {
   pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
   .add("bedroom", "images/bedroom.png") //Characters
-  .add("creepCarl", "images/creepyCarl.png").add("mc", "images/mc.png").add("creepyCarlWindow", "images/creepyCarlWindow.png").load(function () {
+  .add("carl", "images/crepycarl.png").add("mc", "images/mc.png").load(function () {
     //WIRE UP THE APP
     var app = new DialogSceneApp({
       antialias: true,

@@ -82,9 +82,8 @@ class DialogueTree {
 
         for(let i in this.nodes){
             console.log('Pushing ' + this.nodes[i].getDestinations());
-            ret.push(this.nodes[i].getDestinations());
+            ret.concat(this.nodes[i].getDestinations());
         }
-
         return ret;
     }
 }
@@ -110,7 +109,6 @@ class DialogueNode {
   getDestinations() {
     let ret = [];
     for(let i in this.options){
-
         ret.push(this.options[i].destination);
     }
     return ret;
@@ -243,4 +241,4 @@ test();
 //     DialogueTree,
 //     DialogueNode,
 //     OptionNode
-// };
+// };11111

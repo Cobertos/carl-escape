@@ -23,6 +23,7 @@ class DialogueTree {
         return ret;
     }
 
+
     selectNode(nodeId){
         this.currentNode = this.getNode(nodeId);
     }
@@ -117,11 +118,12 @@ class DialogueNode {
 }
 
 class OptionNode {
-    constructor(destination, text, actions, checks) {
+    constructor(destination, text, actions, checks, speaker) {
         this.destination = destination;
         this.text = text;
         this.actions = actions;
         this.checks = checks;
+        this.speaker = speaker; // Used to select visuals
     }
   
     toString() {
@@ -235,10 +237,10 @@ function test(){
 }
 
 
-test();
+//test();
 
-// export {
-//     DialogueTree,
-//     DialogueNode,
-//     OptionNode
-// };11111
+export {
+    DialogueTree,
+    DialogueNode,
+    OptionNode
+};11111

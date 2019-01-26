@@ -20,4 +20,4 @@ Try the game without installing at: [[TODO: Add GithubPages link]]
 * Download `node`, `npm`, and `git`
 * Clone this repository to your local machine
 * Run `npm install` inside the cloned directory
-* [[TODO: Build instructions]]
+* Run `gulp build` OR run `gulp dev` to build with watch and serve files from `docs/`

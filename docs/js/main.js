@@ -44277,6 +44277,14 @@ function (_PIXI$Application) {
 
     _this.stage.addChild(box);
 
+    var frame = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.dialogFrame.texture, 156, 156, 156, 156);
+    frame.width = 1000;
+    frame.height = 400;
+    frame.scale.x = 0.5;
+    frame.scale.y = 0.5;
+
+    _this._dialogBox.addChild(frame);
+
     var name = _this._dialogName = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("NAME", {
       fontFamily: 'Arial',
       fontSize: 24,
@@ -44388,7 +44396,8 @@ function (_PIXI$Application) {
 document.addEventListener("DOMContentLoaded", function () {
   pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
   .add("bedroom", "images/bedroom.png") //Characters
-  .add("carl", "images/crepycarl.png").add("mc", "images/mc.png").load(function () {
+  .add("carl", "images/crepycarl.png").add("mc", "images/mc.png") //Other assets
+  .add("dialogFrame", "images/frameyboi.png").load(function () {
     //WIRE UP THE APP
     var app = new DialogSceneApp({
       antialias: true,

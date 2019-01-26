@@ -25,6 +25,12 @@ class DialogSceneApp extends PIXI.Application {
     box.drawRect(0,0,500,200);
     box.endFill();
     this.stage.addChild(box);
+    let frame = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.dialogFrame.texture, 156, 156, 156, 156);
+    frame.width = 1000;
+    frame.height = 400;
+    frame.scale.x = 0.5;
+    frame.scale.y = 0.5;
+    this._dialogBox.addChild(frame);
 
     let name = this._dialogName = new PIXI.Text("NAME", {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'center'});
     name.position.x = 10;
@@ -114,6 +120,8 @@ PIXI.loader
   //Characters
   .add("carl", "images/crepycarl.png")
   .add("mc", "images/mc.png")
+  //Other assets
+  .add("dialogFrame", "images/frameyboi.png")
   .load(()=>{
     //WIRE UP THE APP
     const app = new DialogSceneApp({

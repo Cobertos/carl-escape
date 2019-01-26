@@ -44188,7 +44188,23 @@ var DialogTree = {
   counter: -1,
   getPrompt: function getPrompt() {
     this.counter++;
-    return ["MC: Wow I really wish I had friends", "CrepyCarl: HEy man ill be your friend", "MC: Not you carl :(", "MC: Time to summon that demon"][this.counter];
+    return [{
+      placement: "left",
+      name: "MC",
+      phrase: "Wow I wish I had a friend for my birthday"
+    }, {
+      placement: "right",
+      name: "CrepyCarl",
+      phrase: "HEy man ill be your friend"
+    }, {
+      placement: "left",
+      name: "MC",
+      phrase: "Not you carl :("
+    }, {
+      placement: "left",
+      name: "MC",
+      phrase: "Time to summon that demon"
+    }][this.counter];
   }
 };
 
@@ -44226,6 +44242,8 @@ __webpack_require__.r(__webpack_exports__);
 
 var TYPING_SPEED = 10; //ms between letter
 
+var SCREEN_PADDING = 20;
+
 var DialogSceneApp =
 /*#__PURE__*/
 function (_PIXI$Application) {
@@ -44237,7 +44255,27 @@ function (_PIXI$Application) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DialogSceneApp);
 
     _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(DialogSceneApp).call(this, options));
-    _this.dialogTree = dialogTree; //Add all the elements
+    _this.dialogTree = dialogTree;
+    _this._currentPrompt = undefined; //Add all the elements
+
+    var box = _this._dialogBox = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+    box.beginFill(0xFFF0CC);
+    box.lineStyle(4, 0xFF3300, 1);
+    box.drawRect(0, 0, 500, 200);
+    box.endFill();
+
+    _this.stage.addChild(box);
+
+    var name = _this._dialogName = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("NAME", {
+      fontFamily: 'Arial',
+      fontSize: 24,
+      fill: 0xff1010,
+      align: 'center'
+    });
+    name.position.x = 10;
+    name.position.y = 10;
+
+    _this._dialogBox.addChild(name);
 
     var text = _this._dialogText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("Initial Text", {
       fontFamily: 'Arial',
@@ -44246,18 +44284,37 @@ function (_PIXI$Application) {
       align: 'center'
     });
     text.position.x = 10;
-    text.position.y = 10;
-    _this._dialogCurrentPhrase = undefined;
+    text.position.y = 40;
     _this._dialogInterval = undefined;
 
-    _this.stage.addChild(text);
+    _this._dialogBox.addChild(text);
+    /*let face1 = this._leftFace = new PIXI.Sprite(
+      PIXI.loader.resources.creepCarl.texture
+    );
+    this.stage.addChild(sprite);*/
+
 
     return _this;
   }
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogSceneApp, [{
-    key: "nextPhrase",
-    value: function nextPhrase() {
+    key: "nextScene",
+    value: function nextScene() {
+      this._currentPrompt = this.dialogTree.getPrompt();
+      var _this$_currentPrompt = this._currentPrompt,
+          placement = _this$_currentPrompt.placement,
+          name = _this$_currentPrompt.name;
+
+      var boxBounds = this._dialogBox.getBounds();
+
+      this._dialogBox.x = placement === "left" ? SCREEN_PADDING : this.screen.width - SCREEN_PADDING - boxBounds.width;
+      this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
+      this._dialogName.text = name;
+      this.startTyping();
+    }
+  }, {
+    key: "startTyping",
+    value: function startTyping() {
       var _this2 = this;
 
       if (this._dialogInterval) {
@@ -44266,16 +44323,14 @@ function (_PIXI$Application) {
       } //Start a new dialog
 
 
-      this._dialogCurrentPhrase = this.dialogTree.getPrompt();
-
-      var letters = this._dialogCurrentPhrase.split("");
+      var letters = this._currentPrompt.phrase.split("");
 
       var currLetter = 0;
       this._dialogInterval = setInterval(function () {
         _this2._dialogText.text = letters.slice(0, currLetter).join("");
         currLetter++;
 
-        if (currLetter > _this2._dialogCurrentPhrase.length) {
+        if (currLetter > _this2._currentPrompt.phrase.length) {
           _this2.stopTyping();
 
           return;
@@ -44302,39 +44357,30 @@ function (_PIXI$Application) {
   }]);
 
   return DialogSceneApp;
-}(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Application"]); //WIRE UP THE APP
+}(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Application"]);
 
-
-var app = new DialogSceneApp({
-  antialias: true,
-  width: window.innerWidth,
-  height: window.innerHeight
-}, _MockDialogTree_js__WEBPACK_IMPORTED_MODULE_6__["DialogTree"]);
 document.addEventListener("DOMContentLoaded", function () {
-  document.body.appendChild(app.view);
-});
-["mouseup", "touchend"].forEach(function (eventName) {
-  app.view.addEventListener(eventName, function () {
-    if (app.isTyping) {
-      app.endCurrentTypingPhrase();
-    } else {
-      app.nextPhrase();
-    }
+  pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
+  .add("bedroom", "images/bedroom.png") //Characters
+  .add("creepCarl", "images/creepyCarl.png").add("mc", "images/mc.png").add("creepyCarlWindow", "images/creepyCarlWindow.png").load(function () {
+    //WIRE UP THE APP
+    var app = new DialogSceneApp({
+      antialias: true,
+      width: window.innerWidth,
+      height: window.innerHeight
+    }, _MockDialogTree_js__WEBPACK_IMPORTED_MODULE_6__["DialogTree"]);
+    document.body.appendChild(app.view);
+    ["mouseup", "touchend"].forEach(function (eventName) {
+      app.view.addEventListener(eventName, function () {
+        if (app.isTyping) {
+          app.endCurrentTypingPhrase();
+        } else {
+          app.nextScene();
+        }
+      });
+    });
   });
 });
-/*PIXI.loader
-  //Backgrounds
-  .add("bedroom", "images/bedroom.png")
-  //Characters
-  .add("creepCarl", "images/creepyCarl.png")
-  .add("mc", "images/mc.png")
-  .add("creepyCarlWindow", "images/creepyCarlWindow.png")
-  .load(()=>{
-    let sprite = new PIXI.Sprite(
-      PIXI.loader.resources.creepCarl.texture
-    );
-    app.stage.addChild(sprite);
-  });*/
 
 /***/ }),
 

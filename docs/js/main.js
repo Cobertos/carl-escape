@@ -44174,6 +44174,125 @@ module.exports = function(module) {
 
 /***/ }),
 
+/***/ "./src/data/story/index.js":
+/*!*********************************!*\
+  !*** ./src/data/story/index.js ***!
+  \*********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _story1_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./story1.js */ "./src/data/story/story1.js");
+/* harmony import */ var _story2_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./story2.js */ "./src/data/story/story2.js");
+/* harmony import */ var _story3_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./story3.js */ "./src/data/story/story3.js");
+/* harmony import */ var _story4_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./story4.js */ "./src/data/story/story4.js");
+/* harmony import */ var _story5_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./story5.js */ "./src/data/story/story5.js");
+
+
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  story1: _story1_js__WEBPACK_IMPORTED_MODULE_0__["default"],
+  story2: _story2_js__WEBPACK_IMPORTED_MODULE_1__["default"],
+  story3: _story3_js__WEBPACK_IMPORTED_MODULE_2__["default"],
+  story4: _story4_js__WEBPACK_IMPORTED_MODULE_3__["default"],
+  story5: _story5_js__WEBPACK_IMPORTED_MODULE_4__["default"]
+});
+
+/***/ }),
+
+/***/ "./src/data/story/story1.js":
+/*!**********************************!*\
+  !*** ./src/data/story/story1.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  scene_1: {
+    big: 'data',
+    must: 'match Jame\'s data structure'
+  }
+});
+
+/***/ }),
+
+/***/ "./src/data/story/story2.js":
+/*!**********************************!*\
+  !*** ./src/data/story/story2.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  scene_1: {
+    big: 'data',
+    must: 'match Jame\'s data structure'
+  }
+});
+
+/***/ }),
+
+/***/ "./src/data/story/story3.js":
+/*!**********************************!*\
+  !*** ./src/data/story/story3.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  scene_1: {
+    big: 'data',
+    must: 'match Jame\'s data structure'
+  }
+});
+
+/***/ }),
+
+/***/ "./src/data/story/story4.js":
+/*!**********************************!*\
+  !*** ./src/data/story/story4.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  scene_1: {
+    big: 'data',
+    must: 'match Jame\'s data structure'
+  }
+});
+
+/***/ }),
+
+/***/ "./src/data/story/story5.js":
+/*!**********************************!*\
+  !*** ./src/data/story/story5.js ***!
+  \**********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  scene_1: {
+    big: 'data',
+    must: 'match Jame\'s data structure'
+  }
+});
+
+/***/ }),
+
 /***/ "./src/js/MockDialogTree.js":
 /*!**********************************!*\
   !*** ./src/js/MockDialogTree.js ***!
@@ -44467,7 +44586,10 @@ document.addEventListener("DOMContentLoaded", function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _chat_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chat.js */ "./src/js/chat.js");
+/* harmony import */ var _data_story__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data/story */ "./src/data/story/index.js");
 
+
+console.log("We did it reddit", _data_story__WEBPACK_IMPORTED_MODULE_1__["default"].story1.scene_1.big);
 
 /***/ })
 

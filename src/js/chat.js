@@ -25,7 +25,7 @@ class DialogSceneApp extends PIXI.Application {
     box.drawRect(0,0,500,200);
     box.endFill();
     this.stage.addChild(box);
-    let frame = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.dialogFrame.texture, 156, 156, 156, 156);
+    let frame = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.dialogFrame.texture, 117, 117, 117, 117);
     frame.width = 1000;
     frame.height = 400;
     frame.scale.x = 0.5;
@@ -33,13 +33,13 @@ class DialogSceneApp extends PIXI.Application {
     this._dialogBox.addChild(frame);
 
     let name = this._dialogName = new PIXI.Text("NAME", {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'center'});
-    name.position.x = 10;
-    name.position.y = 10;
+    name.position.x = 50;
+    name.position.y = 50;
     this._dialogBox.addChild(name);
 
-    let text = this._dialogText = new PIXI.Text("Initial Text", {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'center'});
-    text.position.x = 10;
-    text.position.y = 40;
+    let text = this._dialogText = new PIXI.Text("Initial Text", {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'left', wordWrap: true, wordWrapWidth: 400});
+    text.position.x = 50;
+    text.position.y = 80;
     this._dialogInterval = undefined;
     this._dialogBox.addChild(text);
 

@@ -44277,7 +44277,7 @@ function (_PIXI$Application) {
 
     _this.stage.addChild(box);
 
-    var frame = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.dialogFrame.texture, 156, 156, 156, 156);
+    var frame = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.dialogFrame.texture, 117, 117, 117, 117);
     frame.width = 1000;
     frame.height = 400;
     frame.scale.x = 0.5;
@@ -44291,8 +44291,8 @@ function (_PIXI$Application) {
       fill: 0xff1010,
       align: 'center'
     });
-    name.position.x = 10;
-    name.position.y = 10;
+    name.position.x = 50;
+    name.position.y = 50;
 
     _this._dialogBox.addChild(name);
 
@@ -44300,10 +44300,12 @@ function (_PIXI$Application) {
       fontFamily: 'Arial',
       fontSize: 24,
       fill: 0xff1010,
-      align: 'center'
+      align: 'left',
+      wordWrap: true,
+      wordWrapWidth: 400
     });
-    text.position.x = 10;
-    text.position.y = 40;
+    text.position.x = 50;
+    text.position.y = 80;
     _this._dialogInterval = undefined;
 
     _this._dialogBox.addChild(text);

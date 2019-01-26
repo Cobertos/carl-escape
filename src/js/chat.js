@@ -33,16 +33,16 @@ class DialogSceneApp extends PIXI.Application {
       PIXI.loader.resources.mc.texture
     );
     let face1Aspect = face1.height/face1.width;
-    face1.width = 200;
-    face1.height= 200*face1Aspect;
+    face1.width = 400;
+    face1.height= 400*face1Aspect;
     this.stage.addChild(face1);
 
     let face2 = this._rightFace = new PIXI.Sprite(
       PIXI.loader.resources.carl.texture
     );
     let face2Aspect = face2.height/face2.width;
-    face2.width = 200;
-    face2.height= 200*face2Aspect;
+    face2.width = 400;
+    face2.height= 400*face2Aspect;
     this.stage.addChild(face2);
   }
 
@@ -59,10 +59,12 @@ class DialogSceneApp extends PIXI.Application {
     this._dialogName.text = name;
 
     this._leftFace.x = 20;
-    this._leftFace.y = this.screen.height/2;
+    this._leftFace.y = this.screen.height/3;
+    this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
 
     this._rightFace.x = (this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width);
-    this._rightFace.y = this.screen.height/2;
+    this._rightFace.y = this.screen.height/3;
+    this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
 
     this.startTyping();
   }

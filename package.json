@@ -1,0 +1,30 @@
+{
+  "name": "party-person",
+  "author": {
+    "name": "Peter / Cobertos",
+    "email": "me@cobertos.com",
+    "url": "http://cobertos.com"
+  },
+  "private": "true",
+  "version": "1.0.0",
+  "description": "HOLY SHIT OTHER PEOPLE CONTRBITUED ITS NOT JUST ME I JUST NEED TO ADD THEM",
+  "dependencies": {
+    "@babel/runtime": "^7.3.1",
+    "pixi.js": "^4.8.5",
+    "stats.js": "^0.17.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-transform-runtime": "^7.2.0",
+    "@babel/preset-env": "^7.3.1",
+    "babel-loader": "^8.0.5",
+    "browser-sync": "^2.26.0",
+    "gulp": "^4.0.0",
+    "gulp-clean-css": "^3.10.0",
+    "gulp-sass": "^4.0.1",
+    "html-loader": "^0.5.5",
+    "webpack": "^4.3.0",
+    "webpack-messages": "^2.0.3",
+    "webpack-stream": "^5.1.1"
+  }
+}

@@ -1,3 +1,5 @@
+import testTree from "./test.js";
+
 class DialogueTree {
     constructor(name, nodes) {
         this.name = name;
@@ -22,7 +24,6 @@ class DialogueTree {
 
         return ret;
     }
-
 
     selectNode(nodeId){
         this.currentNode = this.getNode(nodeId);
@@ -70,7 +71,7 @@ class DialogueTree {
         let destinations = this.getDestinations();
         let ret = false;
         for(let i in destinations){
-            if(this.getNode(destinations[i]) == null){
+            if(this.getNode(destinations[i]) == null && destinations[i] != -1){
                 console.log("Destination " + destinations[i] + " is null.");
                 ret = true;
             }
@@ -85,6 +86,20 @@ class DialogueTree {
             console.log('Pushing ' + this.nodes[i].getDestinations());
             ret.concat(this.nodes[i].getDestinations());
         }
+        return ret;
+    }
+
+    static fromJson(json){
+        let ret = new DialogueTree();
+
+        ret.name = json.name;
+        ret.nodes = [];
+
+        for(let i in json.nodes){
+            let nodeJson = json.nodes[i];
+            ret.nodes.push(DialogueNode.fromJson(nodeJson));
+        }
+
         return ret;
     }
 }
@@ -115,15 +130,38 @@ class DialogueNode {
     return ret;
   }
   
+  static fromJson(json){
+    let ret = new DialogueNode();
+    ret.id = json.id;
+    ret.prompt = json.prompt;
+    ret.speaker = json.speaker;
+    ret.background = json.background;
+    ret.options = [];
+
+    for(let i in json.options){
+        let optionJson = json.options[i];
+        ret.options.push(OptionNode.fromJson(optionJson));
+    }
+
+    return ret;
+  }
 }
 
 class OptionNode {
-    constructor(destination, text, actions, checks, speaker) {
+    constructor(destination, text, actions, checks) {
         this.destination = destination;
         this.text = text;
         this.actions = actions;
         this.checks = checks;
-        this.speaker = speaker; // Used to select visuals
+    }
+
+    static fromJson(json){
+        let ret = new OptionNode();
+        ret.destination = json.destination;
+        ret.text = json.text;
+        ret.actions = json.actions;
+        ret.checks = json.checks;
+        return ret;
     }
   
     toString() {
@@ -151,96 +189,111 @@ class OptionNode {
     }
 }
 
-
-function sampleTree() {
-    let nodes = [
-        new DialogueNode(
-            1,
-            "Name a creative color.",
-            [
-                new OptionNode(
-                    2,
-                    "Blue",
-                    ["Creative"],
-                    []
-                ),
-                new OptionNode(
-                    3,
-                    "Green",
-                    ["NotCreative"],
-                    []
-                )
-            ]
-
-
-        ),
-        new DialogueNode(
-            2,
-            "Creative!",
-            [
-                new OptionNode(
-                    4,
-                    "Oh thanks!",
-                    [],
-                    []
-                ),
-            ]
-        ),
-
-        new DialogueNode(
-            3,
-            "Green is not a creative color",
-            [
-                
-                new OptionNode(
-                    4,
-                    "Oh drat!",
-                    [],
-                    []
-                )
-            ]
-        ),
-
-        new DialogueNode(
-            4,
-            "What side effects do you have?",
-            [
-                new OptionNode(
-                    -2,
-                    "You're creative!",
-                    [],
-                    ["Creative"]
-                ),
-                new OptionNode(
-                    -2,
-                    "You're not creative!",
-                    [],
-                    ["NotCreative"]
-
-                )
-            ]
-        )
-    ];
-
-    return new DialogueTree("CoolStory", nodes);
-}
-
-
-
 function test(){
-    console.log("Running tests!");
-    let tree = sampleTree();
+    let json = getTestJson();
+    let tree = DialogueTree.fromJson(json);
 
     console.log(tree.toString());
 
     tree.validate();
 }
 
+// returns DialogueTree for jsonFile
+function loadJsonFile(fileName){
+    let json = getJsonByFile(fileName);
+    return DialogueTree.fromJson(json);
+}
 
-//test();
+function getJsonByFile(fileName){
+    let objects = {
+        "testTree" : testTree
+    };
+
+    return objects[fileName];
+}
+
+function getTestJson(){
+    return {
+    name : "testTree",
+    nodes : [
+        {
+            id : 0,
+            prompt : "Favorite color?",
+            speaker: "carl",
+            background : "background.png",
+            options : [
+                {
+                    destination : 1,
+                    text : 'Green',
+                    actions : [],
+                    checks : [],
+                },
+                {
+                    destination : 2,
+                    text : 'Blue',
+                    actions : [],
+                    checks : [],
+                }
+
+            ]
+        },
+        {
+            id : 1,
+            prompt : "Good choice",
+            speaker: "carl",
+            background : "background.png",
+            options : [
+                {
+                    destination : 3,
+                    text : 'thanks',
+                    actions : [],
+                    checks : [],
+                }
+
+            ]
+        },
+        {   id : 2,
+            prompt : "Bad choice",
+            speaker: "carl",
+            background : "background.png",
+            options : [
+                {
+                    destination : 3,
+                    text : 'Drat',
+                    actions : [],
+                    checks : [],
+                }
+
+            ]
+        },
+        {
+            id : 3,
+            prompt : "Ok, gameover now.",
+            speaker: "carl",
+            background : "background.png",
+            options : [
+                {
+                    destination : -1,
+                    text : '<continue>',
+                    actions : [],
+                    checks : [],
+                }
+            ]
+        }
+    ]  
+};
+
+
+}
+
+
+
+test();
 
 export {
     DialogueTree,
     DialogueNode,
-    OptionNode
-};11111
+    OptionNode,
+    loadJsonFile,
+    getJsonByFile
+};

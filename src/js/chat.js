@@ -136,7 +136,6 @@ class DialogSceneApp extends PIXI.Application {
     for(let i in actions){
       if(this.isGameAction(actions[i])){
         this.playGame(actions[i]);
-        return;
       }
       else{
         this.actions.push(actions[i]);
@@ -152,6 +151,29 @@ class DialogSceneApp extends PIXI.Application {
 
     this.dialogTree.selectNode(dest);
     this.nextScene();
+  }
+
+  isGameAction(action){
+    let gameActions = ["PlayGame1", "PlayGame2", "PlayGame3"];
+    if(gameActions.indexOf(action) > -1){
+      return true;
+    }
+    return false;
+  }
+
+  playGame(action){
+    if(action === "PlayGame1"){
+      console.log("Playing game 1");
+      this.actions.push("WinGame1");
+    }
+    if(action === "PlayGame2"){
+      console.log("Playing game 2");
+      this.actions.push("WinGame2");
+    }
+    if(action === "PlayGame3"){
+      console.log("Playing game 3");
+      this.actions.push("WinGame3");
+    }
   }
 
   startTyping(){

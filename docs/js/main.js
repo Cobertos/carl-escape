@@ -44426,14 +44426,14 @@ function (_PIXI$Application) {
 
     var face1 = _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.mc.texture);
     var face1Aspect = face1.height / face1.width;
-    face1.width = 400;
+    face1.width = _this.screen.width / 2.8;
     face1.height = face1.width * face1Aspect;
 
     _this.stage.addChild(face1);
 
     var face2 = _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.carl.texture);
     var face2Aspect = face2.height / face2.width;
-    face2.width = 400;
+    face2.width = _this.screen.width / 2.8;
     face2.height = face2.width * face2Aspect;
 
     _this.stage.addChild(face2);
@@ -44450,7 +44450,7 @@ function (_PIXI$Application) {
       this._currentPrompt = this.dialogTree.prompt(); //let { placement, name, options } = this._currentPrompt;
 
       var placement = "left";
-      var name = "";
+      var name = "Test";
       var options = this.dialogTree.options(this.actions);
 
       for (var i in this.optionButtons) {
@@ -44617,7 +44617,7 @@ Promise.all([new Promise(function (resolve, reject) {
 }), new Promise(function (resolve, reject) {
   pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
   .add("bedroom", "images/bedroom.png") //Characters
-  .add("carl", "images/crepycarl.png").add("mc", "images/mc.png") //Other assets
+  .add("carl", "images/crepycarl-clothed.png").add("mc", "images/mc-clothed.png") //Other assets
   .add("dialogFrame", "images/frameyboi.png").add("buttonFrame", "images/buttonboi.png").load(resolve);
 }), new Promise(function (resolve, reject) {
   document.addEventListener("DOMContentLoaded", resolve);
@@ -44628,7 +44628,9 @@ Promise.all([new Promise(function (resolve, reject) {
     width: window.innerWidth,
     height: window.innerHeight
   }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__["loadJsonFile"]("testTree"));
-  document.body.appendChild(app.view);
+  document.body.appendChild(app.view); //lock for mobile devices
+
+  screen.orientation.lock('landscape');
   ["mouseup", "touchend"].forEach(function (eventName) {
     app.view.addEventListener(eventName, function () {
       if (app.isTyping) {

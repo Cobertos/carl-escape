@@ -50,7 +50,7 @@ class DialogSceneApp extends PIXI.Application {
       PIXI.loader.resources.mc.texture
     );
     let face1Aspect = face1.height/face1.width;
-    face1.width = 400;
+    face1.width = this.screen.width/2.8;
     face1.height= face1.width*face1Aspect;
     this.stage.addChild(face1);
 
@@ -58,7 +58,7 @@ class DialogSceneApp extends PIXI.Application {
       PIXI.loader.resources.carl.texture
     );
     let face2Aspect = face2.height/face2.width;
-    face2.width = 400;
+    face2.width = this.screen.width/2.8;
     face2.height= face2.width*face2Aspect;
     this.stage.addChild(face2);
   }
@@ -73,7 +73,7 @@ class DialogSceneApp extends PIXI.Application {
     //let { placement, name, options } = this._currentPrompt;
 
     let placement = "left";
-    let name = "";
+    let name = "Test";
     let options = this.dialogTree.options(this.actions);
     
     for(let i in this.optionButtons){
@@ -218,8 +218,8 @@ Promise.all([
       //Backgrounds
       .add("bedroom", "images/bedroom.png")
       //Characters
-      .add("carl", "images/crepycarl.png")
-      .add("mc", "images/mc.png")
+      .add("carl", "images/crepycarl-clothed.png")
+      .add("mc", "images/mc-clothed.png")
       //Other assets
       .add("dialogFrame", "images/frameyboi.png")
       .add("buttonFrame", "images/buttonboi.png")
@@ -236,6 +236,9 @@ Promise.all([
     height: window.innerHeight
   }, Dialogue.loadJsonFile("testTree"));
   document.body.appendChild(app.view);
+
+  //lock for mobile devices
+  screen.orientation.lock('landscape');
 
   ["mouseup", "touchend"].forEach((eventName)=>{
     app.view.addEventListener(eventName, ()=>{

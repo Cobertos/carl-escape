@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import WebFont from "webfontloader";
 //import { DialogTree as dialogTree } from "./MockDialogTree.js";
 import * as Dialogue from "./dialogue_node.js";
 
@@ -25,12 +26,8 @@ class DialogSceneApp extends PIXI.Application {
     background.height= background.width*backgroundAspect;
     this.stage.addChild(background);
 
-    let box = this._dialogBox = new PIXI.Graphics();
-    box.beginFill(0xFFF0CC);
-    box.lineStyle(4, 0xFF3300, 1);
-    box.drawRect(0,0,500,200);
-    box.endFill();
-    this.stage.addChild(box);
+    this._dialogBox = new PIXI.Container();
+    this.stage.addChild(this._dialogBox);
     let frame = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.dialogFrame.texture, 117, 117, 117, 117);
     frame.width = 1000;
     frame.height = 400;
@@ -38,12 +35,12 @@ class DialogSceneApp extends PIXI.Application {
     frame.scale.y = 0.5;
     this._dialogBox.addChild(frame);
 
-    let name = this._dialogName = new PIXI.Text("NAME", {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'center'});
+    let name = this._dialogName = new PIXI.Text("NAME", {fontFamily : 'Varela Round', fontSize: 24, fill : 0x000000, align : 'center'});
     name.position.x = 50;
     name.position.y = 50;
     this._dialogBox.addChild(name);
 
-    let text = this._dialogText = new PIXI.Text("Initial Text", {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'left', wordWrap: true, wordWrapWidth: 400});
+    let text = this._dialogText = new PIXI.Text("Initial Text", {fontFamily : 'Varela Round', fontSize: 24, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: 400});
     text.position.x = 50;
     text.position.y = 80;
     this._dialogInterval = undefined;
@@ -99,21 +96,22 @@ class DialogSceneApp extends PIXI.Application {
 
     if(options) {
       options.forEach((option, idx)=>{
-        let button = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.buttonFrame.texture, 117, 117, 117, 117);
-        button.width = 200 * 4;
-        button.height = 70 * 4;
-        button.scale.x = 0.25;
-        button.scale.y = 0.25;
-        button.position.x = 30;
-        button.position.y = 30 + 50 * idx;
+        let button = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.buttonFrame.texture, 231, 214, 231, 214);
+        button.width = 300 * 8;
+        button.height = 80 * 8;
+        button.scale.x = 0.125;
+        button.scale.y = 0.125;
+        button.position.x = 10;
+        button.position.y = 10 + 80 * idx;
         this.stage.addChild(button);
 
-        let buttonText = new PIXI.Text(option.text, {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'left'});
-        buttonText.position.x = 20 * 4;
-        buttonText.position.y = 20 * 4;
-        buttonText.scale.x = 4;
-        buttonText.scale.y = 4;
+        let buttonText = new PIXI.Text(option.text, {fontFamily : 'Varela Round', fontSize: 24, fill : 0x000000, align : 'left'});
+        buttonText.anchor.y = 0.5;
         button.addChild(buttonText);
+        buttonText.position.x = 30 * 8;
+        buttonText.position.y = 80/2 * 8;
+        buttonText.scale.x = 8;
+        buttonText.scale.y = 8;
 
         button.interactive = true;
         button.buttonMode = true;
@@ -206,34 +204,47 @@ class DialogSceneApp extends PIXI.Application {
 
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{
-PIXI.loader
-  //Backgrounds
-  .add("bedroom", "images/bedroom.png")
-  //Characters
-  .add("carl", "images/crepycarl.png")
-  .add("mc", "images/mc.png")
-  //Other assets
-  .add("dialogFrame", "images/frameyboi.png")
-  .add("buttonFrame", "images/frameyboi.png")
-  .load(()=>{
-    //WIRE UP THE APP
-    const app = new DialogSceneApp({
-      antialias: true,
-      width: window.innerWidth,
-      height: window.innerHeight
-    }, Dialogue.loadJsonFile("testTree"));
-    document.body.appendChild(app.view);
+Promise.all([
+  new Promise((resolve, reject)=>{
+    WebFont.load({
+      active: resolve,
+      google: {
+        families: ['Varela Round', 'ZCOOL KuaiLe']
+      }
+    });
+  }),
+  new Promise((resolve, reject)=>{
+    PIXI.loader
+      //Backgrounds
+      .add("bedroom", "images/bedroom.png")
+      //Characters
+      .add("carl", "images/crepycarl.png")
+      .add("mc", "images/mc.png")
+      //Other assets
+      .add("dialogFrame", "images/frameyboi.png")
+      .add("buttonFrame", "images/buttonboi.png")
+      .load(resolve);
+  }),
+  new Promise((resolve, reject)=>{
+    document.addEventListener("DOMContentLoaded", resolve);
+  })
+]).then(()=>{
+  //WIRE UP THE APP
+  const app = new DialogSceneApp({
+    antialias: true,
+    width: window.innerWidth,
+    height: window.innerHeight
+  }, Dialogue.loadJsonFile("testTree"));
+  document.body.appendChild(app.view);
 
-    ["mouseup", "touchend"].forEach((eventName)=>{
-      app.view.addEventListener(eventName, ()=>{
-        if(app.isTyping) {
-          app.stopTyping();
-        }
-        else {
-          app.nextScene();
-        }
-      });
+  ["mouseup", "touchend"].forEach((eventName)=>{
+    app.view.addEventListener(eventName, ()=>{
+      if(app.isTyping) {
+        app.stopTyping();
+      }
+      else {
+        app.nextScene();
+      }
     });
   });
 });

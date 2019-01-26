@@ -66,7 +66,7 @@ class DialogSceneApp extends PIXI.Application {
 
   nextScene(){
     this._currentPrompt = this.dialogTree.getPrompt();
-    let { placement, name } = this._currentPrompt;
+    let { placement, name, options } = this._currentPrompt;
     let boxBounds = this._dialogBox.getBounds();
     this._dialogBox.x = placement === "left" ? SCREEN_PADDING : (this.screen.width - SCREEN_PADDING - boxBounds.width);
     this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
@@ -79,6 +79,26 @@ class DialogSceneApp extends PIXI.Application {
     this._rightFace.x = (this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width);
     this._rightFace.y = this.screen.height/3;
     this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
+
+    if(options) {
+      options.forEach((option, idx)=>{
+        let button = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.buttonFrame.texture, 117, 117, 117, 117);
+        button.width = 200 * 4;
+        button.height = 70 * 4;
+        button.scale.x = 0.25;
+        button.scale.y = 0.25;
+        button.position.x = 30;
+        button.position.y = 30 + 50 * idx;
+        this._dialogBox.addChild(button);
+
+        let buttonText = new PIXI.Text(option, {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'left'});
+        buttonText.position.x = 20 * 4;
+        buttonText.position.y = 20 * 4;
+        buttonText.scale.x = 4;
+        buttonText.scale.y = 4;
+        button.addChild(buttonText);
+      });
+    }
 
     this.startTyping();
   }
@@ -109,7 +129,7 @@ class DialogSceneApp extends PIXI.Application {
 
   endCurrentTypingPhrase() {
     this.stopTyping();
-    this._dialogText.text = this._dialogCurrentPhrase;
+    this._dialogText.text = this._currentPrompt.phrase;
   }
 }
 
@@ -122,6 +142,7 @@ PIXI.loader
   .add("mc", "images/mc.png")
   //Other assets
   .add("dialogFrame", "images/frameyboi.png")
+  .add("buttonFrame", "images/frameyboi.png")
   .load(()=>{
     //WIRE UP THE APP
     const app = new DialogSceneApp({

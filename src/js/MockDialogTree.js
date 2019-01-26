@@ -22,6 +22,12 @@ const DialogTree = {
       name: "MC",
       phrase: "Time to summon that demon",
       background: "bedroom"
+    },{
+      placement: "left",
+      name: "MC",
+      phrase: "Make a choice",
+      options: ["amd", "hello"],
+      background: "bedroom"
     }][this.counter];
   }
 };

@@ -44208,6 +44208,12 @@ var DialogTree = {
       name: "MC",
       phrase: "Time to summon that demon",
       background: "bedroom"
+    }, {
+      placement: "left",
+      name: "MC",
+      phrase: "Make a choice",
+      options: ["amd", "hello"],
+      background: "bedroom"
     }][this.counter];
   }
 };
@@ -44330,10 +44336,13 @@ function (_PIXI$Application) {
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogSceneApp, [{
     key: "nextScene",
     value: function nextScene() {
+      var _this2 = this;
+
       this._currentPrompt = this.dialogTree.getPrompt();
       var _this$_currentPrompt = this._currentPrompt,
           placement = _this$_currentPrompt.placement,
-          name = _this$_currentPrompt.name;
+          name = _this$_currentPrompt.name,
+          options = _this$_currentPrompt.options;
 
       var boxBounds = this._dialogBox.getBounds();
 
@@ -44346,12 +44355,39 @@ function (_PIXI$Application) {
       this._rightFace.x = this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width;
       this._rightFace.y = this.screen.height / 3;
       this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
+
+      if (options) {
+        options.forEach(function (option, idx) {
+          var button = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.buttonFrame.texture, 117, 117, 117, 117);
+          button.width = 200 * 4;
+          button.height = 70 * 4;
+          button.scale.x = 0.25;
+          button.scale.y = 0.25;
+          button.position.x = 30;
+          button.position.y = 30 + 50 * idx;
+
+          _this2._dialogBox.addChild(button);
+
+          var buttonText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"](option, {
+            fontFamily: 'Arial',
+            fontSize: 24,
+            fill: 0xff1010,
+            align: 'left'
+          });
+          buttonText.position.x = 20 * 4;
+          buttonText.position.y = 20 * 4;
+          buttonText.scale.x = 4;
+          buttonText.scale.y = 4;
+          button.addChild(buttonText);
+        });
+      }
+
       this.startTyping();
     }
   }, {
     key: "startTyping",
     value: function startTyping() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this._dialogInterval) {
         //Clear previous dialog
@@ -44363,11 +44399,11 @@ function (_PIXI$Application) {
 
       var currLetter = 0;
       this._dialogInterval = setInterval(function () {
-        _this2._dialogText.text = letters.slice(0, currLetter).join("");
+        _this3._dialogText.text = letters.slice(0, currLetter).join("");
         currLetter++;
 
-        if (currLetter > _this2._currentPrompt.phrase.length) {
-          _this2.stopTyping();
+        if (currLetter > _this3._currentPrompt.phrase.length) {
+          _this3.stopTyping();
 
           return;
         }
@@ -44383,7 +44419,7 @@ function (_PIXI$Application) {
     key: "endCurrentTypingPhrase",
     value: function endCurrentTypingPhrase() {
       this.stopTyping();
-      this._dialogText.text = this._dialogCurrentPhrase;
+      this._dialogText.text = this._currentPrompt.phrase;
     }
   }, {
     key: "isTyping",
@@ -44399,7 +44435,7 @@ document.addEventListener("DOMContentLoaded", function () {
   pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
   .add("bedroom", "images/bedroom.png") //Characters
   .add("carl", "images/crepycarl.png").add("mc", "images/mc.png") //Other assets
-  .add("dialogFrame", "images/frameyboi.png").load(function () {
+  .add("dialogFrame", "images/frameyboi.png").add("buttonFrame", "images/frameyboi.png").load(function () {
     //WIRE UP THE APP
     var app = new DialogSceneApp({
       antialias: true,

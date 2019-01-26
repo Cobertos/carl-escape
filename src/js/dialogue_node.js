@@ -1,4 +1,4 @@
-import testTree from "./test.js";
+import testTree from "./json/test.js";
 
 class DialogueTree {
     constructor(name, nodes) {
@@ -99,7 +99,7 @@ class DialogueTree {
             let nodeJson = json.nodes[i];
             ret.nodes.push(DialogueNode.fromJson(nodeJson));
         }
-
+        ret.selectNode(0);
         return ret;
     }
 }
@@ -201,15 +201,26 @@ function test(){
 // returns DialogueTree for jsonFile
 function loadJsonFile(fileName){
     let json = getJsonByFile(fileName);
-    return DialogueTree.fromJson(json);
+    
+    let ret = DialogueTree.fromJson(json);
+
+    if(ret == null){
+        console.error("Couldn't parse file " + fileName);
+    }
+
+    return ret;
 }
 
 function getJsonByFile(fileName){
     let objects = {
         "testTree" : testTree
     };
+    let ret = objects[fileName];
+    if(ret == null){
+        console.error(fileName + " was Null.");
+    }
 
-    return objects[fileName];
+    return ret;
 }
 
 function getTestJson(){
@@ -288,7 +299,7 @@ function getTestJson(){
 
 
 
-test();
+//test();
 
 export {
     DialogueTree,

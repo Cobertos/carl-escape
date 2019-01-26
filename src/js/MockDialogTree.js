@@ -5,19 +5,23 @@ const DialogTree = {
     return [{
       placement: "left",
       name: "MC",
-      phrase: "Wow I wish I had a friend for my birthday"
+      phrase: "Wow I wish I had a friend for my birthday",
+      background: "bedroom"
     },{
       placement: "right",
       name: "CrepyCarl",
-      phrase: "HEy man ill be your friend"
+      phrase: "HEy man ill be your friend",
+      background: "bedroom"
     },{
       placement: "left",
       name: "MC",
-      phrase: "Not you carl :("
+      phrase: "Not you carl :(",
+      background: "bedroom"
     },{
       placement: "left",
       name: "MC",
-      phrase: "Time to summon that demon"
+      phrase: "Time to summon that demon",
+      background: "bedroom"
     }][this.counter];
   }
 };

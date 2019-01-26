@@ -44191,19 +44191,23 @@ var DialogTree = {
     return [{
       placement: "left",
       name: "MC",
-      phrase: "Wow I wish I had a friend for my birthday"
+      phrase: "Wow I wish I had a friend for my birthday",
+      background: "bedroom"
     }, {
       placement: "right",
       name: "CrepyCarl",
-      phrase: "HEy man ill be your friend"
+      phrase: "HEy man ill be your friend",
+      background: "bedroom"
     }, {
       placement: "left",
       name: "MC",
-      phrase: "Not you carl :("
+      phrase: "Not you carl :(",
+      background: "bedroom"
     }, {
       placement: "left",
       name: "MC",
-      phrase: "Time to summon that demon"
+      phrase: "Time to summon that demon",
+      background: "bedroom"
     }][this.counter];
   }
 };
@@ -44258,6 +44262,13 @@ function (_PIXI$Application) {
     _this.dialogTree = dialogTree;
     _this._currentPrompt = undefined; //Add all the elements
 
+    var background = _this._background = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.bedroom.texture);
+    var backgroundAspect = background.height / background.width;
+    background.width = _this.screen.width;
+    background.height = background.width * backgroundAspect;
+
+    _this.stage.addChild(background);
+
     var box = _this._dialogBox = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
     box.beginFill(0xFFF0CC);
     box.lineStyle(4, 0xFF3300, 1);
@@ -44292,14 +44303,14 @@ function (_PIXI$Application) {
     var face1 = _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.mc.texture);
     var face1Aspect = face1.height / face1.width;
     face1.width = 400;
-    face1.height = 400 * face1Aspect;
+    face1.height = face1.width * face1Aspect;
 
     _this.stage.addChild(face1);
 
     var face2 = _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.carl.texture);
     var face2Aspect = face2.height / face2.width;
     face2.width = 400;
-    face2.height = 400 * face2Aspect;
+    face2.height = face2.width * face2Aspect;
 
     _this.stage.addChild(face2);
 

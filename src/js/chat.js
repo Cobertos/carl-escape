@@ -11,6 +11,14 @@ class DialogSceneApp extends PIXI.Application {
     this._currentPrompt = undefined;
 
     //Add all the elements
+    let background = this._background = new PIXI.Sprite(
+      PIXI.loader.resources.bedroom.texture
+    );
+    let backgroundAspect = background.height/background.width;
+    background.width = this.screen.width;
+    background.height= background.width*backgroundAspect;
+    this.stage.addChild(background);
+
     let box = this._dialogBox = new PIXI.Graphics();
     box.beginFill(0xFFF0CC);
     box.lineStyle(4, 0xFF3300, 1);
@@ -34,7 +42,7 @@ class DialogSceneApp extends PIXI.Application {
     );
     let face1Aspect = face1.height/face1.width;
     face1.width = 400;
-    face1.height= 400*face1Aspect;
+    face1.height= face1.width*face1Aspect;
     this.stage.addChild(face1);
 
     let face2 = this._rightFace = new PIXI.Sprite(
@@ -42,7 +50,7 @@ class DialogSceneApp extends PIXI.Application {
     );
     let face2Aspect = face2.height/face2.width;
     face2.width = 400;
-    face2.height= 400*face2Aspect;
+    face2.height= face2.width*face2Aspect;
     this.stage.addChild(face2);
   }
 

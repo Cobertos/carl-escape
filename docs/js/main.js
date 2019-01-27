@@ -45453,6 +45453,8 @@ function (_PIXI$Application) {
 
     _this.stage.addChild(face2);
 
+    _this.nextScene();
+
     return _this;
   }
 
@@ -45732,16 +45734,6 @@ Promise.all([new Promise(function (resolve, reject) {
     screen.orientation.lock('landscape');
   }
   catch(e) {}*/
-
-  ["mouseup", "touchend"].forEach(function (eventName) {
-    app.view.addEventListener(eventName, function () {
-      if (app.isTyping) {
-        app.stopTyping();
-      } else {
-        app.nextScene();
-      }
-    });
-  });
 });
 
 /***/ }),

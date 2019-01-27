@@ -66,6 +66,8 @@ class DialogSceneApp extends PIXI.Application {
     face2.width = this.screen.width/2.8;
     face2.height= face2.width*face2Aspect;
     this.stage.addChild(face2);
+
+    this.nextScene();
   }
 
   get isTyping(){
@@ -322,15 +324,4 @@ Promise.all([
     screen.orientation.lock('landscape');
   }
   catch(e) {}*/
-
-  ["mouseup", "touchend"].forEach((eventName)=>{
-    app.view.addEventListener(eventName, ()=>{
-      if(app.isTyping) {
-        app.stopTyping();
-      }
-      else {
-        app.nextScene();
-      }
-    });
-  });
 });

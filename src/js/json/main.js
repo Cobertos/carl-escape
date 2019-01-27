@@ -16,7 +16,7 @@ export default {
                 {
                     destination : 2,
                     text : 'Hit the snooze button',
-                    actions : [],
+                    actions : ["Casual"],
                     checks : [],
                 }
 
@@ -78,7 +78,7 @@ export default {
                 },
                 {
                     destination : 6,
-                    text : "You'll pick up something on your lunch break.",
+                    text : "You'll grab fast food on break.",
                     actions : [],
                     checks : [],
                 }
@@ -159,13 +159,13 @@ export default {
         },
         {
             id : 8,
-            prompt : " ",
-            speaker: "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
+            prompt : "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
+            speaker: "",
             background : "frontyard",
             options : [
                 {
                     destination : 10,
-                    text : "I told you to go home when I saw you in my bushes two days ago, Carl.",
+                    text : "You've been in my bushes for two days.",
                     actions : [],
                     checks : [],
                 }
@@ -180,7 +180,7 @@ export default {
             options : [
                 {
                     destination : 10,
-                    text : "I told you to go home when I saw you in my bushes two days ago, Carl.",
+                    text : "You've been in my bushes for two days.",
                     actions : [],
                     checks : [],
                 }
@@ -195,7 +195,7 @@ export default {
             options : [
                 {
                     destination : 11,
-                    text : "Ok, but I didn't want you here in the first place",
+                    text : "I didn't want you here in the first place",
                     actions : [],
                     checks : [],
                 },
@@ -264,7 +264,7 @@ export default {
                 },
                 {
                     destination : 15,
-                    text : "Hmmm, looks like I'll have to work from home today.",
+                    text : "Looks like I have to work at home today.",
                     actions : [],
                     checks : [],
                 }
@@ -294,7 +294,7 @@ export default {
             options : [
                 {
                     destination : 16,
-                    text : "Ummm, that's not necessary. [Get out of your car.]",
+                    text : "That's not necessary. [Get out of your car.]",
                     actions : ["PlayGameEasy"],
                     checks : [],
                 }
@@ -309,13 +309,13 @@ export default {
             options : [
                 {
                     destination : 17,
-                    text : "You safely exit your car and put a little distance between Carl and yourself.",
+                    text : "You exit your car.",
                     actions : [],
                     checks : ["WinGameEasy"],
                 },
                 {
                     destination : 17,
-                    text : "You fumble with the handle, stumble out of the vehicle, and notice Carl directly behind you. 'Gotta be faster than that'.",
+                    text : "Carl follows closely.",
                     actions : [],
                     checks : ["LoseGameEasy"],
                 }
@@ -422,13 +422,13 @@ export default {
             options : [
                 {
                     destination : 24,
-                    text : "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
+                    text : "[You retreat to your front door.]",
                     actions : [],
                     checks : ["WinGameNormal"],
                 },
                 {
                     destination : 25,
-                    text : "[Carl noticed you trying to reach your front door. He's standing uncomfortably close to you.]",
+                    text : "[Carl noticed. He's uncomfortably close.]",
                     actions : [],
                     checks : ["LoseGameNormal"],
                 }
@@ -443,13 +443,13 @@ export default {
             options : [
                 {
                     destination : 24,
-                    text : "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
+                    text : "[You retreat to your front door.]",
                     actions : ["WinGameNormal"],
                     checks : [],
                 },
                 {
                     destination : 25,
-                    text : "[Carl noticed you trying to reach your front door. He's standing uncomfortably close to you.]",
+                    text : "[Carl noticed. He's uncomfortably close.]",
                     actions : ["LoseGameNormal"],
                     checks : [],
                 }
@@ -464,12 +464,12 @@ export default {
             options : [
                 {
                     destination : 26,
-                    text : "[Discretely fish your key out of your pocket.]",
+                    text : "[Fish your key out of your pocket.]",
                     actions : [],
                     checks : [],
                 },
                 {
-                    destination : 25,
+                    destination : 27,
                     text : "[Ask Carl to go home.]",
                     actions : [],
                     checks : [],
@@ -479,19 +479,19 @@ export default {
         },
         {
             id : 25,
-            prompt : "Oh, are you trying to invite me inside? owo I suppose I could come in for a bit.",
+            prompt : "Oh, are you trying to invite me inside? owo",
             speaker: "Carl",
             background : "frontyard",
             options : [
                 {
                     destination : 28,
-                    text : "Wha-nonononono, that's not what I meant.",
+                    text : "Wha-nononono, that's not what I meant.",
                     actions : [],
                     checks : [],
                 },
                 {
                     destination : 28,
-                    text : "Actually, I have some work I need to get done on my own.",
+                    text : "I have some work I need to get done...",
                     actions : [],
                     checks : [],
                 }
@@ -500,13 +500,13 @@ export default {
         },
         {
             id : 26,
-            prompt : "Hey, watcha doin'? Trying to get me to come in for a drink? Well, if you insist.",
+            prompt : "Trying to get me to come in for a drink~?",
             speaker: "Carl",
             background : "frontyard",
             options : [
                 {
                     destination : 28,
-                    text : "Actually, I have some work that I need to get done on my own.",
+                    text : "I have some work I need to do...",
                     actions : [],
                     checks : [],
                 },
@@ -521,19 +521,19 @@ export default {
         },
         {
             id : 27,
-            prompt : "I did go home. I mean, I went to your home, anyway. That's better~",
+            prompt : "I went to your home. That's better~",
             speaker: "Carl",
             background : "frontyard",
             options : [
                 {
                     destination : 29,
-                    text : "No, go to your actual place of living.",
+                    text : "No, go to your actual house.",
                     actions : [],
                     checks : [],
                 },
                 {
                     destination : 29,
-                    text : "Listen, I don't care where you go, as long as you leave my property.",
+                    text : "Please just leave, Carl.",
                     actions : [],
                     checks : [],
                 }
@@ -548,7 +548,7 @@ export default {
             options : [
                 {
                     destination : 30,
-                    text : "Put your key in the lock and get into your house.",
+                    text : "Unlock your front door!",
                     actions : ["PlayGameKey"],
                     checks : [],
                 }
@@ -563,7 +563,7 @@ export default {
             options : [
                 {
                     destination : 30,
-                    text : "Put your key in the lock and get into your house.",
+                    text : "Unlock your front door!",
                     actions : ["PlayGameKey"],
                     checks : [],
                 }
@@ -578,13 +578,13 @@ export default {
             options : [
                 {
                     destination : 31,
-                    text : "You did it! You now have a door between yourself and Carl.",
+                    text : "You did it! You're back inside.",
                     actions : [],
                     checks : ["WinGameKey"],
                 },
                 {
                     destination : 32,
-                    text : "You feel Carl's arms slip around you from behind in an intimately awkward hug.",
+                    text : "Carl's arms slip around you in a hug.",
                     actions : [],
                     checks : ["LoseGameKey"],
                 }
@@ -599,7 +599,7 @@ export default {
             options : [
                 {
                     destination : 33,
-                    text : "Ignore him",
+                    text : "Ignore him.",
                     actions : [],
                     checks : [],
                 }
@@ -629,7 +629,7 @@ export default {
             options : [
                 {
                     destination : -1,
-                    text : "Put some headphones in and enjoy the rest of your day home.",
+                    text : "You're safe in your home... For now.",
                     actions : [],
                     checks : [],
                 }
@@ -644,12 +644,12 @@ export default {
             options : [
                 {
                     destination : 31,
-                    text : "[You break free long enough to unlock your door and separate yourself from Carl.]",
+                    text : "[You're free long enough to unlock your door.]",
                     actions : [],
                     checks : ["WinGameHard"],
                 },
                 {
-                    destination : -1,
+                    destination : 35,
                     text : "[Carl tells you how soft your skin is.]",
                     actions : [],
                     checks : ["LoseGameHard"],
@@ -659,13 +659,13 @@ export default {
         },
         {
             id : 35,
-            prompt : "[You are trapped in a seemingly endless hug from Carl. There is no escape.]",
+            prompt : "[There is no escape.]",
             speaker: "",
             background : "bedroom",
             options : [
                 {
                     destination : -1,
-                    text : "[Wait for Carl to get tired so you can go back inside.]",
+                    text : "[You've lost the safety of your home. :()]",
                     actions : [],
                     checks : [],
                 }

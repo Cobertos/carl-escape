@@ -10,6 +10,11 @@ import {Howl, Howler} from 'howler';
 const TYPING_SPEED = 10; //ms between letter
 const SCREEN_PADDING = 20;
 
+const BACKGROUND_TO_URL = {
+  "bedroom": "images/bedroom.png",
+  "frontyard": "images/frontyard.png"
+};
+
 class DialogSceneApp extends PIXI.Application {
   constructor(options, dialogTree){
     super(options);
@@ -22,13 +27,10 @@ class DialogSceneApp extends PIXI.Application {
     this._currentPrompt = undefined;
 
     //Add all the elements
-    let background = this._background = new PIXI.Sprite(
-      PIXI.loader.resources.bedroom.texture
-    );
-    let backgroundAspect = background.height/background.width;
-    background.width = this.screen.width;
-    background.height= background.width*backgroundAspect;
-    this.stage.addChild(background);
+    let background = this._background = document.createElement("div");
+    background.classList.add("bg");
+    document.body.appendChild(background);
+    background.style.backgroundImage = `url(${BACKGROUND_TO_URL["bedroom"]})`;
 
     this._dialogBox = new PIXI.Container();
     this.stage.addChild(this._dialogBox);
@@ -65,6 +67,8 @@ class DialogSceneApp extends PIXI.Application {
     face2.width = this.screen.width/2.8;
     face2.height= face2.width*face2Aspect;
     this.stage.addChild(face2);
+
+    this.nextScene();
   }
 
   get isTyping(){
@@ -77,9 +81,14 @@ class DialogSceneApp extends PIXI.Application {
     //let { placement, name, options } = this._currentPrompt;
 
     let placement = "left";
-    let name = "Test";
+    let name = "Test"; //TODO: Add name here from this.dialogTree?
     let options = this.dialogTree.options(this.actions);
+    //TODO: Add background grabbing code and name
+    let background = "bedroom";
     
+    //Set background image
+    this._background.style.backgroundImage = `url(${BACKGROUND_TO_URL[background]})`;
+
     for(let i in this.optionButtons){
       this.stage.removeChild(this.optionButtons[i]);
     }
@@ -313,9 +322,6 @@ Promise.all([
   }),
   new Promise((resolve, reject)=>{
     PIXI.loader
-      //Backgrounds
-      .add("bedroom", "images/bedroom.png")
-      .add("frontyard", "images/frontyard.png")
       //Characters
       .add("carl", "images/crepycarl-clothed.png")
       .add("mc", "images/mc-clothed.png")
@@ -334,7 +340,8 @@ Promise.all([
   const app = new DialogSceneApp({
     antialias: true,
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
+    transparent: true
   }, Dialogue.loadJsonFile("mainTree"));
   document.body.appendChild(app.view);
   app.playSound("audio/Unsettle1.wav");
@@ -343,15 +350,4 @@ Promise.all([
     screen.orientation.lock('landscape');
   }
   catch(e) {}*/
-
-  ["mouseup", "touchend"].forEach((eventName)=>{
-    app.view.addEventListener(eventName, ()=>{
-      if(app.isTyping) {
-        app.stopTyping();
-      }
-      else {
-        app.nextScene();
-      }
-    });
-  });
 });

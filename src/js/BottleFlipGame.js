@@ -5,9 +5,12 @@ import { QuickParticleSystem } from "./engine/QuickParticleSystem.js";
 const dist = (point)=>Math.sqrt(Math.pow(point.x,2) + Math.pow(point.y,2))
 const COUNTDOWN_LENGTH = 20;
 
-class KeyFlipGameApp extends PIXI.Application {
+class KeyFlipGame extends PIXI.Container {
   constructor(options){
     super(options);
+    this.intrinsicWidth = options.intrinsicWidth || 500;
+    this.intrinsicHeight = options.intrinsicHeight || 200;
+
     this._started = false;
     this._stopped = false;
     this._spawnTime = Date.now();
@@ -19,13 +22,22 @@ class KeyFlipGameApp extends PIXI.Application {
     this._timeText = new PIXI.Text(COUNTDOWN_LENGTH+"",
       {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
         stroke: 0x000000, strokeThickness: 20 });
-    this._timeText.position.x = this.screen.width/2;
-    this._timeText.position.y = this.screen.height/2;
-    this._timeText._initialWidth = this._timeText.width;
-    this._timeText._initialHeight = this._timeText.height;
+    this._timeText.position.x = this.intrinsicWidth/2;
+    this._timeText.position.y = this.intrinsicHeight/2;
+    this._timeText._initialPosition = new PIXI.Point(this.intrinsicWidth/2, this.intrinsicHeight/2);;
     this._timeText.visible = false;
     this._timeText.anchor.set(0.5);
-    this.stage.addChild(this._timeText);
+    this.addChild(this._timeText);
+
+    this._doorImage = new PIXI.Sprite(PIXI.loader.resources.door.texture);
+    this._doorImage.anchor.set(1,0);
+    this._doorImage.position.x = this.intrinsicWidth;
+    this._doorImage.position.y = 0;
+    let doorAspect = this._doorImage.width/this._doorImage.height;
+    this._doorImage.height= this.intrinsicHeight;
+    this._doorImage.width = this._doorImage.height*doorAspect;
+    this.addChild(this._doorImage);
+
 
     //Add all the elements
     class Key extends WithPhysics(PIXI.Sprite) {
@@ -108,7 +120,7 @@ class KeyFlipGameApp extends PIXI.Application {
           return;
         }
         this.dragging = false;
-        key.acceleration.y = -9.8*300; //gravity, 9.8m/s^2 * 450 pixels / meter?
+        key.acceleration.y = -9.8*300; //gravity, 9.8m/s^2 * 300 pixels / meter?
 
         //TODO
         //set anchor to middle but keep key position
@@ -161,10 +173,18 @@ class KeyFlipGameApp extends PIXI.Application {
         this.angularVelocity = 0;
         this.linearVelocity = 0;
       }
+
+      bonk() {
+        this.dragging = false;
+        this.acceleration.set(0, -9.8*300); //gravity in y
+        this.velocity.x = -500;
+        this.angularVelocity = 0;
+        this.linearVelocity = 0;
+      }
     }
 
     let key = this._key = new Key();
-    this.stage.addChild(key);
+    this.addChild(key);
 
     //Landing pad for the key
     let self = this;
@@ -178,7 +198,7 @@ class KeyFlipGameApp extends PIXI.Application {
           return;
         }
         let rot = Math.abs(key.rotation % (Math.PI*2));
-        let inRotationRange = rot > Math.PI*2 - 0.1 || rot < 0 + 0.1;
+        let inRotationRange = rot > Math.PI*2 - Math.PI/5 || rot < 0 + Math.PI/5; //tolerance in radians
         if(inRotationRange) {
           this._keyTime = Date.now();
           key.tint = 0xFFFF00;
@@ -193,7 +213,7 @@ class KeyFlipGameApp extends PIXI.Application {
           this._blinkEffect.x = key.position.x + key.width/2;
           this._blinkEffect.y = key.position.y;
           this._blinkEffect.anchor.set(0.5);
-          self.stage.addChild(this._blinkEffect);
+          self.addChild(this._blinkEffect);
 
           //Star particles
           this._particleSystem = new QuickParticleSystem({
@@ -211,13 +231,14 @@ class KeyFlipGameApp extends PIXI.Application {
             });
           this._particleSystem.x = key.position.x + key.width/2;
           this._particleSystem.y = key.position.y;
-          self.stage.addChild(this._particleSystem);
+          self.addChild(this._particleSystem);
 
           self.win();
         }
         else {
           key.angularAcceleration = 0;
           key.angularVelocity /= 4;
+          key.bonk();
         }
       }
 
@@ -239,11 +260,28 @@ class KeyFlipGameApp extends PIXI.Application {
     }
     this._landingArea = new KeyHole();
     this._landingArea.beginFill(0xFFFF55);
-    this._landingArea.drawRectBound = this._landingArea.drawRect.bind(this._landingArea,
-      this.screen.width-20, this.screen.height/2, 20, this.screen.height/6);
-    this._landingArea.drawRectBound();
+    let lockHeight = this.intrinsicHeight/9;
+    this._landingArea.drawRect(this.intrinsicWidth-(380*this._doorImage.width/681), this.intrinsicHeight/2-lockHeight/2, 20, lockHeight);
     this._landingArea.endFill();
-    this.stage.addChild(this._landingArea);
+    this._landingArea.visible = false;
+    this.addChild(this._landingArea);
+
+    class Wall extends WithPhysics(PIXI.Graphics) {
+      onCollision(otherObj){
+        if(key._frozen || otherObj !== key) {
+          return;
+        }
+        key.angularAcceleration = 0;
+        key.angularVelocity /= 4;
+        key.bonk();
+      }
+    }
+    this._wall = new Wall();
+    this._wall.beginFill(0x55FF55);
+    this._wall.drawRect(this.intrinsicWidth-(360*this._doorImage.width/681), 0, 20, this.intrinsicHeight);
+    this._wall.endFill();
+    this._wall.visible = false;
+    this.addChild(this._wall);
 
     class Floor extends WithPhysics(PIXI.Graphics) {
       onCollision(otherObj){
@@ -259,21 +297,21 @@ class KeyFlipGameApp extends PIXI.Application {
     this._floor = new Floor();
     this._floor.beginFill(0x555555);
     this._floor.drawRectBound = this._floor.drawRect.bind(this._floor,
-      0, this.screen.height-20, this.screen.width, 20);
+      0, this.intrinsicHeight-20, this.intrinsicWidth, 20);
     this._floor.drawRectBound();
     this._floor.endFill();
-    this.stage.addChild(this._floor);
+    this.addChild(this._floor);
 
     //Win loss stuff
     this._instructText = new PIXI.Text("PUT THE KEY IN",
       {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
         stroke: 0x000000, strokeThickness: 20 });
-    this._instructText.position.x = this.screen.width/2;
-    this._instructText.position.y = this.screen.height/2;
+    this._instructText.position.x = this.intrinsicWidth/2;
+    this._instructText.position.y = this.intrinsicHeight/2;
     this._instructText._initialWidth = this._instructText.width;
     this._instructText._initialHeight = this._instructText.height;
     this._instructText.anchor.set(0.5);
-    this.stage.addChild(this._instructText);
+    this.addChild(this._instructText);
 
     this._arrowSprite = new PIXI.Sprite(PIXI.loader.resources.arrow.texture);
     this._arrowSprite.position.x = 50;
@@ -281,37 +319,37 @@ class KeyFlipGameApp extends PIXI.Application {
     let arrowAspect = this._arrowSprite.height/this._arrowSprite.width;
     this._arrowSprite.width = 200;
     this._arrowSprite.height= this._arrowSprite.width*arrowAspect;
-    this.stage.addChild(this._arrowSprite);
+    this.addChild(this._arrowSprite);
 
-    this._winText = new PIXI.Text("AYYY YOU DID IT",
+    this._winText = new PIXI.Text("NAILED IT!",
       {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
         stroke: 0x000000, strokeThickness: 20 });
-    this._winText.position.x = this.screen.width/2;
-    this._winText.position.y = this.screen.height/2;
+    this._winText.position.x = this.intrinsicWidth/2;
+    this._winText.position.y = this.intrinsicHeight/2;
     this._winText._initialWidth = this._winText.width;
     this._winText._initialHeight = this._winText.height;
     this._winText.visible = false;
     this._winText.anchor.set(0.5);
-    this.stage.addChild(this._winText);
+    this.addChild(this._winText);
 
     this._loseBg = new PIXI.Graphics();
     this._loseBg.beginFill(0xFF0000);
     this._loseBg.alpha = 0.0; //fades in
-    this._loseBg.drawRect(0, 0, this.screen.width, this.screen.height);
+    this._loseBg.drawRect(0, 0, this.intrinsicWidth, this.intrinsicHeight);
     this._loseBg.endFill();
     this._loseBg.visible = false;
-    this.stage.addChild(this._loseBg);
+    this.addChild(this._loseBg);
 
     this._loseText = new PIXI.Text("N",
       {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
         stroke: 0x000000, strokeThickness: 20 });
-    this._loseText.position.x = this.screen.width/2;
-    this._loseText.position.y = this.screen.height/2;
+    this._loseText.position.x = this.intrinsicWidth/2;
+    this._loseText.position.y = this.intrinsicHeight/2;
     this._loseText._initialWidth = this._loseText.width;
     this._loseText._initialHeight = this._loseText.height;
     this._loseText.visible = false;
     this._loseText.anchor.set(0.5);
-    this.stage.addChild(this._loseText);
+    this.addChild(this._loseText);
   }
 
   win() {
@@ -348,11 +386,15 @@ class KeyFlipGameApp extends PIXI.Application {
     else if(!this._stopped) {
       let now = Date.now() - this._startedTime;
       let timeLeft = COUNTDOWN_LENGTH - now/1000;
+      let timeToGo = now/1000;
       if(timeLeft < 0) {
         this.lose();
         return;
       }
       this._timeText.text = Math.floor(timeLeft)+"";
+      this._timeText.position.set(
+        this._timeText._initialPosition.x + (Math.random()-0.5)*2*Math.max(timeToGo-10,0),
+        this._timeText._initialPosition.y + (Math.random()-0.5)*2*Math.max(timeToGo-10,0));
     }
     else {
       let now = Date.now() - this._stoppedTime;
@@ -391,15 +433,20 @@ PIXI.loader
   .add("key", "images/key.png")
   .add("star", "images/star.png")
   .add("arrow", "images/arrow.png")
+  .add("door", "images/door.png")
   .load(()=>{
     //WIRE UP THE APP
-    const app = new KeyFlipGameApp({
+    const app = new PIXI.Application({
       antialias: true,
       width: window.innerWidth,
-      height: window.innerHeight,
-      transparent: true
+      height: window.innerHeight
     });
     document.body.appendChild(app.view);
+    let game = new KeyFlipGame({
+      intrinsicWidth: app.screen.width, 
+      intrinsicHeight: app.screen.height, 
+    });
+    app.stage.addChild(game);
 
     setInterval(()=>{
       physicsLoop(app.stage);
@@ -407,7 +454,7 @@ PIXI.loader
 
     let raf;
     const loop = ()=>{
-      app.onUpdate();
+      game.onUpdate();
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);

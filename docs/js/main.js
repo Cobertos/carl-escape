@@ -44392,19 +44392,21 @@ var dist = function dist(point) {
   return Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
 };
 
-var COUNTDOWN_LENGTH = 2;
+var COUNTDOWN_LENGTH = 20;
 
-var KeyFlipGameApp =
+var KeyFlipGame =
 /*#__PURE__*/
-function (_PIXI$Application) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(KeyFlipGameApp, _PIXI$Application);
+function (_PIXI$Container) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(KeyFlipGame, _PIXI$Container);
 
-  function KeyFlipGameApp(options) {
+  function KeyFlipGame(options) {
     var _this;
 
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, KeyFlipGameApp);
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, KeyFlipGame);
 
-    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyFlipGameApp).call(this, options));
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyFlipGame).call(this, options));
+    _this.intrinsicWidth = options.intrinsicWidth || 500;
+    _this.intrinsicHeight = options.intrinsicHeight || 200;
     _this._started = false;
     _this._stopped = false;
     _this._spawnTime = Date.now();
@@ -44420,15 +44422,27 @@ function (_PIXI$Application) {
       stroke: 0x000000,
       strokeThickness: 20
     });
-    _this._timeText.position.x = _this.screen.width / 2;
-    _this._timeText.position.y = _this.screen.height / 2;
-    _this._timeText._initialWidth = _this._timeText.width;
-    _this._timeText._initialHeight = _this._timeText.height;
+    _this._timeText.position.x = _this.intrinsicWidth / 2;
+    _this._timeText.position.y = _this.intrinsicHeight / 2;
+    _this._timeText._initialPosition = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Point"](_this.intrinsicWidth / 2, _this.intrinsicHeight / 2);
+    ;
     _this._timeText.visible = false;
 
     _this._timeText.anchor.set(0.5);
 
-    _this.stage.addChild(_this._timeText); //Add all the elements
+    _this.addChild(_this._timeText);
+
+    _this._doorImage = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.door.texture);
+
+    _this._doorImage.anchor.set(1, 0);
+
+    _this._doorImage.position.x = _this.intrinsicWidth;
+    _this._doorImage.position.y = 0;
+    var doorAspect = _this._doorImage.width / _this._doorImage.height;
+    _this._doorImage.height = _this.intrinsicHeight;
+    _this._doorImage.width = _this._doorImage.height * doorAspect;
+
+    _this.addChild(_this._doorImage); //Add all the elements
 
 
     var Key =
@@ -44530,7 +44544,7 @@ function (_PIXI$Application) {
           }
 
           this.dragging = false;
-          key.acceleration.y = -9.8 * 300; //gravity, 9.8m/s^2 * 450 pixels / meter?
+          key.acceleration.y = -9.8 * 300; //gravity, 9.8m/s^2 * 300 pixels / meter?
           //TODO
           //set anchor to middle but keep key position
           //let anchorDiff = new PIXI.Point();
@@ -44585,6 +44599,16 @@ function (_PIXI$Application) {
           this.angularVelocity = 0;
           this.linearVelocity = 0;
         }
+      }, {
+        key: "bonk",
+        value: function bonk() {
+          this.dragging = false;
+          this.acceleration.set(0, -9.8 * 300); //gravity in y
+
+          this.velocity.x = -500;
+          this.angularVelocity = 0;
+          this.linearVelocity = 0;
+        }
       }]);
 
       return Key;
@@ -44592,7 +44616,7 @@ function (_PIXI$Application) {
 
     var key = _this._key = new Key();
 
-    _this.stage.addChild(key); //Landing pad for the key
+    _this.addChild(key); //Landing pad for the key
 
 
     var self = _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this));
@@ -44626,7 +44650,7 @@ function (_PIXI$Application) {
           }
 
           var rot = Math.abs(key.rotation % (Math.PI * 2));
-          var inRotationRange = rot > Math.PI * 2 - 0.1 || rot < 0 + 0.1;
+          var inRotationRange = rot > Math.PI * 2 - Math.PI / 5 || rot < 0 + Math.PI / 5; //tolerance in radians
 
           if (inRotationRange) {
             this._keyTime = Date.now();
@@ -44643,7 +44667,7 @@ function (_PIXI$Application) {
 
             this._blinkEffect.anchor.set(0.5);
 
-            self.stage.addChild(this._blinkEffect); //Star particles
+            self.addChild(this._blinkEffect); //Star particles
 
             this._particleSystem = new _engine_QuickParticleSystem_js__WEBPACK_IMPORTED_MODULE_9__["QuickParticleSystem"]({
               texture: pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.star.texture,
@@ -44660,11 +44684,12 @@ function (_PIXI$Application) {
             });
             this._particleSystem.x = key.position.x + key.width / 2;
             this._particleSystem.y = key.position.y;
-            self.stage.addChild(this._particleSystem);
+            self.addChild(this._particleSystem);
             self.win();
           } else {
             key.angularAcceleration = 0;
             key.angularVelocity /= 4;
+            key.bonk();
           }
         }
       }, {
@@ -44702,18 +44727,59 @@ function (_PIXI$Application) {
 
     _this._landingArea.beginFill(0xFFFF55);
 
-    _this._landingArea.drawRectBound = _this._landingArea.drawRect.bind(_this._landingArea, _this.screen.width - 20, _this.screen.height / 2, 20, _this.screen.height / 6);
+    var lockHeight = _this.intrinsicHeight / 9;
 
-    _this._landingArea.drawRectBound();
+    _this._landingArea.drawRect(_this.intrinsicWidth - 380 * _this._doorImage.width / 681, _this.intrinsicHeight / 2 - lockHeight / 2, 20, lockHeight);
 
     _this._landingArea.endFill();
 
-    _this.stage.addChild(_this._landingArea);
+    _this._landingArea.visible = false;
+
+    _this.addChild(_this._landingArea);
+
+    var Wall =
+    /*#__PURE__*/
+    function (_WithPhysics3) {
+      _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(Wall, _WithPhysics3);
+
+      function Wall() {
+        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Wall);
+
+        return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Wall).apply(this, arguments));
+      }
+
+      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Wall, [{
+        key: "onCollision",
+        value: function onCollision(otherObj) {
+          if (key._frozen || otherObj !== key) {
+            return;
+          }
+
+          key.angularAcceleration = 0;
+          key.angularVelocity /= 4;
+          key.bonk();
+        }
+      }]);
+
+      return Wall;
+    }(Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["WithPhysics"])(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Graphics"]));
+
+    _this._wall = new Wall();
+
+    _this._wall.beginFill(0x55FF55);
+
+    _this._wall.drawRect(_this.intrinsicWidth - 360 * _this._doorImage.width / 681, 0, 20, _this.intrinsicHeight);
+
+    _this._wall.endFill();
+
+    _this._wall.visible = false;
+
+    _this.addChild(_this._wall);
 
     var Floor =
     /*#__PURE__*/
-    function (_WithPhysics3) {
-      _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(Floor, _WithPhysics3);
+    function (_WithPhysics4) {
+      _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(Floor, _WithPhysics4);
 
       function Floor() {
         _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Floor);
@@ -44742,13 +44808,13 @@ function (_PIXI$Application) {
 
     _this._floor.beginFill(0x555555);
 
-    _this._floor.drawRectBound = _this._floor.drawRect.bind(_this._floor, 0, _this.screen.height - 20, _this.screen.width, 20);
+    _this._floor.drawRectBound = _this._floor.drawRect.bind(_this._floor, 0, _this.intrinsicHeight - 20, _this.intrinsicWidth, 20);
 
     _this._floor.drawRectBound();
 
     _this._floor.endFill();
 
-    _this.stage.addChild(_this._floor); //Win loss stuff
+    _this.addChild(_this._floor); //Win loss stuff
 
 
     _this._instructText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("PUT THE KEY IN", {
@@ -44759,14 +44825,14 @@ function (_PIXI$Application) {
       stroke: 0x000000,
       strokeThickness: 20
     });
-    _this._instructText.position.x = _this.screen.width / 2;
-    _this._instructText.position.y = _this.screen.height / 2;
+    _this._instructText.position.x = _this.intrinsicWidth / 2;
+    _this._instructText.position.y = _this.intrinsicHeight / 2;
     _this._instructText._initialWidth = _this._instructText.width;
     _this._instructText._initialHeight = _this._instructText.height;
 
     _this._instructText.anchor.set(0.5);
 
-    _this.stage.addChild(_this._instructText);
+    _this.addChild(_this._instructText);
 
     _this._arrowSprite = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.arrow.texture);
     _this._arrowSprite.position.x = 50;
@@ -44775,9 +44841,9 @@ function (_PIXI$Application) {
     _this._arrowSprite.width = 200;
     _this._arrowSprite.height = _this._arrowSprite.width * arrowAspect;
 
-    _this.stage.addChild(_this._arrowSprite);
+    _this.addChild(_this._arrowSprite);
 
-    _this._winText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("AYYY YOU DID IT", {
+    _this._winText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("NAILED IT!", {
       fontFamily: 'Impact',
       fontSize: 200,
       fill: 0xffffff,
@@ -44785,15 +44851,15 @@ function (_PIXI$Application) {
       stroke: 0x000000,
       strokeThickness: 20
     });
-    _this._winText.position.x = _this.screen.width / 2;
-    _this._winText.position.y = _this.screen.height / 2;
+    _this._winText.position.x = _this.intrinsicWidth / 2;
+    _this._winText.position.y = _this.intrinsicHeight / 2;
     _this._winText._initialWidth = _this._winText.width;
     _this._winText._initialHeight = _this._winText.height;
     _this._winText.visible = false;
 
     _this._winText.anchor.set(0.5);
 
-    _this.stage.addChild(_this._winText);
+    _this.addChild(_this._winText);
 
     _this._loseBg = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Graphics"]();
 
@@ -44801,13 +44867,13 @@ function (_PIXI$Application) {
 
     _this._loseBg.alpha = 0.0; //fades in
 
-    _this._loseBg.drawRect(0, 0, _this.screen.width, _this.screen.height);
+    _this._loseBg.drawRect(0, 0, _this.intrinsicWidth, _this.intrinsicHeight);
 
     _this._loseBg.endFill();
 
     _this._loseBg.visible = false;
 
-    _this.stage.addChild(_this._loseBg);
+    _this.addChild(_this._loseBg);
 
     _this._loseText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("N", {
       fontFamily: 'Impact',
@@ -44817,20 +44883,20 @@ function (_PIXI$Application) {
       stroke: 0x000000,
       strokeThickness: 20
     });
-    _this._loseText.position.x = _this.screen.width / 2;
-    _this._loseText.position.y = _this.screen.height / 2;
+    _this._loseText.position.x = _this.intrinsicWidth / 2;
+    _this._loseText.position.y = _this.intrinsicHeight / 2;
     _this._loseText._initialWidth = _this._loseText.width;
     _this._loseText._initialHeight = _this._loseText.height;
     _this._loseText.visible = false;
 
     _this._loseText.anchor.set(0.5);
 
-    _this.stage.addChild(_this._loseText);
+    _this.addChild(_this._loseText);
 
     return _this;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(KeyFlipGameApp, [{
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(KeyFlipGame, [{
     key: "win",
     value: function win() {
       this._stopped = true;
@@ -44873,6 +44939,7 @@ function (_PIXI$Application) {
         var _now = Date.now() - this._startedTime;
 
         var timeLeft = COUNTDOWN_LENGTH - _now / 1000;
+        var timeToGo = _now / 1000;
 
         if (timeLeft < 0) {
           this.lose();
@@ -44880,6 +44947,8 @@ function (_PIXI$Application) {
         }
 
         this._timeText.text = Math.floor(timeLeft) + "";
+
+        this._timeText.position.set(this._timeText._initialPosition.x + (Math.random() - 0.5) * 2 * Math.max(timeToGo - 10, 0), this._timeText._initialPosition.y + (Math.random() - 0.5) * 2 * Math.max(timeToGo - 10, 0));
       } else {
         var _now2 = Date.now() - this._stoppedTime;
 
@@ -44913,26 +44982,30 @@ function (_PIXI$Application) {
     }
   }]);
 
-  return KeyFlipGameApp;
-}(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Application"]);
+  return KeyFlipGame;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Container"]);
 
 document.addEventListener("DOMContentLoaded", function () {
-  pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].add("key", "images/key.png").add("star", "images/star.png").add("arrow", "images/arrow.png").load(function () {
+  pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].add("key", "images/key.png").add("star", "images/star.png").add("arrow", "images/arrow.png").add("door", "images/door.png").load(function () {
     //WIRE UP THE APP
-    var app = new KeyFlipGameApp({
+    var app = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Application"]({
       antialias: true,
       width: window.innerWidth,
-      height: window.innerHeight,
-      transparent: true
+      height: window.innerHeight
     });
     document.body.appendChild(app.view);
+    var game = new KeyFlipGame({
+      intrinsicWidth: app.screen.width,
+      intrinsicHeight: app.screen.height
+    });
+    app.stage.addChild(game);
     setInterval(function () {
       Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["physicsLoop"])(app.stage);
     }, 10);
     var raf;
 
     var loop = function loop() {
-      app.onUpdate();
+      game.onUpdate();
       raf = requestAnimationFrame(loop);
     };
 

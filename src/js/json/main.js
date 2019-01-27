@@ -159,7 +159,7 @@ export default {
         },
         {
             id : 8,
-            prompt : "",
+            prompt : " ",
             speaker: "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
             background : "background.png",
             options : [
@@ -303,7 +303,7 @@ export default {
         },
         {
             id : 16,
-            prompt : "",
+            prompt : " ",
             speaker: "",
             background : "background.png",
             options : [
@@ -311,13 +311,13 @@ export default {
                     destination : 17,
                     text : "You safely exit your car and put a little distance between Carl and yourself.",
                     actions : [],
-                    checks : [],
+                    checks : ["WinGameEasy"],
                 },
                 {
                     destination : 17,
                     text : "You fumble with the handle, stumble out of the vehicle, and notice Carl directly behind you. 'Gotta be faster than that'.",
                     actions : [],
-                    checks : [],
+                    checks : ["LoseGameEasy"],
                 }
 
             ]
@@ -410,28 +410,28 @@ export default {
         },
         {
             id : 22,
-            prompt : "",
+            prompt : " ",
             speaker: "carl",
             background : "background.png",
             options : [
                 {
                     destination : 24,
                     text : "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
-                    actions : ["WinGameNormal"],
-                    checks : [],
+                    actions : [],
+                    checks : ["WinGameNormal"],
                 },
                 {
                     destination : 25,
                     text : "[Carl noticed you trying to reach your front door. He's standing uncomfortably close to you.]",
-                    actions : ["LoseGameNormal"],
-                    checks : [],
+                    actions : [],
+                    checks : ["LoseGameNormal"],
                 }
 
             ]
         },
         {
             id : 23,
-            prompt : "",
+            prompt : " ",
             speaker: "carl",
             background : "background.png",
             options : [
@@ -566,7 +566,7 @@ export default {
         },
         {
             id : 30,
-            prompt : "",
+            prompt : " ",
             speaker: "",
             background : "background.png",
             options : [
@@ -632,7 +632,7 @@ export default {
         },
         {
             id : 34,
-            prompt : "",
+            prompt : " ",
             speaker: "",
             background : "background.png",
             options : [

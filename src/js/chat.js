@@ -136,7 +136,7 @@ class DialogSceneApp extends PIXI.Application {
 
     for(let i in actions){
       if(this.isGameAction(actions[i])){
-        this.playGame(actions[i]);
+        this.playGame(actions[i], option.destination);
         return;
       }
       else{
@@ -159,7 +159,7 @@ class DialogSceneApp extends PIXI.Application {
     return ["PlayGameEasy", "PlayGameNormal", "PlayGameHard", "PlayGameKey"].includes(action);
   }
 
-  playGame(action){
+  playGame(action, destination){
     let game;
     let teardown;
     if(action === "PlayGameEasy" || action === "PlayGameNormal" || action === "PlayGameHard"){
@@ -227,11 +227,22 @@ class DialogSceneApp extends PIXI.Application {
       raf = requestAnimationFrame(loop);
     };
     raf = requestAnimationFrame(loop);
-
+    let difficulty = action.replace("PlayGame", "");
     game.on("ended", (e)=>{
       console.log(e);
       teardown();
+
+      if(e.won){
+        console.log("Won the game!");
+        this.actions.push("WinGame" + difficulty);
+      }
+      else{
+        console.log("Lost the game");
+        this.actions.push("LoseGame" + difficulty);
+      }
       this.stage.removeChild(game);
+      this.dialogTree.selectNode(destination);
+      this.nextScene();
     });
   }
 
@@ -298,7 +309,7 @@ Promise.all([
     antialias: true,
     width: window.innerWidth,
     height: window.innerHeight
-  }, Dialogue.loadJsonFile("testTree"));
+  }, Dialogue.loadJsonFile("mainTree"));
   document.body.appendChild(app.view);
 
   //lock for mobile devices (throws if device doesn't support)

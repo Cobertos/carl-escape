@@ -48952,6 +48952,16 @@ function () {
     key: "prompt",
     value: function prompt() {
       return this.currentNode.prompt;
+    }
+  }, {
+    key: "background",
+    value: function background() {
+      return this.currentNode.background;
+    }
+  }, {
+    key: "currentNode",
+    value: function currentNode() {
+      return this.currentNode;
     } // Return available options
 
   }, {

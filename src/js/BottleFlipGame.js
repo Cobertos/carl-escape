@@ -180,6 +180,25 @@ class KeyFlipGame extends PIXI.Container {
         this.velocity.x = -500;
         this.angularVelocity = 0;
         this.linearVelocity = 0;
+
+        //spawn bonk particle
+        this._bonkSystem = new QuickParticleSystem({
+            texture: PIXI.loader.resources.line.texture,
+            size: 10,
+            sizeVariance: 20,
+            tint: 0x777777,
+            emitTime: 100,
+            lifeTime: 200,
+            lifeTimeVariance: 500,
+            spawnRate: 20,
+            gravity: false,
+            velocityAmount: new PIXI.Point(-500,500),
+            velocityDirectionalVariance: new PIXI.Point(0,1),
+            rotationIsTrajectory: true
+          });
+        this._bonkSystem.x = this.position.x + this.width/2;
+        this._bonkSystem.y = this.position.y;
+        this.parent.addChild(this._bonkSystem);
       }
     }
 
@@ -260,10 +279,11 @@ class KeyFlipGame extends PIXI.Container {
     }
     this._landingArea = new KeyHole();
     this._landingArea.beginFill(0xFFFF55);
-    let lockHeight = this.intrinsicHeight/9;
-    this._landingArea.drawRect(this.intrinsicWidth-(380*this._doorImage.width/681), this.intrinsicHeight/2-lockHeight/2, 20, lockHeight);
+    let lockHeightOffset = 740*this.intrinsicHeight/1500;
+    let lockHeight = 81*this.intrinsicHeight/1500;
+    this._landingArea.drawRect(this.intrinsicWidth-(380*this._doorImage.width/681), lockHeightOffset, 20, lockHeight);
     this._landingArea.endFill();
-    this._landingArea.visible = false;
+    //this._landingArea.visible = false;
     this.addChild(this._landingArea);
 
     class Wall extends WithPhysics(PIXI.Graphics) {
@@ -426,14 +446,21 @@ class KeyFlipGame extends PIXI.Container {
   get won() {
     return this._stopped ? this._won : undefined;
   }
+
+  static getAssetsToLoad(){
+    return [
+      {name:"key", url:"images/key.png"},
+      {name:"star", url:"images/star.png"},
+      {name:"arrow", url:"images/arrow.png"},
+      {name:"door", url:"images/door.png"},
+      {name:"line", url:"images/line.png"}
+    ];
+  }
 }
 
 document.addEventListener("DOMContentLoaded", ()=>{
 PIXI.loader
-  .add("key", "images/key.png")
-  .add("star", "images/star.png")
-  .add("arrow", "images/arrow.png")
-  .add("door", "images/door.png")
+  .add(KeyFlipGame.getAssetsToLoad())
   .load(()=>{
     //WIRE UP THE APP
     const app = new PIXI.Application({

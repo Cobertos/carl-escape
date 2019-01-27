@@ -44,8 +44,14 @@ export class QuickParticleSystem extends PIXI.Container {
     particle.velocity.set(
       (this.velocityDirectionalVariance.x ? doubleRandom : normalRandom)()*this.velocityAmount.x,
       (this.velocityDirectionalVariance.y ? doubleRandom : normalRandom)()*this.velocityAmount.y);
-    particle.angularAcceleration = (Math.random()-0.5);
-    particle.angularVelocity = (Math.random()-0.5)/4;
+    if(!this.rotationIsTrajectory) {
+      particle.angularAcceleration = (Math.random()-0.5);
+      particle.angularVelocity = (Math.random()-0.5)/4;
+    }
+    else {
+      //TODO: I dont think this fully works oh well
+      particle.rotation = Math.atan2(particle.velocity.y, particle.velocity.x);
+    }
     particle.anchor.set(0.5);
     this.addChild(particle);
   }

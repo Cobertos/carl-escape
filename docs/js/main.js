@@ -44607,7 +44607,25 @@ function (_PIXI$Container) {
 
           this.velocity.x = -500;
           this.angularVelocity = 0;
-          this.linearVelocity = 0;
+          this.linearVelocity = 0; //spawn bonk particle
+
+          this._bonkSystem = new _engine_QuickParticleSystem_js__WEBPACK_IMPORTED_MODULE_9__["QuickParticleSystem"]({
+            texture: pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.line.texture,
+            size: 10,
+            sizeVariance: 20,
+            tint: 0x777777,
+            emitTime: 100,
+            lifeTime: 200,
+            lifeTimeVariance: 500,
+            spawnRate: 20,
+            gravity: false,
+            velocityAmount: new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Point"](-500, 500),
+            velocityDirectionalVariance: new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Point"](0, 1),
+            rotationIsTrajectory: true
+          });
+          this._bonkSystem.x = this.position.x + this.width / 2;
+          this._bonkSystem.y = this.position.y;
+          this.parent.addChild(this._bonkSystem);
         }
       }]);
 
@@ -44727,13 +44745,13 @@ function (_PIXI$Container) {
 
     _this._landingArea.beginFill(0xFFFF55);
 
-    var lockHeight = _this.intrinsicHeight / 9;
+    var lockHeightOffset = 740 * _this.intrinsicHeight / 1500;
+    var lockHeight = 81 * _this.intrinsicHeight / 1500;
 
-    _this._landingArea.drawRect(_this.intrinsicWidth - 380 * _this._doorImage.width / 681, _this.intrinsicHeight / 2 - lockHeight / 2, 20, lockHeight);
+    _this._landingArea.drawRect(_this.intrinsicWidth - 380 * _this._doorImage.width / 681, lockHeightOffset, 20, lockHeight);
 
-    _this._landingArea.endFill();
+    _this._landingArea.endFill(); //this._landingArea.visible = false;
 
-    _this._landingArea.visible = false;
 
     _this.addChild(_this._landingArea);
 
@@ -44980,13 +44998,33 @@ function (_PIXI$Container) {
     get: function get() {
       return this._stopped ? this._won : undefined;
     }
+  }], [{
+    key: "getAssetsToLoad",
+    value: function getAssetsToLoad() {
+      return [{
+        name: "key",
+        url: "images/key.png"
+      }, {
+        name: "star",
+        url: "images/star.png"
+      }, {
+        name: "arrow",
+        url: "images/arrow.png"
+      }, {
+        name: "door",
+        url: "images/door.png"
+      }, {
+        name: "line",
+        url: "images/line.png"
+      }];
+    }
   }]);
 
   return KeyFlipGame;
 }(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Container"]);
 
 document.addEventListener("DOMContentLoaded", function () {
-  pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].add("key", "images/key.png").add("star", "images/star.png").add("arrow", "images/arrow.png").add("door", "images/door.png").load(function () {
+  pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].add(KeyFlipGame.getAssetsToLoad()).load(function () {
     //WIRE UP THE APP
     var app = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Application"]({
       antialias: true,
@@ -45149,8 +45187,15 @@ function (_PIXI$Container) {
       };
 
       particle.velocity.set((this.velocityDirectionalVariance.x ? doubleRandom : normalRandom)() * this.velocityAmount.x, (this.velocityDirectionalVariance.y ? doubleRandom : normalRandom)() * this.velocityAmount.y);
-      particle.angularAcceleration = Math.random() - 0.5;
-      particle.angularVelocity = (Math.random() - 0.5) / 4;
+
+      if (!this.rotationIsTrajectory) {
+        particle.angularAcceleration = Math.random() - 0.5;
+        particle.angularVelocity = (Math.random() - 0.5) / 4;
+      } else {
+        //TODO: I dont think this fully works oh well
+        particle.rotation = Math.atan2(particle.velocity.y, particle.velocity.x);
+      }
+
       particle.anchor.set(0.5);
       this.addChild(particle);
     }

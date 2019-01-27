@@ -222,7 +222,7 @@ PIXI.loader
       antialias: true,
       width: window.innerWidth,
       height: window.innerHeight
-    }, Dialogue.loadJsonFile("testTree"));
+    }, Dialogue.loadJsonFile("mainTree"));
     document.body.appendChild(app.view);
 
     ["mouseup", "touchend"].forEach((eventName)=>{

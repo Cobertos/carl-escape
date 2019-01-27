@@ -44588,7 +44588,7 @@ document.addEventListener("DOMContentLoaded", function () {
       antialias: true,
       width: window.innerWidth,
       height: window.innerHeight
-    }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_6__["loadJsonFile"]("testTree"));
+    }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_6__["loadJsonFile"]("mainTree"));
     document.body.appendChild(app.view);
     ["mouseup", "touchend"].forEach(function (eventName) {
       app.view.addEventListener(eventName, function () {
@@ -44623,6 +44623,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _json_test_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./json/test.js */ "./src/js/json/test.js");
+/* harmony import */ var _json_main_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./json/main.js */ "./src/js/json/main.js");
+
 
 
 
@@ -44849,8 +44851,7 @@ function () {
         }
       }
 
-      console.error("OptionNode.performChecks: How did you get here?");
-      return false;
+      return true;
     }
   }], [{
     key: "fromJson",
@@ -44888,7 +44889,8 @@ function loadJsonFile(fileName) {
 
 function getJsonByFile(fileName) {
   var objects = {
-    "testTree": _json_test_js__WEBPACK_IMPORTED_MODULE_2__["default"]
+    "testTree": _json_test_js__WEBPACK_IMPORTED_MODULE_2__["default"],
+    "mainTree": _json_main_js__WEBPACK_IMPORTED_MODULE_3__["default"]
   };
   var ret = objects[fileName];
 
@@ -44957,6 +44959,419 @@ function getTestJson() {
 
 
 
+
+/***/ }),
+
+/***/ "./src/js/json/main.js":
+/*!*****************************!*\
+  !*** ./src/js/json/main.js ***!
+  \*****************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "testTree",
+  nodes: [{
+    id: 0,
+    prompt: "You awake warm and safe in your bed. You are home. All is well.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 1,
+      text: 'Get up and start your day',
+      actions: [],
+      checks: []
+    }, {
+      destination: 2,
+      text: 'Hit the snooze button',
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 1,
+    prompt: "You've got work today. Time to get dressed and head out.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 3,
+      text: 'Put on professional clothing.',
+      actions: ["Professional"],
+      checks: []
+    }, {
+      destination: 3,
+      text: 'Put on casual clothing',
+      actions: ["Casual"],
+      checks: []
+    }]
+  }, {
+    id: 2,
+    prompt: "Great. Now you're late. You're going to look like a scrub all day. Which do you have time for?",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 4,
+      text: "Brush your teeth",
+      actions: [],
+      checks: []
+    }, {
+      destination: 5,
+      text: "Wash your face.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 3,
+    prompt: "You are looking s h a r p. Let's get you out the door and to the office. It's a workday, after all.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 6,
+      text: "Grab your lunch and head outside",
+      actions: ["Lunch"],
+      checks: []
+    }, {
+      destination: 6,
+      text: "You'll pick up something on your lunch break.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 4,
+    prompt: "Well, at least your breath doesn't stink. No time to pack lunch. Let's giddy-up and head out.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 6,
+      text: "Go to the car",
+      actions: ["Scrub"],
+      checks: []
+    }]
+  }, {
+    id: 5,
+    prompt: "At least you semi-look like you have your life together. Let's giddypup and head out.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 6,
+      text: "Go to the car.",
+      actions: ["Clean"],
+      checks: []
+    }]
+  }, {
+    id: 6,
+    prompt: "You hear a rustling from around the back of your house. Do you check it out?",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 7,
+      text: "Yeah, go see what it is.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 8,
+      text: "Nah, probably just a chipmunk",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 7,
+    prompt: "You creep around the side of your house. You see Carl from the office crouched under your bedroom window.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 9,
+      text: "Talk to him",
+      actions: [],
+      checks: []
+    }, {
+      destination: 8,
+      text: "Run back to your car.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 8,
+    prompt: "",
+    speaker: "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
+    background: "background.png",
+    options: [{
+      destination: 10,
+      text: "I told you to go home when I saw you in my bushes two days ago, Carl.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 9,
+    prompt: "You ask him what he's doing at your house. He responds with 'I've been waiting for you'.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 10,
+      text: "I told you to go home when I saw you in my bushes two days ago, Carl.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 10,
+    prompt: "I couldn't bear to be apart from you~",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 11,
+      text: "Ok, but I didn't want you here in the first place",
+      actions: [],
+      checks: []
+    }, {
+      destination: 12,
+      text: "You gotta stop following me home.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 11,
+    prompt: "Hush, silly. Doesn't matter, since I'm here anyway. Can I have a ride to work?",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "No way, dude. Go home.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "Uggghhhh.... sure.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 12,
+    prompt: "Well, maybe you should stop going to work without me~ Can I ride with you to work?",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "No way, dude. Go home.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "Uggghhhh.... sure.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 13,
+    prompt: "You try to start your car, but all it does is sputter. Carl grins maniacally.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 14,
+      text: "Did you do something to my car?",
+      actions: [],
+      checks: []
+    }, {
+      destination: 15,
+      text: "Hmmm, looks like I'll have to work from home today.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 14,
+    prompt: "I'm not telling~",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 16,
+      text: "[Get out of your car.]",
+      actions: ["PlayGameEasy"],
+      checks: []
+    }]
+  }, {
+    id: 15,
+    prompt: "Oh goodie! I'll come with you.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 16,
+      text: "Ummm, that's not necessary. [Get out of your car.]",
+      actions: ["PlayGameEasy"],
+      checks: []
+    }]
+  }, {
+    id: 16,
+    prompt: "",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 17,
+      text: "You safely exit your car and put a little distance between Carl and yourself.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 17,
+      text: "You fumble with the handle, stumble out of the vehicle, and notice Carl directly behind you. 'Gotta be faster than that'.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 17,
+    prompt: "You feel Carl's eyes on you.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 18,
+      text: "What are you looking at?",
+      actions: [],
+      checks: ["Professional"]
+    }, {
+      destination: 19,
+      text: "What are you looking at?",
+      actions: [],
+      checks: ["Casual"]
+    }]
+  }, {
+    id: 18,
+    prompt: "Oh, nothing. I just like the color of your tie.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 20,
+      text: "....Uhh, thanks?",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 19,
+    prompt: "You're looking pretty casual today. I never get to see you this way~<3",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 21,
+      text: "...I don't know how to feel about that.",
+      actions: [],
+      checks: ["Clean"]
+    }, {
+      destination: 22,
+      text: "...I don't know how to feel about that.",
+      actions: [],
+      checks: ["Scrub"]
+    }]
+  }, {
+    id: 12,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 12,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 12,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 12,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 12,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 12,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 12,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "",
+      actions: [],
+      checks: []
+    }]
+  }]
+});
 
 /***/ }),
 

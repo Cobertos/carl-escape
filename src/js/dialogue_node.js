@@ -1,4 +1,5 @@
 import testTree from "./json/test.js";
+import mainTree from "./json/main.js";
 
 class DialogueTree {
     constructor(name, nodes) {
@@ -183,9 +184,8 @@ class OptionNode {
                 return false;
             }
         }
-
-        console.error("OptionNode.performChecks: How did you get here?");
-        return false;
+        
+        return true;
     }
 }
 
@@ -213,7 +213,8 @@ function loadJsonFile(fileName){
 
 function getJsonByFile(fileName){
     let objects = {
-        "testTree" : testTree
+        "testTree" : testTree,
+        "mainTree" : mainTree
     };
     let ret = objects[fileName];
     if(ret == null){

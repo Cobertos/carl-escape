@@ -44322,6 +44322,209 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/js/PowerMeterGame.js":
+/*!**********************************!*\
+  !*** ./src/js/PowerMeterGame.js ***!
+  \**********************************/
+/*! exports provided: PowerMeterGame */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PowerMeterGame", function() { return PowerMeterGame; });
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./engine/WithPhysics.js */ "./src/js/engine/WithPhysics.js");
+
+
+
+
+
+
+
+/**Along with normal PIXI.Application options
+ * oscillationTime The time it takes the sweeper to do one pass over the width in MS
+ * greenAreaWidth 0-1 of the width of the container
+ */
+
+var PowerMeterGame =
+/*#__PURE__*/
+function (_PIXI$Container) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(PowerMeterGame, _PIXI$Container);
+
+  function PowerMeterGame(options) {
+    var _this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PowerMeterGame);
+
+    options.transparent = true;
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(PowerMeterGame).call(this, options));
+    _this.width2 = options.width || 500;
+    _this.height2 = options.height || 200;
+    _this.oscillationTime = options.oscillationTime || 1000;
+    _this.greenAreaWidth = options.greenAreaWidth || 0.5;
+    _this.greenAreaPixelWidth = _this.width2 * _this.greenAreaWidth; //Add all the elements
+
+    _this._redArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._redArea.beginFill(0xAA5555);
+
+    _this._redArea.drawRectBound = _this._redArea.drawRect.bind(_this._redArea, 0, _this.height2 / 6, _this.width2, 2 * _this.height2 / 3);
+
+    _this._redArea.drawRectBound();
+
+    _this._redArea.endFill();
+
+    _this.addChild(_this._redArea);
+
+    _this._greenArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._greenArea.beginFill(0x55AA55);
+
+    _this._greenArea.drawRectBound = _this._greenArea.drawRect.bind(_this._greenArea, (_this.width2 - _this.greenAreaPixelWidth) / 2, _this.height2 / 6, _this.greenAreaPixelWidth, 2 * _this.height2 / 3);
+
+    _this._greenArea.drawRectBound();
+
+    _this._greenArea.endFill();
+
+    _this.addChild(_this._greenArea);
+
+    _this._stopBar = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._stopBar.beginFill(0xFFFFFF);
+
+    _this._stopBar.lineStyle(4, 0x000000, 1);
+
+    _this._stopBar.drawRect(0, 0, 20, _this.height2);
+
+    _this._stopBar.endFill();
+
+    _this.addChild(_this._stopBar);
+
+    var text = _this._skillCheckText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("SKILL CHECK", {
+      fontFamily: 'Impact',
+      fontSize: 200,
+      fill: 0xffffff,
+      align: 'center',
+      stroke: 0x000000,
+      strokeThickness: 20
+    });
+    text.position.x = _this.width2 / 2;
+    text.position.y = _this.height2 / 2;
+    text._initialWidth = text.width;
+    text._initialHeight = text.height;
+    text.visible = false;
+
+    _this._skillCheckText.anchor.set(0.5);
+
+    _this.addChild(text);
+
+    _this._barPos = 0;
+    _this._initialTime = Date.now();
+    _this._started = false;
+    _this._startTime;
+    _this._stopped = false;
+    _this._hitGreenArea = undefined;
+    return _this;
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PowerMeterGame, [{
+    key: "onUpdate",
+    value: function onUpdate() {
+      if (!this._started || this._skillCheckText.visible) {
+        var now = Date.now() - this._initialTime;
+
+        if (now < 300) {
+          //0 - 300ms
+          this._skillCheckText.visible = true;
+          this._skillCheckText.width = this._skillCheckText._initialWidth * 0.5;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * 0.5;
+        } else if (now < 600) {
+          //300 - 600ms
+          var tween = (now - 300) / 300;
+          tween = tween * 0.5 + 0.5;
+          console.log(tween);
+          this._skillCheckText.width = this._skillCheckText._initialWidth * tween;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * tween;
+        } else if (now < 1000) {
+          //600 - 1000ms
+          var _tween = (now - 600) / 400;
+
+          _tween = 1 - _tween;
+          this._skillCheckText.width = this._skillCheckText._initialWidth * _tween;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * _tween;
+        } else if (now > 1000) {
+          this._skillCheckText.visible = false;
+        }
+
+        if (now > 800) {
+          this._started = true;
+          this._startTime = Date.now();
+        }
+      } else {
+        if (!this._stopped) {
+          var _now = Date.now() - this._startTime;
+
+          var shouldMirror = Math.floor(_now / this.oscillationTime) % 2 === 0;
+          this._barPos = Math.abs((shouldMirror ? 0 : 1) - _now % this.oscillationTime / this.oscillationTime);
+          this._stopBar.x = this.width2 * this._barPos - this._stopBar.getBounds().width / 2;
+        } else if (this._stopped) {
+          var blinkInterval = Math.floor(Date.now() / 300) % 2 === 0; //every 1 second
+
+          if (this._hitGreenArea) {
+            this._greenArea.beginFill(blinkInterval ? 0x00FF00 : 0x55AA55);
+
+            this._greenArea.drawRectBound();
+
+            this._greenArea.endFill();
+          } else {
+            this._redArea.beginFill(blinkInterval ? 0xFF0000 : 0xAA5555);
+
+            this._redArea.drawRectBound();
+
+            this._redArea.endFill();
+          }
+        }
+      }
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      if (!this._started) {
+        return;
+      }
+
+      this._stopped = true;
+      var stopPos = this._barPos;
+      var greenBoxX = (this.width2 - this.greenAreaPixelWidth) / 2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
+
+      var greenAreaStart = greenBoxX / this.width2;
+      var greenAreaEnd = (greenBoxX + this._greenArea.width) / this.width2;
+      this._hitGreenArea = stopPos > greenAreaStart && stopPos < greenAreaEnd;
+    } //Whether the player has won, undefiend if not finished
+
+  }, {
+    key: "won",
+    get: function get() {
+      return this._hitGreenArea;
+    }
+  }]);
+
+  return PowerMeterGame;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Container"]);
+
+/***/ }),
+
 /***/ "./src/js/chat.js":
 /*!************************!*\
   !*** ./src/js/chat.js ***!
@@ -44346,6 +44549,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! webfontloader */ "./node_modules/webfontloader/webfontloader.js");
 /* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(webfontloader__WEBPACK_IMPORTED_MODULE_6__);
 /* harmony import */ var _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./dialogue_node.js */ "./src/js/dialogue_node.js");
+/* harmony import */ var _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./PowerMeterGame.js */ "./src/js/PowerMeterGame.js");
 
 
 
@@ -44353,6 +44557,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
  //import { DialogTree as dialogTree } from "./MockDialogTree.js";
+
 
 
 var TYPING_SPEED = 10; //ms between letter
@@ -44516,6 +44721,7 @@ function (_PIXI$Application) {
       for (var i in actions) {
         if (this.isGameAction(actions[i])) {
           this.playGame(actions[i]);
+          return;
         } else {
           this.actions.push(actions[i]);
         }
@@ -44545,9 +44751,41 @@ function (_PIXI$Application) {
   }, {
     key: "playGame",
     value: function playGame(action) {
+      var _this3 = this;
+
       if (action === "PlayGame1") {
-        console.log("Playing game 1");
-        this.actions.push("WinGame1");
+        var gameApp1 = new _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__["PowerMeterGame"]({
+          width: this._dialogBox.getBounds().width,
+          height: this._dialogBox.getBounds().height,
+          //oscillationTime: 1000,
+          //greenAreaWidth: 0.4
+          endCallback: function endCallback(win) {
+            if (win) {
+              _this3.actions.push("WinGame1"); //TODO: Go back to normal flow
+
+            }
+          }
+        });
+        gameApp1.position.x = SCREEN_PADDING;
+        gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
+        var raf;
+
+        var loop = function loop() {
+          gameApp1.onUpdate();
+          raf = requestAnimationFrame(loop);
+        };
+
+        raf = requestAnimationFrame(loop);
+        this.view.addEventListener("pointerdown", function () {
+          gameApp1.stop();
+        });
+        window.addEventListener("keydown", function (e) {
+          if (e.key === " ") {
+            gameApp1.stop();
+            e.preventDefault(); //Stop the scrolling  
+          }
+        });
+        this.stage.addChild(gameApp1);
       }
 
       if (action === "PlayGame2") {
@@ -44563,7 +44801,7 @@ function (_PIXI$Application) {
   }, {
     key: "startTyping",
     value: function startTyping() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (this._dialogInterval) {
         //Clear previous dialog
@@ -44577,11 +44815,11 @@ function (_PIXI$Application) {
       var currLetter = 0;
       this._dialogInterval = setInterval(function () {
         console.log("Anything");
-        _this3._dialogText.text = letters.slice(0, currLetter).join("");
+        _this4._dialogText.text = letters.slice(0, currLetter).join("");
         currLetter++;
 
-        if (currLetter > _this3._currentPrompt.length) {
-          _this3.stopTyping();
+        if (currLetter > _this4._currentPrompt.length) {
+          _this4.stopTyping();
 
           return;
         }
@@ -44628,9 +44866,13 @@ Promise.all([new Promise(function (resolve, reject) {
     width: window.innerWidth,
     height: window.innerHeight
   }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__["loadJsonFile"]("testTree"));
-  document.body.appendChild(app.view); //lock for mobile devices
+  document.body.appendChild(app.view); //lock for mobile devices (throws if device doesn't support)
 
-  screen.orientation.lock('landscape');
+  /*try {
+    screen.orientation.lock('landscape');
+  }
+  catch(e) {}*/
+
   ["mouseup", "touchend"].forEach(function (eventName) {
     app.view.addEventListener(eventName, function () {
       if (app.isTyping) {
@@ -45000,6 +45242,172 @@ function getTestJson() {
 
 /***/ }),
 
+/***/ "./src/js/engine/WithPhysics.js":
+/*!**************************************!*\
+  !*** ./src/js/engine/WithPhysics.js ***!
+  \**************************************/
+/*! exports provided: WithPhysics, physicsLoop */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WithPhysics", function() { return WithPhysics; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "physicsLoop", function() { return physicsLoop; });
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+
+/**Returns the passed PIXI class wrapped in a class that supports physics simulation
+ * Usage:
+ * class MyNewPhysicsClass extends WithPhysics(PIXI.Sprite) {
+ *     //...
+ * }
+ */
+function WithPhysics(pixiCls) {
+  var _WithPhysicsCls =
+  /*#__PURE__*/
+  function (_pixiCls) {
+    _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(_WithPhysicsCls, _pixiCls);
+
+    _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(_WithPhysicsCls, [{
+      key: "hasPhysics",
+      get: function get() {
+        return true;
+      }
+    }]);
+
+    function _WithPhysicsCls() {
+      var _getPrototypeOf2;
+
+      var _this;
+
+      _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, _WithPhysicsCls);
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1___default()(this, (_getPrototypeOf2 = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2___default()(_WithPhysicsCls)).call.apply(_getPrototypeOf2, [this].concat(args))); //Units per second
+
+      _this.velocity = new PIXI.Point();
+      _this.acceleration = new PIXI.Point();
+      _this.angularVelocity = 0;
+      _this.angularAcceleration = 0;
+      return _this;
+    }
+    /**Override with your things to do when physics is updating
+     * and super call to do normal stuff
+     */
+
+
+    _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(_WithPhysicsCls, [{
+      key: "onPhysicsUpdate",
+      value: function onPhysicsUpdate(time, deltaTime) {
+        this.velocity.x += this.acceleration.x * deltaTime / 1000;
+        this.velocity.y += this.acceleration.y * deltaTime / 1000;
+        this.position.x += this.velocity.x * deltaTime / 1000;
+        this.position.y -= this.velocity.y * deltaTime / 1000;
+        this.angularVelocity += this.angularAcceleration;
+        this.rotation += this.angularVelocity;
+      }
+      /**Override to do things when we collide with an object
+       */
+
+    }, {
+      key: "onCollision",
+      value: function onCollision(otherObjects) {}
+    }]);
+
+    return _WithPhysicsCls;
+  }(pixiCls);
+
+  return _WithPhysicsCls;
+}
+/* Stub tests...
+let physicsCls = WithPhysics(PIXI.Container);
+it("has a velocity and an acceleration", ()=>{
+  //arrange
+  let container = new physicsCls();
+
+  //assert
+  expect(container.velocity instanceof PIXI.Point);
+  expect(container.acceleration instanceof PIXI.Point);
+});*/
+
+function depthFirstIterate(obj, func) {
+  if (!obj) {
+    return;
+  }
+
+  obj.children.forEach(function (child) {
+    return depthFirstIterate(child, func);
+  });
+  func(obj);
+}
+
+var lastTime = Date.now();
+/**From a given rootNode, loops through all children and
+ * does the physics simulation on them
+ */
+
+function physicsLoop(rootNode) {
+  var time = Date.now();
+  var deltaTime = time - lastTime;
+  lastTime = time; //Iterate over all objects, collect the physics objects
+  //and call the physics simulation
+
+  var physObjs = [];
+  depthFirstIterate(rootNode, function (obj) {
+    if (!obj.hasPhysics) {
+      return;
+    }
+
+    obj.onPhysicsUpdate(time, deltaTime);
+    physObjs.push(obj);
+  }); //Determine whether any objects
+  //are colliding, O(n^2/2) it's not that smart
+
+  physObjs.forEach(function (obj1, idx) {
+    //.slice(idx to NOT REPEAT), should also never get
+    //obj1 === obj2
+    physObjs.slice(idx + 1).forEach(function (obj2) {
+      //Box test with pixi.rectangle
+      var rect1 = obj1.getBounds();
+      var rect2 = obj2.getBounds();
+      var instersects = //x direction
+      rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && //y direction
+      rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y;
+
+      if (intersects) {
+        //Let them know
+        obj1.onCollision(obj2);
+        obj2.onCollision(obj1); //General collision event
+
+        var evt = new Event("collision");
+        evt.obj1 = obj1;
+        evt.obj2 = obj2;
+        evt.time = time;
+        window.dispatchEvent(evt);
+      }
+    });
+  });
+}
+setInterval(physicsLoop, 100);
+
+/***/ }),
+
 /***/ "./src/js/json/test.js":
 /*!*****************************!*\
   !*** ./src/js/json/test.js ***!
@@ -45035,7 +45443,7 @@ __webpack_require__.r(__webpack_exports__);
     options: [{
       destination: 3,
       text: 'thanks',
-      actions: [],
+      actions: ["PlayGame1"],
       checks: []
     }]
   }, {

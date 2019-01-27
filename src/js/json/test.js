@@ -31,7 +31,7 @@ export default {
                 {
                     destination : 3,
                     text : 'thanks',
-                    actions : [],
+                    actions : ["PlayGame1"],
                     checks : [],
                 }
 

@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 import WebFont from "webfontloader";
 //import { DialogTree as dialogTree } from "./MockDialogTree.js";
 import * as Dialogue from "./dialogue_node.js";
+import { PowerMeterGame } from "./PowerMeterGame.js";
 
 const TYPING_SPEED = 10; //ms between letter
 const SCREEN_PADDING = 20;
@@ -134,6 +135,7 @@ class DialogSceneApp extends PIXI.Application {
     for(let i in actions){
       if(this.isGameAction(actions[i])){
         this.playGame(actions[i]);
+        return;
       }
       else{
         this.actions.push(actions[i]);
@@ -161,8 +163,38 @@ class DialogSceneApp extends PIXI.Application {
 
   playGame(action){
     if(action === "PlayGame1"){
-      console.log("Playing game 1");
-      this.actions.push("WinGame1");
+      let gameApp1 = new PowerMeterGame({
+        width: this._dialogBox.getBounds().width,
+        height: this._dialogBox.getBounds().height,
+        //oscillationTime: 1000,
+        //greenAreaWidth: 0.4
+        endCallback: (win)=>{
+          
+          if(win) {
+            this.actions.push("WinGame1");
+            //TODO: Go back to normal flow
+          }
+        }
+      });
+      gameApp1.position.x = SCREEN_PADDING;
+      gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
+      let raf;
+      const loop = ()=>{
+        gameApp1.onUpdate();
+        raf = requestAnimationFrame(loop);
+      };
+      raf = requestAnimationFrame(loop);
+
+      this.view.addEventListener("pointerdown", ()=>{
+        gameApp1.stop();
+      });
+      window.addEventListener("keydown", (e)=>{
+        if(e.key === " ") {
+          gameApp1.stop();
+          e.preventDefault(); //Stop the scrolling  
+        }
+      });
+      this.stage.addChild(gameApp1);
     }
     if(action === "PlayGame2"){
       console.log("Playing game 2");
@@ -237,8 +269,11 @@ Promise.all([
   }, Dialogue.loadJsonFile("testTree"));
   document.body.appendChild(app.view);
 
-  //lock for mobile devices
-  screen.orientation.lock('landscape');
+  //lock for mobile devices (throws if device doesn't support)
+  /*try {
+    screen.orientation.lock('landscape');
+  }
+  catch(e) {}*/
 
   ["mouseup", "touchend"].forEach((eventName)=>{
     app.view.addEventListener(eventName, ()=>{

@@ -44368,18 +44368,19 @@ function (_PIXI$Container) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PowerMeterGame);
 
     options.transparent = true;
-    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(PowerMeterGame).call(this, options));
-    _this.width2 = options.width || 500;
-    _this.height2 = options.height || 200;
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(PowerMeterGame).call(this, options)); //Width and height to size this thing too
+
+    _this.intrinsicWidth = options.intrinsicWidth || 500;
+    _this.intrinsicHeight = options.intrinsicHeight || 200;
     _this.oscillationTime = options.oscillationTime || 1000;
     _this.greenAreaWidth = options.greenAreaWidth || 0.5;
-    _this.greenAreaPixelWidth = _this.width2 * _this.greenAreaWidth; //Add all the elements
+    _this.greenAreaPixelWidth = _this.intrinsicWidth * _this.greenAreaWidth; //Add all the elements
 
     _this._redArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
 
     _this._redArea.beginFill(0xAA5555);
 
-    _this._redArea.drawRectBound = _this._redArea.drawRect.bind(_this._redArea, 0, _this.height2 / 6, _this.width2, 2 * _this.height2 / 3);
+    _this._redArea.drawRectBound = _this._redArea.drawRect.bind(_this._redArea, 0, _this.intrinsicHeight / 6, _this.intrinsicWidth, 2 * _this.intrinsicHeight / 3);
 
     _this._redArea.drawRectBound();
 
@@ -44391,7 +44392,7 @@ function (_PIXI$Container) {
 
     _this._greenArea.beginFill(0x55AA55);
 
-    _this._greenArea.drawRectBound = _this._greenArea.drawRect.bind(_this._greenArea, (_this.width2 - _this.greenAreaPixelWidth) / 2, _this.height2 / 6, _this.greenAreaPixelWidth, 2 * _this.height2 / 3);
+    _this._greenArea.drawRectBound = _this._greenArea.drawRect.bind(_this._greenArea, (_this.intrinsicWidth - _this.greenAreaPixelWidth) / 2, _this.intrinsicHeight / 6, _this.greenAreaPixelWidth, 2 * _this.intrinsicHeight / 3);
 
     _this._greenArea.drawRectBound();
 
@@ -44405,7 +44406,7 @@ function (_PIXI$Container) {
 
     _this._stopBar.lineStyle(4, 0x000000, 1);
 
-    _this._stopBar.drawRect(0, 0, 20, _this.height2);
+    _this._stopBar.drawRect(0, 0, 20, _this.intrinsicHeight);
 
     _this._stopBar.endFill();
 
@@ -44419,8 +44420,8 @@ function (_PIXI$Container) {
       stroke: 0x000000,
       strokeThickness: 20
     });
-    text.position.x = _this.width2 / 2;
-    text.position.y = _this.height2 / 2;
+    text.position.x = _this.intrinsicWidth / 2;
+    text.position.y = _this.intrinsicHeight / 2;
     text._initialWidth = text.width;
     text._initialHeight = text.height;
     text.visible = false;
@@ -44477,7 +44478,7 @@ function (_PIXI$Container) {
 
           var shouldMirror = Math.floor(_now / this.oscillationTime) % 2 === 0;
           this._barPos = Math.abs((shouldMirror ? 0 : 1) - _now % this.oscillationTime / this.oscillationTime);
-          this._stopBar.x = this.width2 * this._barPos - this._stopBar.getBounds().width / 2;
+          this._stopBar.x = this.intrinsicWidth * this._barPos - this._stopBar.getBounds().width / 2;
         } else if (this._stopped) {
           var blinkInterval = Math.floor(Date.now() / 300) % 2 === 0; //every 1 second
 
@@ -44506,11 +44507,14 @@ function (_PIXI$Container) {
 
       this._stopped = true;
       var stopPos = this._barPos;
-      var greenBoxX = (this.width2 - this.greenAreaPixelWidth) / 2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
+      var greenBoxX = (this.intrinsicWidth - this.greenAreaPixelWidth) / 2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
 
-      var greenAreaStart = greenBoxX / this.width2;
-      var greenAreaEnd = (greenBoxX + this._greenArea.width) / this.width2;
+      var greenAreaStart = greenBoxX / this.intrinsicWidth;
+      var greenAreaEnd = (greenBoxX + this._greenArea.width) / this.intrinsicWidth;
       this._hitGreenArea = stopPos > greenAreaStart && stopPos < greenAreaEnd;
+      this.emit("ended", {
+        won: this.won
+      });
     } //Whether the player has won, undefiend if not finished
 
   }, {
@@ -44751,20 +44755,12 @@ function (_PIXI$Application) {
   }, {
     key: "playGame",
     value: function playGame(action) {
-      var _this3 = this;
-
       if (action === "PlayGame1") {
         var gameApp1 = new _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__["PowerMeterGame"]({
           width: this._dialogBox.getBounds().width,
-          height: this._dialogBox.getBounds().height,
-          //oscillationTime: 1000,
+          height: this._dialogBox.getBounds().height //oscillationTime: 1000,
           //greenAreaWidth: 0.4
-          endCallback: function endCallback(win) {
-            if (win) {
-              _this3.actions.push("WinGame1"); //TODO: Go back to normal flow
 
-            }
-          }
         });
         gameApp1.position.x = SCREEN_PADDING;
         gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
@@ -44786,6 +44782,9 @@ function (_PIXI$Application) {
           }
         });
         this.stage.addChild(gameApp1);
+        gameApp1.on("ended", function (e) {
+          console.log(e); //there's a .won with whether they won or not
+        });
       }
 
       if (action === "PlayGame2") {
@@ -44801,7 +44800,7 @@ function (_PIXI$Application) {
   }, {
     key: "startTyping",
     value: function startTyping() {
-      var _this4 = this;
+      var _this3 = this;
 
       if (this._dialogInterval) {
         //Clear previous dialog
@@ -44815,11 +44814,11 @@ function (_PIXI$Application) {
       var currLetter = 0;
       this._dialogInterval = setInterval(function () {
         console.log("Anything");
-        _this4._dialogText.text = letters.slice(0, currLetter).join("");
+        _this3._dialogText.text = letters.slice(0, currLetter).join("");
         currLetter++;
 
-        if (currLetter > _this4._currentPrompt.length) {
-          _this4.stopTyping();
+        if (currLetter > _this3._currentPrompt.length) {
+          _this3.stopTyping();
 
           return;
         }

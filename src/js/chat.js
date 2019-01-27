@@ -168,13 +168,6 @@ class DialogSceneApp extends PIXI.Application {
         height: this._dialogBox.getBounds().height,
         //oscillationTime: 1000,
         //greenAreaWidth: 0.4
-        endCallback: (win)=>{
-          
-          if(win) {
-            this.actions.push("WinGame1");
-            //TODO: Go back to normal flow
-          }
-        }
       });
       gameApp1.position.x = SCREEN_PADDING;
       gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
@@ -195,6 +188,10 @@ class DialogSceneApp extends PIXI.Application {
         }
       });
       this.stage.addChild(gameApp1);
+
+      gameApp1.on("ended", (e)=>{
+        console.log(e); //there's a .won with whether they won or not
+      });
     }
     if(action === "PlayGame2"){
       console.log("Playing game 2");

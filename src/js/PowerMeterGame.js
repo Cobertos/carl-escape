@@ -9,26 +9,27 @@ export class PowerMeterGame extends PIXI.Container {
   constructor(options){
     options.transparent = true;
     super(options);
-    this.width2 = options.width || 500;
-    this.height2 = options.height || 200;
+    //Width and height to size this thing too
+    this.intrinsicWidth = options.intrinsicWidth || 500;
+    this.intrinsicHeight = options.intrinsicHeight || 200;
 
     this.oscillationTime = options.oscillationTime || 1000;
     this.greenAreaWidth = options.greenAreaWidth || 0.5;
 
-    this.greenAreaPixelWidth = this.width2*this.greenAreaWidth;
+    this.greenAreaPixelWidth = this.intrinsicWidth*this.greenAreaWidth;
 
     //Add all the elements
     this._redArea = new PIXI.Graphics();
     this._redArea.beginFill(0xAA5555);
     this._redArea.drawRectBound = this._redArea.drawRect.bind(this._redArea,
-      0, this.height2/6, this.width2, 2*this.height2/3);
+      0, this.intrinsicHeight/6, this.intrinsicWidth, 2*this.intrinsicHeight/3);
     this._redArea.drawRectBound();
     this._redArea.endFill();
     this.addChild(this._redArea);
     this._greenArea = new PIXI.Graphics();
     this._greenArea.beginFill(0x55AA55);
     this._greenArea.drawRectBound = this._greenArea.drawRect.bind(this._greenArea,
-      (this.width2-this.greenAreaPixelWidth)/2,this.height2/6,this.greenAreaPixelWidth,2*this.height2/3);
+      (this.intrinsicWidth-this.greenAreaPixelWidth)/2,this.intrinsicHeight/6,this.greenAreaPixelWidth,2*this.intrinsicHeight/3);
     this._greenArea.drawRectBound();
     this._greenArea.endFill();
     this.addChild(this._greenArea);
@@ -36,15 +37,15 @@ export class PowerMeterGame extends PIXI.Container {
     this._stopBar = new PIXI.Graphics();
     this._stopBar.beginFill(0xFFFFFF);
     this._stopBar.lineStyle(4, 0x000000, 1);
-    this._stopBar.drawRect(0,0,20,this.height2);
+    this._stopBar.drawRect(0,0,20,this.intrinsicHeight);
     this._stopBar.endFill();
     this.addChild(this._stopBar);
 
     let text = this._skillCheckText = new PIXI.Text("SKILL CHECK",
       {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
         stroke: 0x000000, strokeThickness: 20 });
-    text.position.x = this.width2/2;
-    text.position.y = this.height2/2;
+    text.position.x = this.intrinsicWidth/2;
+    text.position.y = this.intrinsicHeight/2;
     text._initialWidth = text.width;
     text._initialHeight = text.height;
     text.visible = false;
@@ -96,7 +97,7 @@ export class PowerMeterGame extends PIXI.Container {
         let now = Date.now() - this._startTime;
         let shouldMirror = (Math.floor((now / this.oscillationTime)) % 2) === 0;
         this._barPos = Math.abs((shouldMirror ? 0 : 1) - (now % this.oscillationTime / this.oscillationTime));
-        this._stopBar.x = this.width2 * this._barPos - this._stopBar.getBounds().width/2;
+        this._stopBar.x = this.intrinsicWidth * this._barPos - this._stopBar.getBounds().width/2;
       }
       else if(this._stopped) {
         let blinkInterval = (Math.floor((Date.now() / 300)) % 2) === 0; //every 1 second
@@ -120,10 +121,11 @@ export class PowerMeterGame extends PIXI.Container {
     }
     this._stopped = true;
     let stopPos = this._barPos;
-    let greenBoxX = (this.width2-this.greenAreaPixelWidth)/2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
-    let greenAreaStart = greenBoxX/this.width2;
-    let greenAreaEnd = (greenBoxX+this._greenArea.width)/this.width2;
+    let greenBoxX = (this.intrinsicWidth-this.greenAreaPixelWidth)/2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
+    let greenAreaStart = greenBoxX/this.intrinsicWidth;
+    let greenAreaEnd = (greenBoxX+this._greenArea.width)/this.intrinsicWidth;
     this._hitGreenArea = (stopPos > greenAreaStart) && (stopPos < greenAreaEnd);
+    this.emit("ended", { won: this.won });
   }
 
   //Whether the player has won, undefiend if not finished

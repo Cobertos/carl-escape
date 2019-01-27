@@ -3,6 +3,8 @@ import WebFont from "webfontloader";
 //import { DialogTree as dialogTree } from "./MockDialogTree.js";
 import * as Dialogue from "./dialogue_node.js";
 import { PowerMeterGame } from "./PowerMeterGame.js";
+import { KeyFlipGame } from "./BottleFlipGame.js";
+import { physicsLoop } from "./engine/WithPhysics.js";
 
 const TYPING_SPEED = 10; //ms between letter
 const SCREEN_PADDING = 20;
@@ -154,11 +156,7 @@ class DialogSceneApp extends PIXI.Application {
   }
 
   isGameAction(action){
-    let gameActions = ["PlayGameEasy", "PlayGameNormal", "PlayGameHard", "PlayGameKey"];
-    if(gameActions.indexOf(action) > -1){
-      return true;
-    }
-    return false;
+    return ["PlayGameEasy", "PlayGameNormal", "PlayGameHard", "PlayGameKey"].includes(action);
   }
 
   playGame(action){
@@ -176,40 +174,65 @@ class DialogSceneApp extends PIXI.Application {
       //this.actions.push("WinGame3");
     }
     if(action === "PlayGameKey"){
-      console.log("Key game not implemented");
+      this.keyFlipGame();
     }
   }
 
   powerMeterGame(){
     let gameApp1 = new PowerMeterGame({
-        width: this._dialogBox.getBounds().width,
-        height: this._dialogBox.getBounds().height,
-        //oscillationTime: 1000,
-        //greenAreaWidth: 0.4
-      });
-      gameApp1.position.x = SCREEN_PADDING;
-      gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
-      let raf;
-      const loop = ()=>{
-        gameApp1.onUpdate();
-        raf = requestAnimationFrame(loop);
-      };
+      width: this._dialogBox.getBounds().width,
+      height: this._dialogBox.getBounds().height,
+      //oscillationTime: 1000,
+      //greenAreaWidth: 0.4
+    });
+    gameApp1.position.x = SCREEN_PADDING;
+    gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
+    let raf;
+    const loop = ()=>{
+      gameApp1.onUpdate();
       raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
 
-      this.view.addEventListener("pointerdown", ()=>{
+    this.view.addEventListener("pointerdown", ()=>{
+      gameApp1.stop();
+    });
+    window.addEventListener("keydown", (e)=>{
+      if(e.key === " ") {
         gameApp1.stop();
-      });
-      window.addEventListener("keydown", (e)=>{
-        if(e.key === " ") {
-          gameApp1.stop();
-          e.preventDefault(); //Stop the scrolling  
-        }
-      });
-      this.stage.addChild(gameApp1);
+        e.preventDefault(); //Stop the scrolling  
+      }
+    });
+    this.stage.addChild(gameApp1);
 
-      gameApp1.on("ended", (e)=>{
-        console.log(e); //there's a .won with whether they won or not
-      });
+    gameApp1.on("ended", (e)=>{
+      console.log(e); //there's a .won with whether they won or not
+    });
+  }
+
+  keyFlipGame(){
+    let game = new KeyFlipGame({
+      intrinsicWidth: 3*this.screen.width/4, 
+      intrinsicHeight: 3*this.screen.height/4, 
+    });
+    game.position.x = this.screen.width/4;
+    game.position.y = 0;
+    this.stage.addChild(game);
+
+    setInterval(()=>{
+      physicsLoop(game);
+    }, 10);
+
+    let raf;
+    const loop = ()=>{
+      game.onUpdate();
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+
+    game.on("ended", (e)=>{
+      console.log(e);
+    });
   }
 
   startTyping(){
@@ -261,6 +284,8 @@ Promise.all([
       //Other assets
       .add("dialogFrame", "images/frameyboi.png")
       .add("buttonFrame", "images/buttonboi.png")
+      //games
+      .add(KeyFlipGame.getAssetsToLoad())
       .load(resolve);
   }),
   new Promise((resolve, reject)=>{
@@ -272,7 +297,7 @@ Promise.all([
     antialias: true,
     width: window.innerWidth,
     height: window.innerHeight
-  }, Dialogue.loadJsonFile("mainTree"));
+  }, Dialogue.loadJsonFile("testTree"));
   document.body.appendChild(app.view);
 
   //lock for mobile devices (throws if device doesn't support)

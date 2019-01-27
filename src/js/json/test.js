@@ -18,6 +18,12 @@ export default {
                     text : 'Blue',
                     actions : [],
                     checks : [],
+                },
+                {
+                    destination : 4,
+                    text : 'TEST',
+                    actions : [],
+                    checks : [],
                 }
 
             ]
@@ -31,7 +37,7 @@ export default {
                 {
                     destination : 3,
                     text : 'thanks',
-                    actions : ["PlayGame1"],
+                    actions : [],
                     checks : [],
                 }
 
@@ -61,6 +67,38 @@ export default {
                     destination : -1,
                     text : '<continue>',
                     actions : [],
+                    checks : [],
+                }
+            ]
+        },
+        {
+            id : 4,
+            prompt : "TEST",
+            speaker: "carl",
+            background : "background.png",
+            options : [
+                {
+                    destination : -1,
+                    text : '<PlayGameEasy>',
+                    actions : ["PlayGameEasy"],
+                    checks : [],
+                },
+                {
+                    destination : -1,
+                    text : '<PlayGameMedium>',
+                    actions : ["PlayGameMedium"],
+                    checks : [],
+                },
+                {
+                    destination : -1,
+                    text : '<PlayGameHard>',
+                    actions : ["PlayGameHard"],
+                    checks : [],
+                },
+                {
+                    destination : -1,
+                    text : '<PlayGameKey>',
+                    actions : ["PlayGameKey"],
                     checks : [],
                 }
             ]

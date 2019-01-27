@@ -1210,329 +1210,6 @@ earcut.flatten = function (data) {
 
 /***/ }),
 
-/***/ "./node_modules/eventemitter3/index.js":
-/*!*********************************************!*\
-  !*** ./node_modules/eventemitter3/index.js ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var has = Object.prototype.hasOwnProperty
-  , prefix = '~';
-
-/**
- * Constructor to create a storage for our `EE` objects.
- * An `Events` instance is a plain object whose properties are event names.
- *
- * @constructor
- * @api private
- */
-function Events() {}
-
-//
-// We try to not inherit from `Object.prototype`. In some engines creating an
-// instance in this way is faster than calling `Object.create(null)` directly.
-// If `Object.create(null)` is not supported we prefix the event names with a
-// character to make sure that the built-in object properties are not
-// overridden or used as an attack vector.
-//
-if (Object.create) {
-  Events.prototype = Object.create(null);
-
-  //
-  // This hack is needed because the `__proto__` property is still inherited in
-  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
-  //
-  if (!new Events().__proto__) prefix = false;
-}
-
-/**
- * Representation of a single event listener.
- *
- * @param {Function} fn The listener function.
- * @param {Mixed} context The context to invoke the listener with.
- * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
- * @constructor
- * @api private
- */
-function EE(fn, context, once) {
-  this.fn = fn;
-  this.context = context;
-  this.once = once || false;
-}
-
-/**
- * Minimal `EventEmitter` interface that is molded against the Node.js
- * `EventEmitter` interface.
- *
- * @constructor
- * @api public
- */
-function EventEmitter() {
-  this._events = new Events();
-  this._eventsCount = 0;
-}
-
-/**
- * Return an array listing the events for which the emitter has registered
- * listeners.
- *
- * @returns {Array}
- * @api public
- */
-EventEmitter.prototype.eventNames = function eventNames() {
-  var names = []
-    , events
-    , name;
-
-  if (this._eventsCount === 0) return names;
-
-  for (name in (events = this._events)) {
-    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
-  }
-
-  if (Object.getOwnPropertySymbols) {
-    return names.concat(Object.getOwnPropertySymbols(events));
-  }
-
-  return names;
-};
-
-/**
- * Return the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Boolean} exists Only check if there are listeners.
- * @returns {Array|Boolean}
- * @api public
- */
-EventEmitter.prototype.listeners = function listeners(event, exists) {
-  var evt = prefix ? prefix + event : event
-    , available = this._events[evt];
-
-  if (exists) return !!available;
-  if (!available) return [];
-  if (available.fn) return [available.fn];
-
-  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
-    ee[i] = available[i].fn;
-  }
-
-  return ee;
-};
-
-/**
- * Calls each of the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @returns {Boolean} `true` if the event had listeners, else `false`.
- * @api public
- */
-EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return false;
-
-  var listeners = this._events[evt]
-    , len = arguments.length
-    , args
-    , i;
-
-  if (listeners.fn) {
-    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
-
-    switch (len) {
-      case 1: return listeners.fn.call(listeners.context), true;
-      case 2: return listeners.fn.call(listeners.context, a1), true;
-      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
-      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
-      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-    }
-
-    for (i = 1, args = new Array(len -1); i < len; i++) {
-      args[i - 1] = arguments[i];
-    }
-
-    listeners.fn.apply(listeners.context, args);
-  } else {
-    var length = listeners.length
-      , j;
-
-    for (i = 0; i < length; i++) {
-      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
-
-      switch (len) {
-        case 1: listeners[i].fn.call(listeners[i].context); break;
-        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
-        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
-        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
-        default:
-          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
-            args[j - 1] = arguments[j];
-          }
-
-          listeners[i].fn.apply(listeners[i].context, args);
-      }
-    }
-  }
-
-  return true;
-};
-
-/**
- * Add a listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.on = function on(event, fn, context) {
-  var listener = new EE(fn, context || this)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Add a one-time listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.once = function once(event, fn, context) {
-  var listener = new EE(fn, context || this, true)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Remove the listeners of a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn Only remove the listeners that match this function.
- * @param {Mixed} context Only remove the listeners that have this context.
- * @param {Boolean} once Only remove one-time listeners.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return this;
-  if (!fn) {
-    if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-    return this;
-  }
-
-  var listeners = this._events[evt];
-
-  if (listeners.fn) {
-    if (
-         listeners.fn === fn
-      && (!once || listeners.once)
-      && (!context || listeners.context === context)
-    ) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
-      if (
-           listeners[i].fn !== fn
-        || (once && !listeners[i].once)
-        || (context && listeners[i].context !== context)
-      ) {
-        events.push(listeners[i]);
-      }
-    }
-
-    //
-    // Reset the array, or remove it completely if we have no more listeners.
-    //
-    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
-    else if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-  }
-
-  return this;
-};
-
-/**
- * Remove all listeners, or those of the specified event.
- *
- * @param {String|Symbol} [event] The event name.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
-  var evt;
-
-  if (event) {
-    evt = prefix ? prefix + event : event;
-    if (this._events[evt]) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    this._events = new Events();
-    this._eventsCount = 0;
-  }
-
-  return this;
-};
-
-//
-// Alias methods names because people roll like that.
-//
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-//
-// This function doesn't apply anymore.
-//
-EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
-  return this;
-};
-
-//
-// Expose the prefix.
-//
-EventEmitter.prefixed = prefix;
-
-//
-// Allow `EventEmitter` to be imported as module namespace.
-//
-EventEmitter.EventEmitter = EventEmitter;
-
-//
-// Expose the module.
-//
-if (true) {
-  module.exports = EventEmitter;
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/ismobilejs/dist/isMobile.min.js":
 /*!******************************************************!*\
   !*** ./node_modules/ismobilejs/dist/isMobile.min.js ***!
@@ -6818,7 +6495,7 @@ exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -13518,7 +13195,7 @@ var _RenderTexture = __webpack_require__(/*! ../textures/RenderTexture */ "./nod
 
 var _RenderTexture2 = _interopRequireDefault(_RenderTexture);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -23095,7 +22772,7 @@ var _settings = __webpack_require__(/*! ../settings */ "./node_modules/pixi.js/l
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -24462,7 +24139,7 @@ var _TextureUvs = __webpack_require__(/*! ./TextureUvs */ "./node_modules/pixi.j
 
 var _TextureUvs2 = _interopRequireDefault(_TextureUvs);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -26727,7 +26404,7 @@ var _settings = __webpack_require__(/*! ../settings */ "./node_modules/pixi.js/l
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -33628,7 +33305,7 @@ var _InteractionTrackingData = __webpack_require__(/*! ./InteractionTrackingData
 
 var _InteractionTrackingData2 = _interopRequireDefault(_InteractionTrackingData);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -36051,7 +35728,7 @@ var _resourceLoader2 = _interopRequireDefault(_resourceLoader);
 
 var _blob = __webpack_require__(/*! resource-loader/lib/middlewares/parsing/blob */ "./node_modules/resource-loader/lib/middlewares/parsing/blob.js");
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -40488,6 +40165,329 @@ core.WebGLRenderer.registerPlugin('prepare', WebGLPrepare);
 
 /***/ }),
 
+/***/ "./node_modules/pixi.js/node_modules/eventemitter3/index.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/pixi.js/node_modules/eventemitter3/index.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if (true) {
+  module.exports = EventEmitter;
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/process/browser.js":
 /*!*****************************************!*\
   !*** ./node_modules/process/browser.js ***!
@@ -44167,6 +44167,35 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/webfontloader/webfontloader.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/webfontloader/webfontloader.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;/* Web Font Loader v1.6.28 - (c) Adobe Systems, Google. License: Apache 2.0 */(function(){function aa(a,b,c){return a.call.apply(a.bind,arguments)}function ba(a,b,c){if(!a)throw Error();if(2<arguments.length){var d=Array.prototype.slice.call(arguments,2);return function(){var c=Array.prototype.slice.call(arguments);Array.prototype.unshift.apply(c,d);return a.apply(b,c)}}return function(){return a.apply(b,arguments)}}function p(a,b,c){p=Function.prototype.bind&&-1!=Function.prototype.bind.toString().indexOf("native code")?aa:ba;return p.apply(null,arguments)}var q=Date.now||function(){return+new Date};function ca(a,b){this.a=a;this.o=b||a;this.c=this.o.document}var da=!!window.FontFace;function t(a,b,c,d){b=a.c.createElement(b);if(c)for(var e in c)c.hasOwnProperty(e)&&("style"==e?b.style.cssText=c[e]:b.setAttribute(e,c[e]));d&&b.appendChild(a.c.createTextNode(d));return b}function u(a,b,c){a=a.c.getElementsByTagName(b)[0];a||(a=document.documentElement);a.insertBefore(c,a.lastChild)}function v(a){a.parentNode&&a.parentNode.removeChild(a)}
+function w(a,b,c){b=b||[];c=c||[];for(var d=a.className.split(/\s+/),e=0;e<b.length;e+=1){for(var f=!1,g=0;g<d.length;g+=1)if(b[e]===d[g]){f=!0;break}f||d.push(b[e])}b=[];for(e=0;e<d.length;e+=1){f=!1;for(g=0;g<c.length;g+=1)if(d[e]===c[g]){f=!0;break}f||b.push(d[e])}a.className=b.join(" ").replace(/\s+/g," ").replace(/^\s+|\s+$/,"")}function y(a,b){for(var c=a.className.split(/\s+/),d=0,e=c.length;d<e;d++)if(c[d]==b)return!0;return!1}
+function ea(a){return a.o.location.hostname||a.a.location.hostname}function z(a,b,c){function d(){m&&e&&f&&(m(g),m=null)}b=t(a,"link",{rel:"stylesheet",href:b,media:"all"});var e=!1,f=!0,g=null,m=c||null;da?(b.onload=function(){e=!0;d()},b.onerror=function(){e=!0;g=Error("Stylesheet failed to load");d()}):setTimeout(function(){e=!0;d()},0);u(a,"head",b)}
+function A(a,b,c,d){var e=a.c.getElementsByTagName("head")[0];if(e){var f=t(a,"script",{src:b}),g=!1;f.onload=f.onreadystatechange=function(){g||this.readyState&&"loaded"!=this.readyState&&"complete"!=this.readyState||(g=!0,c&&c(null),f.onload=f.onreadystatechange=null,"HEAD"==f.parentNode.tagName&&e.removeChild(f))};e.appendChild(f);setTimeout(function(){g||(g=!0,c&&c(Error("Script load timeout")))},d||5E3);return f}return null};function B(){this.a=0;this.c=null}function C(a){a.a++;return function(){a.a--;D(a)}}function E(a,b){a.c=b;D(a)}function D(a){0==a.a&&a.c&&(a.c(),a.c=null)};function F(a){this.a=a||"-"}F.prototype.c=function(a){for(var b=[],c=0;c<arguments.length;c++)b.push(arguments[c].replace(/[\W_]+/g,"").toLowerCase());return b.join(this.a)};function G(a,b){this.c=a;this.f=4;this.a="n";var c=(b||"n4").match(/^([nio])([1-9])$/i);c&&(this.a=c[1],this.f=parseInt(c[2],10))}function fa(a){return H(a)+" "+(a.f+"00")+" 300px "+I(a.c)}function I(a){var b=[];a=a.split(/,\s*/);for(var c=0;c<a.length;c++){var d=a[c].replace(/['"]/g,"");-1!=d.indexOf(" ")||/^\d/.test(d)?b.push("'"+d+"'"):b.push(d)}return b.join(",")}function J(a){return a.a+a.f}function H(a){var b="normal";"o"===a.a?b="oblique":"i"===a.a&&(b="italic");return b}
+function ga(a){var b=4,c="n",d=null;a&&((d=a.match(/(normal|oblique|italic)/i))&&d[1]&&(c=d[1].substr(0,1).toLowerCase()),(d=a.match(/([1-9]00|normal|bold)/i))&&d[1]&&(/bold/i.test(d[1])?b=7:/[1-9]00/.test(d[1])&&(b=parseInt(d[1].substr(0,1),10))));return c+b};function ha(a,b){this.c=a;this.f=a.o.document.documentElement;this.h=b;this.a=new F("-");this.j=!1!==b.events;this.g=!1!==b.classes}function ia(a){a.g&&w(a.f,[a.a.c("wf","loading")]);K(a,"loading")}function L(a){if(a.g){var b=y(a.f,a.a.c("wf","active")),c=[],d=[a.a.c("wf","loading")];b||c.push(a.a.c("wf","inactive"));w(a.f,c,d)}K(a,"inactive")}function K(a,b,c){if(a.j&&a.h[b])if(c)a.h[b](c.c,J(c));else a.h[b]()};function ja(){this.c={}}function ka(a,b,c){var d=[],e;for(e in b)if(b.hasOwnProperty(e)){var f=a.c[e];f&&d.push(f(b[e],c))}return d};function M(a,b){this.c=a;this.f=b;this.a=t(this.c,"span",{"aria-hidden":"true"},this.f)}function N(a){u(a.c,"body",a.a)}function O(a){return"display:block;position:absolute;top:-9999px;left:-9999px;font-size:300px;width:auto;height:auto;line-height:normal;margin:0;padding:0;font-variant:normal;white-space:nowrap;font-family:"+I(a.c)+";"+("font-style:"+H(a)+";font-weight:"+(a.f+"00")+";")};function P(a,b,c,d,e,f){this.g=a;this.j=b;this.a=d;this.c=c;this.f=e||3E3;this.h=f||void 0}P.prototype.start=function(){var a=this.c.o.document,b=this,c=q(),d=new Promise(function(d,e){function f(){q()-c>=b.f?e():a.fonts.load(fa(b.a),b.h).then(function(a){1<=a.length?d():setTimeout(f,25)},function(){e()})}f()}),e=null,f=new Promise(function(a,d){e=setTimeout(d,b.f)});Promise.race([f,d]).then(function(){e&&(clearTimeout(e),e=null);b.g(b.a)},function(){b.j(b.a)})};function Q(a,b,c,d,e,f,g){this.v=a;this.B=b;this.c=c;this.a=d;this.s=g||"BESbswy";this.f={};this.w=e||3E3;this.u=f||null;this.m=this.j=this.h=this.g=null;this.g=new M(this.c,this.s);this.h=new M(this.c,this.s);this.j=new M(this.c,this.s);this.m=new M(this.c,this.s);a=new G(this.a.c+",serif",J(this.a));a=O(a);this.g.a.style.cssText=a;a=new G(this.a.c+",sans-serif",J(this.a));a=O(a);this.h.a.style.cssText=a;a=new G("serif",J(this.a));a=O(a);this.j.a.style.cssText=a;a=new G("sans-serif",J(this.a));a=
+O(a);this.m.a.style.cssText=a;N(this.g);N(this.h);N(this.j);N(this.m)}var R={D:"serif",C:"sans-serif"},S=null;function T(){if(null===S){var a=/AppleWebKit\/([0-9]+)(?:\.([0-9]+))/.exec(window.navigator.userAgent);S=!!a&&(536>parseInt(a[1],10)||536===parseInt(a[1],10)&&11>=parseInt(a[2],10))}return S}Q.prototype.start=function(){this.f.serif=this.j.a.offsetWidth;this.f["sans-serif"]=this.m.a.offsetWidth;this.A=q();U(this)};
+function la(a,b,c){for(var d in R)if(R.hasOwnProperty(d)&&b===a.f[R[d]]&&c===a.f[R[d]])return!0;return!1}function U(a){var b=a.g.a.offsetWidth,c=a.h.a.offsetWidth,d;(d=b===a.f.serif&&c===a.f["sans-serif"])||(d=T()&&la(a,b,c));d?q()-a.A>=a.w?T()&&la(a,b,c)&&(null===a.u||a.u.hasOwnProperty(a.a.c))?V(a,a.v):V(a,a.B):ma(a):V(a,a.v)}function ma(a){setTimeout(p(function(){U(this)},a),50)}function V(a,b){setTimeout(p(function(){v(this.g.a);v(this.h.a);v(this.j.a);v(this.m.a);b(this.a)},a),0)};function W(a,b,c){this.c=a;this.a=b;this.f=0;this.m=this.j=!1;this.s=c}var X=null;W.prototype.g=function(a){var b=this.a;b.g&&w(b.f,[b.a.c("wf",a.c,J(a).toString(),"active")],[b.a.c("wf",a.c,J(a).toString(),"loading"),b.a.c("wf",a.c,J(a).toString(),"inactive")]);K(b,"fontactive",a);this.m=!0;na(this)};
+W.prototype.h=function(a){var b=this.a;if(b.g){var c=y(b.f,b.a.c("wf",a.c,J(a).toString(),"active")),d=[],e=[b.a.c("wf",a.c,J(a).toString(),"loading")];c||d.push(b.a.c("wf",a.c,J(a).toString(),"inactive"));w(b.f,d,e)}K(b,"fontinactive",a);na(this)};function na(a){0==--a.f&&a.j&&(a.m?(a=a.a,a.g&&w(a.f,[a.a.c("wf","active")],[a.a.c("wf","loading"),a.a.c("wf","inactive")]),K(a,"active")):L(a.a))};function oa(a){this.j=a;this.a=new ja;this.h=0;this.f=this.g=!0}oa.prototype.load=function(a){this.c=new ca(this.j,a.context||this.j);this.g=!1!==a.events;this.f=!1!==a.classes;pa(this,new ha(this.c,a),a)};
+function qa(a,b,c,d,e){var f=0==--a.h;(a.f||a.g)&&setTimeout(function(){var a=e||null,m=d||null||{};if(0===c.length&&f)L(b.a);else{b.f+=c.length;f&&(b.j=f);var h,l=[];for(h=0;h<c.length;h++){var k=c[h],n=m[k.c],r=b.a,x=k;r.g&&w(r.f,[r.a.c("wf",x.c,J(x).toString(),"loading")]);K(r,"fontloading",x);r=null;if(null===X)if(window.FontFace){var x=/Gecko.*Firefox\/(\d+)/.exec(window.navigator.userAgent),xa=/OS X.*Version\/10\..*Safari/.exec(window.navigator.userAgent)&&/Apple/.exec(window.navigator.vendor);
+X=x?42<parseInt(x[1],10):xa?!1:!0}else X=!1;X?r=new P(p(b.g,b),p(b.h,b),b.c,k,b.s,n):r=new Q(p(b.g,b),p(b.h,b),b.c,k,b.s,a,n);l.push(r)}for(h=0;h<l.length;h++)l[h].start()}},0)}function pa(a,b,c){var d=[],e=c.timeout;ia(b);var d=ka(a.a,c,a.c),f=new W(a.c,b,e);a.h=d.length;b=0;for(c=d.length;b<c;b++)d[b].load(function(b,d,c){qa(a,f,b,d,c)})};function ra(a,b){this.c=a;this.a=b}
+ra.prototype.load=function(a){function b(){if(f["__mti_fntLst"+d]){var c=f["__mti_fntLst"+d](),e=[],h;if(c)for(var l=0;l<c.length;l++){var k=c[l].fontfamily;void 0!=c[l].fontStyle&&void 0!=c[l].fontWeight?(h=c[l].fontStyle+c[l].fontWeight,e.push(new G(k,h))):e.push(new G(k))}a(e)}else setTimeout(function(){b()},50)}var c=this,d=c.a.projectId,e=c.a.version;if(d){var f=c.c.o;A(this.c,(c.a.api||"https://fast.fonts.net/jsapi")+"/"+d+".js"+(e?"?v="+e:""),function(e){e?a([]):(f["__MonotypeConfiguration__"+
+d]=function(){return c.a},b())}).id="__MonotypeAPIScript__"+d}else a([])};function sa(a,b){this.c=a;this.a=b}sa.prototype.load=function(a){var b,c,d=this.a.urls||[],e=this.a.families||[],f=this.a.testStrings||{},g=new B;b=0;for(c=d.length;b<c;b++)z(this.c,d[b],C(g));var m=[];b=0;for(c=e.length;b<c;b++)if(d=e[b].split(":"),d[1])for(var h=d[1].split(","),l=0;l<h.length;l+=1)m.push(new G(d[0],h[l]));else m.push(new G(d[0]));E(g,function(){a(m,f)})};function ta(a,b){a?this.c=a:this.c=ua;this.a=[];this.f=[];this.g=b||""}var ua="https://fonts.googleapis.com/css";function va(a,b){for(var c=b.length,d=0;d<c;d++){var e=b[d].split(":");3==e.length&&a.f.push(e.pop());var f="";2==e.length&&""!=e[1]&&(f=":");a.a.push(e.join(f))}}
+function wa(a){if(0==a.a.length)throw Error("No fonts to load!");if(-1!=a.c.indexOf("kit="))return a.c;for(var b=a.a.length,c=[],d=0;d<b;d++)c.push(a.a[d].replace(/ /g,"+"));b=a.c+"?family="+c.join("%7C");0<a.f.length&&(b+="&subset="+a.f.join(","));0<a.g.length&&(b+="&text="+encodeURIComponent(a.g));return b};function ya(a){this.f=a;this.a=[];this.c={}}
+var za={latin:"BESbswy","latin-ext":"\u00e7\u00f6\u00fc\u011f\u015f",cyrillic:"\u0439\u044f\u0416",greek:"\u03b1\u03b2\u03a3",khmer:"\u1780\u1781\u1782",Hanuman:"\u1780\u1781\u1782"},Aa={thin:"1",extralight:"2","extra-light":"2",ultralight:"2","ultra-light":"2",light:"3",regular:"4",book:"4",medium:"5","semi-bold":"6",semibold:"6","demi-bold":"6",demibold:"6",bold:"7","extra-bold":"8",extrabold:"8","ultra-bold":"8",ultrabold:"8",black:"9",heavy:"9",l:"3",r:"4",b:"7"},Ba={i:"i",italic:"i",n:"n",normal:"n"},
+Ca=/^(thin|(?:(?:extra|ultra)-?)?light|regular|book|medium|(?:(?:semi|demi|extra|ultra)-?)?bold|black|heavy|l|r|b|[1-9]00)?(n|i|normal|italic)?$/;
+function Da(a){for(var b=a.f.length,c=0;c<b;c++){var d=a.f[c].split(":"),e=d[0].replace(/\+/g," "),f=["n4"];if(2<=d.length){var g;var m=d[1];g=[];if(m)for(var m=m.split(","),h=m.length,l=0;l<h;l++){var k;k=m[l];if(k.match(/^[\w-]+$/)){var n=Ca.exec(k.toLowerCase());if(null==n)k="";else{k=n[2];k=null==k||""==k?"n":Ba[k];n=n[1];if(null==n||""==n)n="4";else var r=Aa[n],n=r?r:isNaN(n)?"4":n.substr(0,1);k=[k,n].join("")}}else k="";k&&g.push(k)}0<g.length&&(f=g);3==d.length&&(d=d[2],g=[],d=d?d.split(","):
+g,0<d.length&&(d=za[d[0]])&&(a.c[e]=d))}a.c[e]||(d=za[e])&&(a.c[e]=d);for(d=0;d<f.length;d+=1)a.a.push(new G(e,f[d]))}};function Ea(a,b){this.c=a;this.a=b}var Fa={Arimo:!0,Cousine:!0,Tinos:!0};Ea.prototype.load=function(a){var b=new B,c=this.c,d=new ta(this.a.api,this.a.text),e=this.a.families;va(d,e);var f=new ya(e);Da(f);z(c,wa(d),C(b));E(b,function(){a(f.a,f.c,Fa)})};function Ga(a,b){this.c=a;this.a=b}Ga.prototype.load=function(a){var b=this.a.id,c=this.c.o;b?A(this.c,(this.a.api||"https://use.typekit.net")+"/"+b+".js",function(b){if(b)a([]);else if(c.Typekit&&c.Typekit.config&&c.Typekit.config.fn){b=c.Typekit.config.fn;for(var e=[],f=0;f<b.length;f+=2)for(var g=b[f],m=b[f+1],h=0;h<m.length;h++)e.push(new G(g,m[h]));try{c.Typekit.load({events:!1,classes:!1,async:!0})}catch(l){}a(e)}},2E3):a([])};function Ha(a,b){this.c=a;this.f=b;this.a=[]}Ha.prototype.load=function(a){var b=this.f.id,c=this.c.o,d=this;b?(c.__webfontfontdeckmodule__||(c.__webfontfontdeckmodule__={}),c.__webfontfontdeckmodule__[b]=function(b,c){for(var g=0,m=c.fonts.length;g<m;++g){var h=c.fonts[g];d.a.push(new G(h.name,ga("font-weight:"+h.weight+";font-style:"+h.style)))}a(d.a)},A(this.c,(this.f.api||"https://f.fontdeck.com/s/css/js/")+ea(this.c)+"/"+b+".js",function(b){b&&a([])})):a([])};var Y=new oa(window);Y.a.c.custom=function(a,b){return new sa(b,a)};Y.a.c.fontdeck=function(a,b){return new Ha(b,a)};Y.a.c.monotype=function(a,b){return new ra(b,a)};Y.a.c.typekit=function(a,b){return new Ga(b,a)};Y.a.c.google=function(a,b){return new Ea(b,a)};var Z={load:p(Y.load,Y)}; true?!(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){return Z}).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):undefined;}());
+
+
+/***/ }),
+
 /***/ "./node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
@@ -44354,11 +44383,12 @@ __webpack_require__.r(__webpack_exports__);
 /*!**********************************!*\
   !*** ./src/js/BottleFlipGame.js ***!
   \**********************************/
-/*! no exports provided */
+/*! exports provided: KeyFlipGame */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "KeyFlipGame", function() { return KeyFlipGame; });
 /* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/get */ "./node_modules/@babel/runtime/helpers/get.js");
 /* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
@@ -44393,7 +44423,6 @@ var dist = function dist(point) {
 };
 
 var COUNTDOWN_LENGTH = 20;
-
 var KeyFlipGame =
 /*#__PURE__*/
 function (_PIXI$Container) {
@@ -44793,17 +44822,7 @@ function (_PIXI$Container) {
 
     _this._wall.visible = false;
 
-<<<<<<< HEAD
     _this.addChild(_this._wall);
-=======
-      this.dialogTree.selectNode(dest);
-      this.nextScene();
-    }
-  }, {
-    key: "isGameAction",
-    value: function isGameAction(action) {
-      var gameActions = ["PlayGameEasy", "PlayGameNormal", "PlayGameHard", "PlayGameKey"];
->>>>>>> 13a68aace31b830c248c7cf472091018f6a5d17e
 
     var Floor =
     /*#__PURE__*/
@@ -44816,7 +44835,6 @@ function (_PIXI$Container) {
         return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Floor).apply(this, arguments));
       }
 
-<<<<<<< HEAD
       _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Floor, [{
         key: "onCollision",
         value: function onCollision(otherObj) {
@@ -44839,68 +44857,6 @@ function (_PIXI$Container) {
     _this._floor.beginFill(0x555555);
 
     _this._floor.drawRectBound = _this._floor.drawRect.bind(_this._floor, 0, _this.intrinsicHeight - 20, _this.intrinsicWidth, 20);
-=======
-      return false;
-    }
-  }, {
-    key: "playGame",
-    value: function playGame(action) {
-      if (action === "PlayGameEasy") {
-        this.powerMeterGame();
-      }
-
-      if (action === "PlayGameNormal") {
-        console.log("Playing game 2");
-        this.powerMeterGame(); //this.actions.push("WinGame2");
-      }
-
-      if (action === "PlayGameHard") {
-        console.log("Playing game 3");
-        this.powerMeterGame(); //this.actions.push("WinGame3");
-      }
-
-      if (action === "PlayGameKey") {
-        console.log("Key game not implemented");
-      }
-    }
-  }, {
-    key: "powerMeterGame",
-    value: function powerMeterGame() {
-      var gameApp1 = new _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__["PowerMeterGame"]({
-        width: this._dialogBox.getBounds().width,
-        height: this._dialogBox.getBounds().height //oscillationTime: 1000,
-        //greenAreaWidth: 0.4
-
-      });
-      gameApp1.position.x = SCREEN_PADDING;
-      gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
-      var raf;
-
-      var loop = function loop() {
-        gameApp1.onUpdate();
-        raf = requestAnimationFrame(loop);
-      };
-
-      raf = requestAnimationFrame(loop);
-      this.view.addEventListener("pointerdown", function () {
-        gameApp1.stop();
-      });
-      window.addEventListener("keydown", function (e) {
-        if (e.key === " ") {
-          gameApp1.stop();
-          e.preventDefault(); //Stop the scrolling  
-        }
-      });
-      this.stage.addChild(gameApp1);
-      gameApp1.on("ended", function (e) {
-        console.log(e); //there's a .won with whether they won or not
-      });
-    }
-  }, {
-    key: "startTyping",
-    value: function startTyping() {
-      var _this3 = this;
->>>>>>> 13a68aace31b830c248c7cf472091018f6a5d17e
 
     _this._floor.drawRectBound();
 
@@ -44933,37 +44889,7 @@ function (_PIXI$Container) {
     _this._arrowSprite.width = 200;
     _this._arrowSprite.height = _this._arrowSprite.width * arrowAspect;
 
-<<<<<<< HEAD
     _this.addChild(_this._arrowSprite);
-=======
-Promise.all([new Promise(function (resolve, reject) {
-  webfontloader__WEBPACK_IMPORTED_MODULE_6___default.a.load({
-    active: resolve,
-    google: {
-      families: ['Varela Round', 'ZCOOL KuaiLe']
-    }
-  });
-}), new Promise(function (resolve, reject) {
-  pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
-  .add("bedroom", "images/bedroom.png") //Characters
-  .add("carl", "images/crepycarl-clothed.png").add("mc", "images/mc-clothed.png") //Other assets
-  .add("dialogFrame", "images/frameyboi.png").add("buttonFrame", "images/buttonboi.png").load(resolve);
-}), new Promise(function (resolve, reject) {
-  document.addEventListener("DOMContentLoaded", resolve);
-})]).then(function () {
-  //WIRE UP THE APP
-  var app = new DialogSceneApp({
-    antialias: true,
-    width: window.innerWidth,
-    height: window.innerHeight
-  }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__["loadJsonFile"]("mainTree"));
-  document.body.appendChild(app.view); //lock for mobile devices (throws if device doesn't support)
-
-  /*try {
-    screen.orientation.lock('landscape');
-  }
-  catch(e) {}*/
->>>>>>> 13a68aace31b830c248c7cf472091018f6a5d17e
 
     _this._winText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("NAILED IT!", {
       fontFamily: 'Impact',
@@ -44983,24 +44909,7 @@ Promise.all([new Promise(function (resolve, reject) {
 
     _this.addChild(_this._winText);
 
-<<<<<<< HEAD
     _this._loseBg = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Graphics"]();
-=======
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DialogueTree", function() { return DialogueTree; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DialogueNode", function() { return DialogueNode; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OptionNode", function() { return OptionNode; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadJsonFile", function() { return loadJsonFile; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getJsonByFile", function() { return getJsonByFile; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _json_test_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./json/test.js */ "./src/js/json/test.js");
-/* harmony import */ var _json_main_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./json/main.js */ "./src/js/json/main.js");
-
->>>>>>> 13a68aace31b830c248c7cf472091018f6a5d17e
 
     _this._loseBg.beginFill(0xFF0000);
 
@@ -45151,33 +45060,959 @@ __webpack_require__.r(__webpack_exports__);
   return KeyFlipGame;
 }(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Container"]);
 
-document.addEventListener("DOMContentLoaded", function () {
-  pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].add(KeyFlipGame.getAssetsToLoad()).load(function () {
-    //WIRE UP THE APP
-    var app = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Application"]({
-      antialias: true,
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-    document.body.appendChild(app.view);
-    var game = new KeyFlipGame({
-      intrinsicWidth: app.screen.width,
-      intrinsicHeight: app.screen.height
-    });
-    app.stage.addChild(game);
-    setInterval(function () {
-      Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["physicsLoop"])(app.stage);
-    }, 10);
-    var raf;
+/***/ }),
 
-    var loop = function loop() {
-      game.onUpdate();
+/***/ "./src/js/PowerMeterGame.js":
+/*!**********************************!*\
+  !*** ./src/js/PowerMeterGame.js ***!
+  \**********************************/
+/*! exports provided: PowerMeterGame */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PowerMeterGame", function() { return PowerMeterGame; });
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./engine/WithPhysics.js */ "./src/js/engine/WithPhysics.js");
+
+
+
+
+
+
+
+/**Along with normal PIXI.Application options
+ * oscillationTime The time it takes the sweeper to do one pass over the width in MS
+ * greenAreaWidth 0-1 of the width of the container
+ */
+
+var PowerMeterGame =
+/*#__PURE__*/
+function (_PIXI$Container) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(PowerMeterGame, _PIXI$Container);
+
+  function PowerMeterGame(options) {
+    var _this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PowerMeterGame);
+
+    options.transparent = true;
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(PowerMeterGame).call(this, options)); //Width and height to size this thing too
+
+    _this.intrinsicWidth = options.intrinsicWidth || 500;
+    _this.intrinsicHeight = options.intrinsicHeight || 200;
+    _this.oscillationTime = options.oscillationTime || 1000;
+    _this.greenAreaWidth = options.greenAreaWidth || 0.5;
+    _this.greenAreaPixelWidth = _this.intrinsicWidth * _this.greenAreaWidth; //Add all the elements
+
+    _this._redArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._redArea.beginFill(0xAA5555);
+
+    _this._redArea.drawRectBound = _this._redArea.drawRect.bind(_this._redArea, 0, _this.intrinsicHeight / 6, _this.intrinsicWidth, 2 * _this.intrinsicHeight / 3);
+
+    _this._redArea.drawRectBound();
+
+    _this._redArea.endFill();
+
+    _this.addChild(_this._redArea);
+
+    _this._greenArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._greenArea.beginFill(0x55AA55);
+
+    _this._greenArea.drawRectBound = _this._greenArea.drawRect.bind(_this._greenArea, (_this.intrinsicWidth - _this.greenAreaPixelWidth) / 2, _this.intrinsicHeight / 6, _this.greenAreaPixelWidth, 2 * _this.intrinsicHeight / 3);
+
+    _this._greenArea.drawRectBound();
+
+    _this._greenArea.endFill();
+
+    _this.addChild(_this._greenArea);
+
+    _this._stopBar = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._stopBar.beginFill(0xFFFFFF);
+
+    _this._stopBar.lineStyle(4, 0x000000, 1);
+
+    _this._stopBar.drawRect(0, 0, 20, _this.intrinsicHeight);
+
+    _this._stopBar.endFill();
+
+    _this.addChild(_this._stopBar);
+
+    var text = _this._skillCheckText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("SKILL CHECK", {
+      fontFamily: 'Impact',
+      fontSize: 200,
+      fill: 0xffffff,
+      align: 'center',
+      stroke: 0x000000,
+      strokeThickness: 20
+    });
+    text.position.x = _this.intrinsicWidth / 2;
+    text.position.y = _this.intrinsicHeight / 2;
+    text._initialWidth = text.width;
+    text._initialHeight = text.height;
+    text.visible = false;
+
+    _this._skillCheckText.anchor.set(0.5);
+
+    _this.addChild(text);
+
+    _this._barPos = 0;
+    _this._initialTime = Date.now();
+    _this._started = false;
+    _this._startTime;
+    _this._stopped = false;
+    _this._hitGreenArea = undefined;
+    return _this;
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PowerMeterGame, [{
+    key: "onUpdate",
+    value: function onUpdate() {
+      if (!this._started || this._skillCheckText.visible) {
+        var now = Date.now() - this._initialTime;
+
+        if (now < 300) {
+          //0 - 300ms
+          this._skillCheckText.visible = true;
+          this._skillCheckText.width = this._skillCheckText._initialWidth * 0.5;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * 0.5;
+        } else if (now < 600) {
+          //300 - 600ms
+          var tween = (now - 300) / 300;
+          tween = tween * 0.5 + 0.5;
+          console.log(tween);
+          this._skillCheckText.width = this._skillCheckText._initialWidth * tween;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * tween;
+        } else if (now < 1000) {
+          //600 - 1000ms
+          var _tween = (now - 600) / 400;
+
+          _tween = 1 - _tween;
+          this._skillCheckText.width = this._skillCheckText._initialWidth * _tween;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * _tween;
+        } else if (now > 1000) {
+          this._skillCheckText.visible = false;
+        }
+
+        if (now > 800) {
+          this._started = true;
+          this._startTime = Date.now();
+        }
+      } else {
+        if (!this._stopped) {
+          var _now = Date.now() - this._startTime;
+
+          var shouldMirror = Math.floor(_now / this.oscillationTime) % 2 === 0;
+          this._barPos = Math.abs((shouldMirror ? 0 : 1) - _now % this.oscillationTime / this.oscillationTime);
+          this._stopBar.x = this.intrinsicWidth * this._barPos - this._stopBar.getBounds().width / 2;
+        } else if (this._stopped) {
+          var blinkInterval = Math.floor(Date.now() / 300) % 2 === 0; //every 1 second
+
+          if (this._hitGreenArea) {
+            this._greenArea.beginFill(blinkInterval ? 0x00FF00 : 0x55AA55);
+
+            this._greenArea.drawRectBound();
+
+            this._greenArea.endFill();
+          } else {
+            this._redArea.beginFill(blinkInterval ? 0xFF0000 : 0xAA5555);
+
+            this._redArea.drawRectBound();
+
+            this._redArea.endFill();
+          }
+        }
+      }
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      if (!this._started) {
+        return;
+      }
+
+      this._stopped = true;
+      var stopPos = this._barPos;
+      var greenBoxX = (this.intrinsicWidth - this.greenAreaPixelWidth) / 2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
+
+      var greenAreaStart = greenBoxX / this.intrinsicWidth;
+      var greenAreaEnd = (greenBoxX + this._greenArea.width) / this.intrinsicWidth;
+      this._hitGreenArea = stopPos > greenAreaStart && stopPos < greenAreaEnd;
+      this.emit("ended", {
+        won: this.won
+      });
+    } //Whether the player has won, undefiend if not finished
+
+  }, {
+    key: "won",
+    get: function get() {
+      return this._hitGreenArea;
+    }
+  }]);
+
+  return PowerMeterGame;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Container"]);
+
+/***/ }),
+
+/***/ "./src/js/chat.js":
+/*!************************!*\
+  !*** ./src/js/chat.js ***!
+  \************************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! webfontloader */ "./node_modules/webfontloader/webfontloader.js");
+/* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(webfontloader__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./dialogue_node.js */ "./src/js/dialogue_node.js");
+/* harmony import */ var _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./PowerMeterGame.js */ "./src/js/PowerMeterGame.js");
+/* harmony import */ var _BottleFlipGame_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./BottleFlipGame.js */ "./src/js/BottleFlipGame.js");
+/* harmony import */ var _engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./engine/WithPhysics.js */ "./src/js/engine/WithPhysics.js");
+
+
+
+
+
+
+ //import { DialogTree as dialogTree } from "./MockDialogTree.js";
+
+
+
+
+
+var TYPING_SPEED = 10; //ms between letter
+
+var SCREEN_PADDING = 20;
+
+var DialogSceneApp =
+/*#__PURE__*/
+function (_PIXI$Application) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(DialogSceneApp, _PIXI$Application);
+
+  function DialogSceneApp(options, dialogTree) {
+    var _this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DialogSceneApp);
+
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(DialogSceneApp).call(this, options));
+
+    if (dialogTree == null) {
+      console.log("Dialogue tree null.");
+    }
+
+    _this.optionButtons = [];
+    _this.actions = [];
+    _this.dialogTree = dialogTree;
+    _this._currentPrompt = undefined; //Add all the elements
+
+    var background = _this._background = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.bedroom.texture);
+    var backgroundAspect = background.height / background.width;
+    background.width = _this.screen.width;
+    background.height = background.width * backgroundAspect;
+
+    _this.stage.addChild(background);
+
+    _this._dialogBox = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Container"]();
+
+    _this.stage.addChild(_this._dialogBox);
+
+    var frame = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.dialogFrame.texture, 117, 117, 117, 117);
+    frame.width = 1000;
+    frame.height = 400;
+    frame.scale.x = 0.5;
+    frame.scale.y = 0.5;
+
+    _this._dialogBox.addChild(frame);
+
+    var name = _this._dialogName = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("NAME", {
+      fontFamily: 'Varela Round',
+      fontSize: 24,
+      fill: 0x000000,
+      align: 'center'
+    });
+    name.position.x = 50;
+    name.position.y = 50;
+
+    _this._dialogBox.addChild(name);
+
+    var text = _this._dialogText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("Initial Text", {
+      fontFamily: 'Varela Round',
+      fontSize: 24,
+      fill: 0x000000,
+      align: 'left',
+      wordWrap: true,
+      wordWrapWidth: 400
+    });
+    text.position.x = 50;
+    text.position.y = 80;
+    _this._dialogInterval = undefined;
+
+    _this._dialogBox.addChild(text);
+
+    var face1 = _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.mc.texture);
+    var face1Aspect = face1.height / face1.width;
+    face1.width = _this.screen.width / 2.8;
+    face1.height = face1.width * face1Aspect;
+
+    _this.stage.addChild(face1);
+
+    var face2 = _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.carl.texture);
+    var face2Aspect = face2.height / face2.width;
+    face2.width = _this.screen.width / 2.8;
+    face2.height = face2.width * face2Aspect;
+
+    _this.stage.addChild(face2);
+
+    return _this;
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogSceneApp, [{
+    key: "nextScene",
+    value: function nextScene() {
+      var _this2 = this;
+
+      this.stopTyping();
+      this._currentPrompt = this.dialogTree.prompt(); //let { placement, name, options } = this._currentPrompt;
+
+      var placement = "left";
+      var name = "Test";
+      var options = this.dialogTree.options(this.actions);
+
+      for (var i in this.optionButtons) {
+        this.stage.removeChild(this.optionButtons[i]);
+      }
+
+      this.optionButtons = [];
+
+      var boxBounds = this._dialogBox.getBounds();
+
+      this._dialogBox.x = placement === "left" ? SCREEN_PADDING : this.screen.width - SCREEN_PADDING - boxBounds.width;
+      this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
+      this._dialogName.text = name;
+      this._leftFace.x = 20;
+      this._leftFace.y = this.screen.height / 4;
+      this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
+      this._rightFace.x = this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width;
+      this._rightFace.y = this.screen.height / 4;
+      this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
+
+      if (options) {
+        options.forEach(function (option, idx) {
+          var button = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.buttonFrame.texture, 231, 214, 231, 214);
+          button.width = 300 * 8;
+          button.height = 80 * 8;
+          button.scale.x = 0.125;
+          button.scale.y = 0.125;
+          button.position.x = 10;
+          button.position.y = 10 + 80 * idx;
+
+          _this2.stage.addChild(button);
+
+          var buttonText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"](option.text, {
+            fontFamily: 'Varela Round',
+            fontSize: 24,
+            fill: 0x000000,
+            align: 'left'
+          });
+          buttonText.anchor.y = 0.5;
+          button.addChild(buttonText);
+          buttonText.position.x = 30 * 8;
+          buttonText.position.y = 80 / 2 * 8;
+          buttonText.scale.x = 8;
+          buttonText.scale.y = 8;
+          button.interactive = true;
+          button.buttonMode = true;
+          button.on("pointerdown", function (evt) {
+            _this2.chooseOption(option);
+          });
+
+          _this2.optionButtons.push(button);
+        });
+      }
+
+      this.startTyping();
+    }
+  }, {
+    key: "chooseOption",
+    value: function chooseOption(option) {
+      console.log("Chose option " + option.text);
+      var actions = option.actions;
+
+      for (var i in actions) {
+        if (this.isGameAction(actions[i])) {
+          this.playGame(actions[i]);
+          return;
+        } else {
+          this.actions.push(actions[i]);
+        }
+      }
+
+      var dest = option.destination;
+
+      if (dest == -1) {
+        console.log("End of current tree.");
+        return;
+      }
+
+      this.dialogTree.selectNode(dest);
+      this.nextScene();
+    }
+  }, {
+    key: "isGameAction",
+    value: function isGameAction(action) {
+      return ["PlayGameEasy", "PlayGameNormal", "PlayGameHard", "PlayGameKey"].includes(action);
+    }
+  }, {
+    key: "playGame",
+    value: function playGame(action) {
+      if (action === "PlayGameEasy") {
+        this.powerMeterGame();
+      }
+
+      if (action === "PlayGameNormal") {
+        console.log("Playing game 2");
+        this.powerMeterGame(); //this.actions.push("WinGame2");
+      }
+
+      if (action === "PlayGameHard") {
+        console.log("Playing game 3");
+        this.powerMeterGame(); //this.actions.push("WinGame3");
+      }
+
+      if (action === "PlayGameKey") {
+        this.keyFlipGame();
+      }
+    }
+  }, {
+    key: "powerMeterGame",
+    value: function powerMeterGame() {
+      var gameApp1 = new _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__["PowerMeterGame"]({
+        width: this._dialogBox.getBounds().width,
+        height: this._dialogBox.getBounds().height //oscillationTime: 1000,
+        //greenAreaWidth: 0.4
+
+      });
+      gameApp1.position.x = SCREEN_PADDING;
+      gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
+      var raf;
+
+      var loop = function loop() {
+        gameApp1.onUpdate();
+        raf = requestAnimationFrame(loop);
+      };
+
       raf = requestAnimationFrame(loop);
-    };
+      this.view.addEventListener("pointerdown", function () {
+        gameApp1.stop();
+      });
+      window.addEventListener("keydown", function (e) {
+        if (e.key === " ") {
+          gameApp1.stop();
+          e.preventDefault(); //Stop the scrolling  
+        }
+      });
+      this.stage.addChild(gameApp1);
+      gameApp1.on("ended", function (e) {
+        console.log(e); //there's a .won with whether they won or not
+      });
+    }
+  }, {
+    key: "keyFlipGame",
+    value: function keyFlipGame() {
+      var game = new _BottleFlipGame_js__WEBPACK_IMPORTED_MODULE_9__["KeyFlipGame"]({
+        intrinsicWidth: 3 * this.screen.width / 4,
+        intrinsicHeight: 3 * this.screen.height / 4
+      });
+      game.position.x = this.screen.width / 4;
+      game.position.y = 0;
+      this.stage.addChild(game);
+      setInterval(function () {
+        Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_10__["physicsLoop"])(game);
+      }, 10);
+      var raf;
 
-    raf = requestAnimationFrame(loop);
+      var loop = function loop() {
+        game.onUpdate();
+        raf = requestAnimationFrame(loop);
+      };
+
+      raf = requestAnimationFrame(loop);
+      game.on("ended", function (e) {
+        console.log(e);
+      });
+    }
+  }, {
+    key: "startTyping",
+    value: function startTyping() {
+      var _this3 = this;
+
+      if (this._dialogInterval) {
+        //Clear previous dialog
+        this.stopTyping();
+      }
+
+      console.log("Typing prompt:" + this._currentPrompt); //Start a new dialog
+
+      var letters = this._currentPrompt.split("");
+
+      var currLetter = 0;
+      this._dialogInterval = setInterval(function () {
+        console.log("Anything");
+        _this3._dialogText.text = letters.slice(0, currLetter).join("");
+        currLetter++;
+
+        if (currLetter > _this3._currentPrompt.length) {
+          _this3.stopTyping();
+
+          return;
+        }
+      }, TYPING_SPEED);
+    }
+  }, {
+    key: "stopTyping",
+    value: function stopTyping() {
+      clearInterval(this._dialogInterval);
+      this._dialogInterval = undefined;
+
+      if (this._currentPrompt) {
+        this._dialogText.text = this._currentPrompt;
+      }
+    }
+  }, {
+    key: "isTyping",
+    get: function get() {
+      return !!this._dialogInterval;
+    }
+  }]);
+
+  return DialogSceneApp;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Application"]);
+
+Promise.all([new Promise(function (resolve, reject) {
+  webfontloader__WEBPACK_IMPORTED_MODULE_6___default.a.load({
+    active: resolve,
+    google: {
+      families: ['Varela Round', 'ZCOOL KuaiLe']
+    }
+  });
+}), new Promise(function (resolve, reject) {
+  pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
+  .add("bedroom", "images/bedroom.png") //Characters
+  .add("carl", "images/crepycarl-clothed.png").add("mc", "images/mc-clothed.png") //Other assets
+  .add("dialogFrame", "images/frameyboi.png").add("buttonFrame", "images/buttonboi.png") //games
+  .add(_BottleFlipGame_js__WEBPACK_IMPORTED_MODULE_9__["KeyFlipGame"].getAssetsToLoad()).load(resolve);
+}), new Promise(function (resolve, reject) {
+  document.addEventListener("DOMContentLoaded", resolve);
+})]).then(function () {
+  //WIRE UP THE APP
+  var app = new DialogSceneApp({
+    antialias: true,
+    width: window.innerWidth,
+    height: window.innerHeight
+  }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__["loadJsonFile"]("testTree"));
+  document.body.appendChild(app.view); //lock for mobile devices (throws if device doesn't support)
+
+  /*try {
+    screen.orientation.lock('landscape');
+  }
+  catch(e) {}*/
+
+  ["mouseup", "touchend"].forEach(function (eventName) {
+    app.view.addEventListener(eventName, function () {
+      if (app.isTyping) {
+        app.stopTyping();
+      } else {
+        app.nextScene();
+      }
+    });
   });
 });
+
+/***/ }),
+
+/***/ "./src/js/dialogue_node.js":
+/*!*********************************!*\
+  !*** ./src/js/dialogue_node.js ***!
+  \*********************************/
+/*! exports provided: DialogueTree, DialogueNode, OptionNode, loadJsonFile, getJsonByFile */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DialogueTree", function() { return DialogueTree; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DialogueNode", function() { return DialogueNode; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OptionNode", function() { return OptionNode; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadJsonFile", function() { return loadJsonFile; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getJsonByFile", function() { return getJsonByFile; });
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _json_test_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./json/test.js */ "./src/js/json/test.js");
+/* harmony import */ var _json_main_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./json/main.js */ "./src/js/json/main.js");
+
+
+
+
+
+var DialogueTree =
+/*#__PURE__*/
+function () {
+  function DialogueTree(name, nodes) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DialogueTree);
+
+    this.name = name;
+    this.nodes = nodes;
+    this.currentNode = this.getNode(0);
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogueTree, [{
+    key: "prompt",
+    value: function prompt() {
+      return this.currentNode.prompt;
+    } // Return available options
+
+  }, {
+    key: "options",
+    value: function options(actions) {
+      var ret = [];
+
+      for (var i in this.currentNode.options) {
+        var option = this.currentNode.options[i];
+
+        if (option.performChecks(actions)) {
+          ret.push(option);
+        }
+      }
+
+      return ret;
+    }
+  }, {
+    key: "selectNode",
+    value: function selectNode(nodeId) {
+      this.currentNode = this.getNode(nodeId);
+    }
+  }, {
+    key: "toString",
+    value: function toString() {
+      var ret = this.name + ":\n";
+
+      for (var i in this.nodes) {
+        var node = this.nodes[i];
+        ret += node.toString();
+      }
+
+      return ret;
+    }
+  }, {
+    key: "getNode",
+    value: function getNode(id) {
+      console.log("getNode: " + id);
+
+      for (var i in this.nodes) {
+        var node = this.nodes[i];
+
+        if (node.id == id) {
+          return node;
+        }
+      }
+
+      console.error("Node " + id + " does not exist");
+      return undefined;
+    }
+  }, {
+    key: "validate",
+    value: function validate() {
+      console.log("Validation start");
+
+      if (!this.hasRootNode()) {
+        console.error("No root node.");
+      }
+
+      if (this.badDestinations()) {
+        console.error("Bad destinations found");
+      }
+    }
+  }, {
+    key: "hasRootNode",
+    value: function hasRootNode() {
+      return this.getNode(0) != null;
+    }
+  }, {
+    key: "badDestinations",
+    value: function badDestinations() {
+      var destinations = this.getDestinations();
+      var ret = false;
+
+      for (var i in destinations) {
+        if (this.getNode(destinations[i]) == null && destinations[i] != -1) {
+          console.log("Destination " + destinations[i] + " is null.");
+          ret = true;
+        }
+      }
+
+      return ret;
+    }
+  }, {
+    key: "getDestinations",
+    value: function getDestinations() {
+      var ret = [];
+
+      for (var i in this.nodes) {
+        console.log('Pushing ' + this.nodes[i].getDestinations());
+        ret.concat(this.nodes[i].getDestinations());
+      }
+
+      return ret;
+    }
+  }], [{
+    key: "fromJson",
+    value: function fromJson(json) {
+      var ret = new DialogueTree();
+      ret.name = json.name;
+      ret.nodes = [];
+
+      for (var i in json.nodes) {
+        var nodeJson = json.nodes[i];
+        ret.nodes.push(DialogueNode.fromJson(nodeJson));
+      }
+
+      ret.selectNode(0);
+      return ret;
+    }
+  }]);
+
+  return DialogueTree;
+}();
+
+var DialogueNode =
+/*#__PURE__*/
+function () {
+  function DialogueNode(id, prompt, options) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DialogueNode);
+
+    this.id = id;
+    this.prompt = prompt;
+    this.options = options;
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogueNode, [{
+    key: "toString",
+    value: function toString() {
+      var ret = "Node[" + this.id + "]:\n";
+      ret += "\"" + this.prompt + "\"\n";
+
+      for (var i in this.options) {
+        ret += "\t" + this.options[i].toString() + "\n";
+      }
+
+      return ret;
+    }
+  }, {
+    key: "getDestinations",
+    value: function getDestinations() {
+      var ret = [];
+
+      for (var i in this.options) {
+        ret.push(this.options[i].destination);
+      }
+
+      return ret;
+    }
+  }], [{
+    key: "fromJson",
+    value: function fromJson(json) {
+      var ret = new DialogueNode();
+      ret.id = json.id;
+      ret.prompt = json.prompt;
+      ret.speaker = json.speaker;
+      ret.background = json.background;
+      ret.options = [];
+
+      for (var i in json.options) {
+        var optionJson = json.options[i];
+        ret.options.push(OptionNode.fromJson(optionJson));
+      }
+
+      return ret;
+    }
+  }]);
+
+  return DialogueNode;
+}();
+
+var OptionNode =
+/*#__PURE__*/
+function () {
+  function OptionNode(destination, text, actions, checks) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, OptionNode);
+
+    this.destination = destination;
+    this.text = text;
+    this.actions = actions;
+    this.checks = checks;
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(OptionNode, [{
+    key: "toString",
+    value: function toString() {
+      var ret = "\"" + this.text + "\"";
+      ret += ": " + this.actions.length + " actions, ";
+      ret += this.checks.length + " checks";
+      return ret;
+    } // Make sure that each action has been fulfilled for each check.
+
+  }, {
+    key: "performChecks",
+    value: function performChecks(actions) {
+      if (this.checks.length == 0) {
+        return true;
+      }
+
+      for (var i in this.checks) {
+        var check = this.checks[i];
+
+        if (actions.indexOf(check) == -1) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+  }], [{
+    key: "fromJson",
+    value: function fromJson(json) {
+      var ret = new OptionNode();
+      ret.destination = json.destination;
+      ret.text = json.text;
+      ret.actions = json.actions;
+      ret.checks = json.checks;
+      return ret;
+    }
+  }]);
+
+  return OptionNode;
+}();
+
+function test() {
+  var json = getTestJson();
+  var tree = DialogueTree.fromJson(json);
+  console.log(tree.toString());
+  tree.validate();
+} // returns DialogueTree for jsonFile
+
+
+function loadJsonFile(fileName) {
+  var json = getJsonByFile(fileName);
+  var ret = DialogueTree.fromJson(json);
+
+  if (ret == null) {
+    console.error("Couldn't parse file " + fileName);
+  }
+
+  return ret;
+}
+
+function getJsonByFile(fileName) {
+  var objects = {
+    "testTree": _json_test_js__WEBPACK_IMPORTED_MODULE_2__["default"],
+    "mainTree": _json_main_js__WEBPACK_IMPORTED_MODULE_3__["default"]
+  };
+  var ret = objects[fileName];
+
+  if (ret == null) {
+    console.error(fileName + " was Null.");
+  }
+
+  return ret;
+}
+
+function getTestJson() {
+  return {
+    name: "testTree",
+    nodes: [{
+      id: 0,
+      prompt: "Favorite color?",
+      speaker: "carl",
+      background: "background.png",
+      options: [{
+        destination: 1,
+        text: 'Green',
+        actions: [],
+        checks: []
+      }, {
+        destination: 2,
+        text: 'Blue',
+        actions: [],
+        checks: []
+      }]
+    }, {
+      id: 1,
+      prompt: "Good choice",
+      speaker: "carl",
+      background: "background.png",
+      options: [{
+        destination: 3,
+        text: 'thanks',
+        actions: [],
+        checks: []
+      }]
+    }, {
+      id: 2,
+      prompt: "Bad choice",
+      speaker: "carl",
+      background: "background.png",
+      options: [{
+        destination: 3,
+        text: 'Drat',
+        actions: [],
+        checks: []
+      }]
+    }, {
+      id: 3,
+      prompt: "Ok, gameover now.",
+      speaker: "carl",
+      background: "background.png",
+      options: [{
+        destination: -1,
+        text: '<continue>',
+        actions: [],
+        checks: []
+      }]
+    }]
+  };
+} //test();
+
+
+
 
 /***/ }),
 
@@ -45253,26 +46088,10 @@ function (_PIXI$Container) {
         return _this2;
       }
 
-<<<<<<< HEAD
       _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(QuickParticle, [{
         key: "onPhysicsUpdate",
         value: function onPhysicsUpdate() {
           var _get2;
-=======
-      return true;
-    }
-  }], [{
-    key: "fromJson",
-    value: function fromJson(json) {
-      var ret = new OptionNode();
-      ret.destination = json.destination;
-      ret.text = json.text;
-      ret.actions = json.actions;
-      ret.checks = json.checks;
-      return ret;
-    }
-  }]);
->>>>>>> 13a68aace31b830c248c7cf472091018f6a5d17e
 
           for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
             args[_key2] = arguments[_key2];
@@ -45299,17 +46118,8 @@ function (_PIXI$Container) {
 
     var endTime = Date.now() + _this.emitTime;
 
-<<<<<<< HEAD
     var interval = setInterval(function () {
       _this.spawnParticle();
-=======
-function getJsonByFile(fileName) {
-  var objects = {
-    "testTree": _json_test_js__WEBPACK_IMPORTED_MODULE_2__["default"],
-    "mainTree": _json_main_js__WEBPACK_IMPORTED_MODULE_3__["default"]
-  };
-  var ret = objects[fileName];
->>>>>>> 13a68aace31b830c248c7cf472091018f6a5d17e
 
       if (Date.now() > endTime) {
         clearInterval(interval);
@@ -45529,9 +46339,6 @@ function physicsLoop(rootNode) {
     });
   });
 }
-<<<<<<< HEAD
-=======
-setInterval(physicsLoop, 100);
 
 /***/ }),
 
@@ -45540,9 +46347,515 @@ setInterval(physicsLoop, 100);
   !*** ./src/js/json/main.js ***!
   \*****************************/
 /*! exports provided: default */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /home/blukat/localdev/GameJam/global-games-jam-2019/src/js/json/main.js: Unexpected token (646:34)\n\n\u001b[0m \u001b[90m 644 | \u001b[39m                }\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 645 | \u001b[39m                {\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 646 | \u001b[39m                    destination \u001b[33m:\u001b[39m \u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m     | \u001b[39m                                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 647 | \u001b[39m                    text \u001b[33m:\u001b[39m \u001b[32m\"[Carl tells you how soft your skin is.]\"\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 648 | \u001b[39m                    actions \u001b[33m:\u001b[39m []\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 649 | \u001b[39m                    checks \u001b[33m:\u001b[39m [\u001b[32m\"LoseGameHard\"\u001b[39m]\u001b[33m,\u001b[39m\u001b[0m\n    at Parser.raise (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:3834:17)\n    at Parser.unexpected (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:5142:16)\n    at Parser.parseExprAtom (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:6279:20)\n    at Parser.parseExprSubscripts (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:5848:23)\n    at Parser.parseMaybeUnary (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:5828:21)\n    at Parser.parseExprOps (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:5717:23)\n    at Parser.parseMaybeConditional (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:5690:23)\n    at Parser.parseMaybeAssign (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:5635:21)\n    at Parser.parseObjectProperty (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:6720:101)\n    at Parser.parseObjPropValue (/home/blukat/localdev/GameJam/global-games-jam-2019/node_modules/@babel/parser/lib/index.js:6745:101)");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "testTree",
+  nodes: [{
+    id: 0,
+    prompt: "You awake warm and safe in your bed. You are home. All is well.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 1,
+      text: 'Get up and start your day',
+      actions: [],
+      checks: []
+    }, {
+      destination: 2,
+      text: 'Hit the snooze button',
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 1,
+    prompt: "You've got work today. Time to get dressed and head out.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 3,
+      text: 'Put on professional clothing.',
+      actions: ["Professional"],
+      checks: []
+    }, {
+      destination: 3,
+      text: 'Put on casual clothing',
+      actions: ["Casual"],
+      checks: []
+    }]
+  }, {
+    id: 2,
+    prompt: "Great. Now you're late. You're going to look like a scrub all day. Which do you have time for?",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 4,
+      text: "Brush your teeth",
+      actions: [],
+      checks: []
+    }, {
+      destination: 5,
+      text: "Wash your face.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 3,
+    prompt: "You are looking s h a r p. Let's get you out the door and to the office. It's a workday, after all.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 6,
+      text: "Grab your lunch and head outside",
+      actions: [],
+      checks: []
+    }, {
+      destination: 6,
+      text: "You'll pick up something on your lunch break.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 4,
+    prompt: "Well, at least your breath doesn't stink. No time to pack lunch. Let's giddy-up and head out.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 6,
+      text: "Go to the car",
+      actions: ["Scrub"],
+      checks: []
+    }]
+  }, {
+    id: 5,
+    prompt: "At least you semi-look like you have your life together. Let's giddypup and head out.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 6,
+      text: "Go to the car.",
+      actions: ["Clean"],
+      checks: []
+    }]
+  }, {
+    id: 6,
+    prompt: "You hear a rustling from around the back of your house. Do you check it out?",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 7,
+      text: "Yeah, go see what it is.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 8,
+      text: "Nah, probably just a chipmunk",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 7,
+    prompt: "You creep around the side of your house. You see Carl from the office crouched under your bedroom window.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 9,
+      text: "Talk to him",
+      actions: [],
+      checks: []
+    }, {
+      destination: 8,
+      text: "Run back to your car.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 8,
+    prompt: "",
+    speaker: "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
+    background: "background.png",
+    options: [{
+      destination: 10,
+      text: "I told you to go home when I saw you in my bushes two days ago, Carl.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 9,
+    prompt: "You ask him what he's doing at your house. He responds with 'I've been waiting for you'.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 10,
+      text: "I told you to go home when I saw you in my bushes two days ago, Carl.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 10,
+    prompt: "I couldn't bear to be apart from you~",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 11,
+      text: "Ok, but I didn't want you here in the first place",
+      actions: [],
+      checks: []
+    }, {
+      destination: 12,
+      text: "You gotta stop following me home.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 11,
+    prompt: "Hush, silly. Doesn't matter, since I'm here anyway. Can I have a ride to work?",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "No way, dude. Go home.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "Uggghhhh.... sure.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 12,
+    prompt: "Well, maybe you should stop going to work without me~ Can I ride with you to work?",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 13,
+      text: "No way, dude. Go home.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 13,
+      text: "Uggghhhh.... sure.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 13,
+    prompt: "You try to start your car, but all it does is sputter. Carl grins maniacally.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 14,
+      text: "Did you do something to my car?",
+      actions: [],
+      checks: []
+    }, {
+      destination: 15,
+      text: "Hmmm, looks like I'll have to work from home today.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 14,
+    prompt: "I'm not telling~",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 16,
+      text: "[Get out of your car.]",
+      actions: ["PlayGameEasy"],
+      checks: []
+    }]
+  }, {
+    id: 15,
+    prompt: "Oh goodie! I'll come with you.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 16,
+      text: "Ummm, that's not necessary. [Get out of your car.]",
+      actions: ["PlayGameEasy"],
+      checks: []
+    }]
+  }, {
+    id: 16,
+    prompt: "",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 17,
+      text: "You safely exit your car and put a little distance between Carl and yourself.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 17,
+      text: "You fumble with the handle, stumble out of the vehicle, and notice Carl directly behind you. 'Gotta be faster than that'.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 17,
+    prompt: "You feel Carl's eyes on you.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 18,
+      text: "What are you looking at?",
+      actions: [],
+      checks: ["Professional"]
+    }, {
+      destination: 19,
+      text: "What are you looking at?",
+      actions: [],
+      checks: ["Casual"]
+    }]
+  }, {
+    id: 18,
+    prompt: "Oh, nothing. I just like the color of your tie.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 20,
+      text: "....Uhh, thanks?",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 19,
+    prompt: "You're looking pretty casual today. I never get to see you this way~<3",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 20,
+      text: "...I don't know how to feel about that.",
+      actions: [],
+      checks: ["Clean"]
+    }, {
+      destination: 21,
+      text: "...I don't know how to feel about that.",
+      actions: [],
+      checks: ["Scrub"]
+    }]
+  }, {
+    id: 20,
+    prompt: "You try to inch your way closer to your front door while Carl is distracted.",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 22,
+      text: "[Calmly back away.]",
+      actions: ["PlayGameNormal"],
+      checks: []
+    }]
+  }, {
+    id: 21,
+    prompt: "And that scene is...*Big sniff* Your natural musk is intoxicating.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 23,
+      text: "[Back away in a hurry.]",
+      actions: ["PlayGameHard"],
+      checks: []
+    }]
+  }, {
+    id: 22,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 24,
+      text: "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
+      actions: ["WinGameNormal"],
+      checks: []
+    }, {
+      destination: 25,
+      text: "[Carl noticed you trying to reach your front door. He's standing uncomfortably close to you.]",
+      actions: ["LoseGameNormal"],
+      checks: []
+    }]
+  }, {
+    id: 23,
+    prompt: "",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 24,
+      text: "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
+      actions: ["WinGameNormal"],
+      checks: []
+    }, {
+      destination: 25,
+      text: "[Carl noticed you trying to reach your front door. He's standing uncomfortably close to you.]",
+      actions: ["LoseGameNormal"],
+      checks: []
+    }]
+  }, {
+    id: 24,
+    prompt: "What do you do next?",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 26,
+      text: "[Discretely fish your key out of your pocket.]",
+      actions: [],
+      checks: []
+    }, {
+      destination: 25,
+      text: "[Ask Carl to go home.]",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 25,
+    prompt: "Oh, are you trying to invite me inside? owo I suppose I could come in for a bit.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 28,
+      text: "Wha-nonononono, that's not what I meant.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 28,
+      text: "Actually, I have some work I need to get done on my own.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 26,
+    prompt: "Hey, watcha doin'? Trying to get me to come in for a drink? Well, if you insist.",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 28,
+      text: "Actually, I have some work that I need to get done on my own.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 28,
+      text: "Uhh, I'm not thirsty.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 27,
+    prompt: "I did go home. I mean, I went to your home, anyway. That's better~",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 29,
+      text: "No, go to your actual place of living.",
+      actions: [],
+      checks: []
+    }, {
+      destination: 29,
+      text: "Listen, I don't care where you go, as long as you leave my property.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 28,
+    prompt: "[Carl looks upset that you denied him. He's reaching for your arm...]",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 30,
+      text: "Put your key in the lock and get into your house.",
+      actions: ["PlayGameKey"],
+      checks: []
+    }]
+  }, {
+    id: 29,
+    prompt: "[Carl looks upset about your tone of voice, and is reaching for your arm...]",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 30,
+      text: "Put your key in the lock and get into your house.",
+      actions: ["PlayGameKey"],
+      checks: []
+    }]
+  }, {
+    id: 30,
+    prompt: "",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 31,
+      text: "You did it! You now have a door between yourself and Carl.",
+      actions: [],
+      checks: ["WinGameKey"]
+    }, {
+      destination: 32,
+      text: "You feel Carl's arms slip around you from behind in an intimately awkward hug.",
+      actions: [],
+      checks: ["LoseGameKey"]
+    }]
+  }, {
+    id: 31,
+    prompt: "[You hear Carl knocking at the door.]",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 33,
+      text: "Ignore him",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 32,
+    prompt: "Mmmmm, this is nice~",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: 34,
+      text: "Struggle",
+      actions: ["PlayGameHard"],
+      checks: []
+    }]
+  }, {
+    id: 33,
+    prompt: "[You've escaped Carl. :)]",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: -1,
+      text: "Put some headphones in and enjoy the rest of your day home.",
+      actions: [],
+      checks: []
+    }]
+  }, {
+    id: 34,
+    prompt: "",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: 31,
+      text: "[You break free long enough to unlock your door and separate yourself from Carl.]",
+      actions: [],
+      checks: ["WinGameHard"]
+    }, {
+      destination: -1,
+      text: "[Carl tells you how soft your skin is.]",
+      actions: [],
+      checks: ["LoseGameHard"]
+    }]
+  }, {
+    id: 35,
+    prompt: "[You are trapped in a seemingly endless hug from Carl. There is no escape.]",
+    speaker: "",
+    background: "background.png",
+    options: [{
+      destination: -1,
+      text: "[Wait for Carl to get tired so you can go back inside.]",
+      actions: [],
+      checks: []
+    }]
+  }]
+});
 
 /***/ }),
 
@@ -45572,6 +46885,11 @@ __webpack_require__.r(__webpack_exports__);
       text: 'Blue',
       actions: [],
       checks: []
+    }, {
+      destination: 4,
+      text: 'TEST',
+      actions: [],
+      checks: []
     }]
   }, {
     id: 1,
@@ -45581,7 +46899,7 @@ __webpack_require__.r(__webpack_exports__);
     options: [{
       destination: 3,
       text: 'thanks',
-      actions: ["PlayGame1"],
+      actions: [],
       checks: []
     }]
   }, {
@@ -45606,9 +46924,34 @@ __webpack_require__.r(__webpack_exports__);
       actions: [],
       checks: []
     }]
+  }, {
+    id: 4,
+    prompt: "TEST",
+    speaker: "carl",
+    background: "background.png",
+    options: [{
+      destination: -1,
+      text: '<PlayGameEasy>',
+      actions: ["PlayGameEasy"],
+      checks: []
+    }, {
+      destination: -1,
+      text: '<PlayGameMedium>',
+      actions: ["PlayGameMedium"],
+      checks: []
+    }, {
+      destination: -1,
+      text: '<PlayGameHard>',
+      actions: ["PlayGameHard"],
+      checks: []
+    }, {
+      destination: -1,
+      text: '<PlayGameKey>',
+      actions: ["PlayGameKey"],
+      checks: []
+    }]
   }]
 });
->>>>>>> 13a68aace31b830c248c7cf472091018f6a5d17e
 
 /***/ }),
 
@@ -45621,7 +46964,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _BottleFlipGame_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BottleFlipGame.js */ "./src/js/BottleFlipGame.js");
+/* harmony import */ var _chat_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chat.js */ "./src/js/chat.js");
 /* harmony import */ var _data_story__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data/story */ "./src/data/story/index.js");
 
 

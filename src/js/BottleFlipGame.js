@@ -5,7 +5,7 @@ import { QuickParticleSystem } from "./engine/QuickParticleSystem.js";
 const dist = (point)=>Math.sqrt(Math.pow(point.x,2) + Math.pow(point.y,2))
 const COUNTDOWN_LENGTH = 20;
 
-class KeyFlipGame extends PIXI.Container {
+export class KeyFlipGame extends PIXI.Container {
   constructor(options){
     super(options);
     this.intrinsicWidth = options.intrinsicWidth || 500;
@@ -462,33 +462,3 @@ class KeyFlipGame extends PIXI.Container {
     ];
   }
 }
-
-document.addEventListener("DOMContentLoaded", ()=>{
-PIXI.loader
-  .add(KeyFlipGame.getAssetsToLoad())
-  .load(()=>{
-    //WIRE UP THE APP
-    const app = new PIXI.Application({
-      antialias: true,
-      width: window.innerWidth,
-      height: window.innerHeight
-    });
-    document.body.appendChild(app.view);
-    let game = new KeyFlipGame({
-      intrinsicWidth: app.screen.width, 
-      intrinsicHeight: app.screen.height, 
-    });
-    app.stage.addChild(game);
-
-    setInterval(()=>{
-      physicsLoop(app.stage);
-    }, 10);
-
-    let raf;
-    const loop = ()=>{
-      game.onUpdate();
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-  });
-});

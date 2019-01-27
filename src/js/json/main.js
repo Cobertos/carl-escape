@@ -643,7 +643,7 @@ export default {
                     checks : ["WinGameHard"],
                 },
                 {
-                    destination : ,
+                    destination : -1,
                     text : "[Carl tells you how soft your skin is.]",
                     actions : [],
                     checks : ["LoseGameHard"],

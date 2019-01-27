@@ -20,7 +20,7 @@ export class KeyFlipGame extends PIXI.Container {
     this._lastTime = 0;
     
     this._timeText = new PIXI.Text(COUNTDOWN_LENGTH+"",
-      {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
+      {fontFamily : 'Impact', fontSize: 160, fill : 0xffffff, align : 'center',
         stroke: 0x000000, strokeThickness: 20 });
     this._timeText.position.x = this.intrinsicWidth/2;
     this._timeText.position.y = this.intrinsicHeight/2;

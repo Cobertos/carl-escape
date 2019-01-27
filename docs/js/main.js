@@ -47651,7 +47651,7 @@ function (_PIXI$Container) {
     _this._lastTime = 0;
     _this._timeText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"](COUNTDOWN_LENGTH + "", {
       fontFamily: 'Impact',
-      fontSize: 200,
+      fontSize: 160,
       fill: 0xffffff,
       align: 'center',
       stroke: 0x000000,
@@ -48559,6 +48559,7 @@ function (_PIXI$Application) {
 
     _this.renderer.resize(window.innerWidth, window.innerHeight);
 
+    _this._isPlayingGame = false;
     window.addEventListener("resize", function () {
       _this.renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -48720,9 +48721,11 @@ function (_PIXI$Application) {
             fontFamily: 'Varela Round',
             fontSize: 24 * crems,
             fill: 0x000000,
-            align: 'left'
+            align: 'left',
+            wordWrap: true,
+            wordWrapWidth: 600 * crems
           });
-          buttonText.anchor.y = 0.5;
+          buttonText.anchor.set(0, 0.5);
           button.addChild(buttonText);
           buttonText.position.x = 70 * crems;
           buttonText.position.y = 70 * crems;
@@ -48731,6 +48734,7 @@ function (_PIXI$Application) {
           button.on("pointerdown", function (evt) {
             _this2.chooseOption(option);
           });
+          button.visible = !_this2._isPlayingGame;
           return button;
         });
       }
@@ -48851,12 +48855,8 @@ function (_PIXI$Application) {
       }
 
       this.stage.addChild(game);
-
-      this._optionsButtons.forEach(function (button) {
-        button.visible = false;
-        button.interactive = false;
-      });
-
+      this._isPlayingGame = true;
+      this.updateUI();
       var raf;
 
       var loop = function loop() {
@@ -48867,11 +48867,7 @@ function (_PIXI$Application) {
       raf = requestAnimationFrame(loop);
       var difficulty = action.replace("PlayGame", "");
       game.on("ended", function (e) {
-        _this3._optionsButtons.forEach(function (button) {
-          button.visible = true;
-          button.interactive = true;
-        });
-
+        _this3._isPlayingGame = false;
         teardown();
 
         if (e.won) {
@@ -48891,6 +48887,8 @@ function (_PIXI$Application) {
         _this3.stage.removeChild(game);
 
         _this3.dialogTree.selectNode(destination);
+
+        _this3.updateUI();
 
         _this3.nextScene();
       });

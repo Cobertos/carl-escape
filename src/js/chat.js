@@ -24,6 +24,7 @@ class DialogSceneApp extends PIXI.Application {
     }
     this.renderer.autoResize = true; //I dont think this works?
     this.renderer.resize(window.innerWidth, window.innerHeight);
+    this._isPlayingGame = false;
     window.addEventListener("resize", ()=>{
       this.renderer.resize(window.innerWidth, window.innerHeight);
       this.updateUI();
@@ -156,18 +157,20 @@ class DialogSceneApp extends PIXI.Application {
         button.position.y = this.screen.height - SCREEN_PADDING - button.height * (1-idx) - button.height;
         this.stage.addChild(button);
 
-        let buttonText = new PIXI.Text(option.text, {fontFamily : 'Varela Round', fontSize: 24*crems, fill : 0x000000, align : 'left'});
-        buttonText.anchor.y = 0.5;
+        let buttonText = new PIXI.Text(option.text, {fontFamily : 'Varela Round', fontSize: 24*crems, fill : 0x000000, align : 'left',
+          wordWrap: true, wordWrapWidth: 600*crems});
+        buttonText.anchor.set(0,0.5);
         button.addChild(buttonText);
         buttonText.position.x = 70*crems;
         buttonText.position.y = 70*crems;
+
 
         button.interactive = true;
         button.buttonMode = true;
         button.on("pointerdown", (evt) => {
           this.chooseOption(option);
         });
-
+        button.visible = !this._isPlayingGame;
         return button;
       });
     }
@@ -283,10 +286,8 @@ class DialogSceneApp extends PIXI.Application {
       };
     }
     this.stage.addChild(game);
-    this._optionsButtons.forEach((button)=>{
-      button.visible = false;
-      button.interactive = false;
-    });
+    this._isPlayingGame = true;
+    this.updateUI();
 
     let raf;
     const loop = ()=>{
@@ -296,10 +297,7 @@ class DialogSceneApp extends PIXI.Application {
     raf = requestAnimationFrame(loop);
     let difficulty = action.replace("PlayGame", "");
     game.on("ended", (e)=>{
-      this._optionsButtons.forEach((button)=>{
-        button.visible = true;
-        button.interactive = true;
-      });
+      this._isPlayingGame = false;
       teardown();
 
       if(e.won){
@@ -314,6 +312,7 @@ class DialogSceneApp extends PIXI.Application {
       }
       this.stage.removeChild(game);
       this.dialogTree.selectNode(destination);
+      this.updateUI();
       this.nextScene();
     });
   }

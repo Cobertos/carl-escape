@@ -48547,6 +48547,11 @@ function (_PIXI$Application) {
       console.log("Dialogue tree null.");
     }
 
+    _this.renderer.autoResize = true; //I dont think this works?
+
+    window.addEventListener("resize", function () {
+      _this.renderer.resize(window.innerWidth, window.innerHeight);
+    });
     _this.optionButtons = [];
     _this.actions = [];
     _this.dialogTree = dialogTree;
@@ -48914,6 +48919,7 @@ Promise.all([new Promise(function (resolve, reject) {
     height: window.innerHeight,
     transparent: true
   }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_9__["loadJsonFile"]("mainTree"));
+  app.view.classList.add("renderer");
   document.body.appendChild(app.view);
   app.playSound("audio/Unsettle1.wav"); //lock for mobile devices (throws if device doesn't support)
 

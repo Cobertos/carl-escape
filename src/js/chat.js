@@ -21,6 +21,10 @@ class DialogSceneApp extends PIXI.Application {
     if(dialogTree == null){
       console.log("Dialogue tree null.");
     }
+    this.renderer.autoResize = true; //I dont think this works?
+    window.addEventListener("resize", ()=>{
+      this.renderer.resize(window.innerWidth, window.innerHeight);
+    });
     this.optionButtons = [];
     this.actions = [];
     this.dialogTree = dialogTree;
@@ -348,6 +352,7 @@ Promise.all([
     height: window.innerHeight,
     transparent: true
   }, Dialogue.loadJsonFile("mainTree"));
+  app.view.classList.add("renderer");
   document.body.appendChild(app.view);
   app.playSound("audio/Unsettle1.wav");
   //lock for mobile devices (throws if device doesn't support)

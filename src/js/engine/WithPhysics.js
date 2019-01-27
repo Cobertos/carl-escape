@@ -7,6 +7,7 @@
 export function WithPhysics(pixiCls){
   class _WithPhysicsCls extends pixiCls {
     get hasPhysics(){ return true; }
+    get doCollisions(){ return true; }
 
     constructor(...args) {
       super(...args);
@@ -69,7 +70,9 @@ export function physicsLoop(rootNode){
       return;
     }
     obj.onPhysicsUpdate(time, deltaTime);
-    physObjs.push(obj);
+    if(obj.doCollisions){
+      physObjs.push(obj);
+    }
   });
   //Determine whether any objects
   //are colliding, O(n^2/2) it's not that smart
@@ -80,7 +83,7 @@ export function physicsLoop(rootNode){
       //Box test with pixi.rectangle
       let rect1 = obj1.getBounds();
       let rect2 = obj2.getBounds();
-      let instersects =
+      let intersects =
         //x direction
         rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x &&
         //y direction
@@ -99,4 +102,3 @@ export function physicsLoop(rootNode){
     });
   });
 }
-setInterval(physicsLoop, 100);

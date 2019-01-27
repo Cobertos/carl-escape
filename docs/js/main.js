@@ -159,6 +159,41 @@ module.exports = _createClass;
 
 /***/ }),
 
+/***/ "./node_modules/@babel/runtime/helpers/get.js":
+/*!****************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/get.js ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var getPrototypeOf = __webpack_require__(/*! ./getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+
+var superPropBase = __webpack_require__(/*! ./superPropBase */ "./node_modules/@babel/runtime/helpers/superPropBase.js");
+
+function _get(target, property, receiver) {
+  if (typeof Reflect !== "undefined" && Reflect.get) {
+    module.exports = _get = Reflect.get;
+  } else {
+    module.exports = _get = function _get(target, property, receiver) {
+      var base = superPropBase(target, property);
+      if (!base) return;
+      var desc = Object.getOwnPropertyDescriptor(base, property);
+
+      if (desc.get) {
+        return desc.get.call(receiver);
+      }
+
+      return desc.value;
+    };
+  }
+
+  return _get(target, property, receiver || target);
+}
+
+module.exports = _get;
+
+/***/ }),
+
 /***/ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js":
 /*!***************************************************************!*\
   !*** ./node_modules/@babel/runtime/helpers/getPrototypeOf.js ***!
@@ -245,6 +280,28 @@ function _setPrototypeOf(o, p) {
 }
 
 module.exports = _setPrototypeOf;
+
+/***/ }),
+
+/***/ "./node_modules/@babel/runtime/helpers/superPropBase.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/@babel/runtime/helpers/superPropBase.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var getPrototypeOf = __webpack_require__(/*! ./getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+
+function _superPropBase(object, property) {
+  while (!Object.prototype.hasOwnProperty.call(object, property)) {
+    object = getPrototypeOf(object);
+    if (object === null) break;
+  }
+
+  return object;
+}
+
+module.exports = _superPropBase;
 
 /***/ }),
 
@@ -44110,35 +44167,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ "./node_modules/webfontloader/webfontloader.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/webfontloader/webfontloader.js ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_RESULT__;/* Web Font Loader v1.6.28 - (c) Adobe Systems, Google. License: Apache 2.0 */(function(){function aa(a,b,c){return a.call.apply(a.bind,arguments)}function ba(a,b,c){if(!a)throw Error();if(2<arguments.length){var d=Array.prototype.slice.call(arguments,2);return function(){var c=Array.prototype.slice.call(arguments);Array.prototype.unshift.apply(c,d);return a.apply(b,c)}}return function(){return a.apply(b,arguments)}}function p(a,b,c){p=Function.prototype.bind&&-1!=Function.prototype.bind.toString().indexOf("native code")?aa:ba;return p.apply(null,arguments)}var q=Date.now||function(){return+new Date};function ca(a,b){this.a=a;this.o=b||a;this.c=this.o.document}var da=!!window.FontFace;function t(a,b,c,d){b=a.c.createElement(b);if(c)for(var e in c)c.hasOwnProperty(e)&&("style"==e?b.style.cssText=c[e]:b.setAttribute(e,c[e]));d&&b.appendChild(a.c.createTextNode(d));return b}function u(a,b,c){a=a.c.getElementsByTagName(b)[0];a||(a=document.documentElement);a.insertBefore(c,a.lastChild)}function v(a){a.parentNode&&a.parentNode.removeChild(a)}
-function w(a,b,c){b=b||[];c=c||[];for(var d=a.className.split(/\s+/),e=0;e<b.length;e+=1){for(var f=!1,g=0;g<d.length;g+=1)if(b[e]===d[g]){f=!0;break}f||d.push(b[e])}b=[];for(e=0;e<d.length;e+=1){f=!1;for(g=0;g<c.length;g+=1)if(d[e]===c[g]){f=!0;break}f||b.push(d[e])}a.className=b.join(" ").replace(/\s+/g," ").replace(/^\s+|\s+$/,"")}function y(a,b){for(var c=a.className.split(/\s+/),d=0,e=c.length;d<e;d++)if(c[d]==b)return!0;return!1}
-function ea(a){return a.o.location.hostname||a.a.location.hostname}function z(a,b,c){function d(){m&&e&&f&&(m(g),m=null)}b=t(a,"link",{rel:"stylesheet",href:b,media:"all"});var e=!1,f=!0,g=null,m=c||null;da?(b.onload=function(){e=!0;d()},b.onerror=function(){e=!0;g=Error("Stylesheet failed to load");d()}):setTimeout(function(){e=!0;d()},0);u(a,"head",b)}
-function A(a,b,c,d){var e=a.c.getElementsByTagName("head")[0];if(e){var f=t(a,"script",{src:b}),g=!1;f.onload=f.onreadystatechange=function(){g||this.readyState&&"loaded"!=this.readyState&&"complete"!=this.readyState||(g=!0,c&&c(null),f.onload=f.onreadystatechange=null,"HEAD"==f.parentNode.tagName&&e.removeChild(f))};e.appendChild(f);setTimeout(function(){g||(g=!0,c&&c(Error("Script load timeout")))},d||5E3);return f}return null};function B(){this.a=0;this.c=null}function C(a){a.a++;return function(){a.a--;D(a)}}function E(a,b){a.c=b;D(a)}function D(a){0==a.a&&a.c&&(a.c(),a.c=null)};function F(a){this.a=a||"-"}F.prototype.c=function(a){for(var b=[],c=0;c<arguments.length;c++)b.push(arguments[c].replace(/[\W_]+/g,"").toLowerCase());return b.join(this.a)};function G(a,b){this.c=a;this.f=4;this.a="n";var c=(b||"n4").match(/^([nio])([1-9])$/i);c&&(this.a=c[1],this.f=parseInt(c[2],10))}function fa(a){return H(a)+" "+(a.f+"00")+" 300px "+I(a.c)}function I(a){var b=[];a=a.split(/,\s*/);for(var c=0;c<a.length;c++){var d=a[c].replace(/['"]/g,"");-1!=d.indexOf(" ")||/^\d/.test(d)?b.push("'"+d+"'"):b.push(d)}return b.join(",")}function J(a){return a.a+a.f}function H(a){var b="normal";"o"===a.a?b="oblique":"i"===a.a&&(b="italic");return b}
-function ga(a){var b=4,c="n",d=null;a&&((d=a.match(/(normal|oblique|italic)/i))&&d[1]&&(c=d[1].substr(0,1).toLowerCase()),(d=a.match(/([1-9]00|normal|bold)/i))&&d[1]&&(/bold/i.test(d[1])?b=7:/[1-9]00/.test(d[1])&&(b=parseInt(d[1].substr(0,1),10))));return c+b};function ha(a,b){this.c=a;this.f=a.o.document.documentElement;this.h=b;this.a=new F("-");this.j=!1!==b.events;this.g=!1!==b.classes}function ia(a){a.g&&w(a.f,[a.a.c("wf","loading")]);K(a,"loading")}function L(a){if(a.g){var b=y(a.f,a.a.c("wf","active")),c=[],d=[a.a.c("wf","loading")];b||c.push(a.a.c("wf","inactive"));w(a.f,c,d)}K(a,"inactive")}function K(a,b,c){if(a.j&&a.h[b])if(c)a.h[b](c.c,J(c));else a.h[b]()};function ja(){this.c={}}function ka(a,b,c){var d=[],e;for(e in b)if(b.hasOwnProperty(e)){var f=a.c[e];f&&d.push(f(b[e],c))}return d};function M(a,b){this.c=a;this.f=b;this.a=t(this.c,"span",{"aria-hidden":"true"},this.f)}function N(a){u(a.c,"body",a.a)}function O(a){return"display:block;position:absolute;top:-9999px;left:-9999px;font-size:300px;width:auto;height:auto;line-height:normal;margin:0;padding:0;font-variant:normal;white-space:nowrap;font-family:"+I(a.c)+";"+("font-style:"+H(a)+";font-weight:"+(a.f+"00")+";")};function P(a,b,c,d,e,f){this.g=a;this.j=b;this.a=d;this.c=c;this.f=e||3E3;this.h=f||void 0}P.prototype.start=function(){var a=this.c.o.document,b=this,c=q(),d=new Promise(function(d,e){function f(){q()-c>=b.f?e():a.fonts.load(fa(b.a),b.h).then(function(a){1<=a.length?d():setTimeout(f,25)},function(){e()})}f()}),e=null,f=new Promise(function(a,d){e=setTimeout(d,b.f)});Promise.race([f,d]).then(function(){e&&(clearTimeout(e),e=null);b.g(b.a)},function(){b.j(b.a)})};function Q(a,b,c,d,e,f,g){this.v=a;this.B=b;this.c=c;this.a=d;this.s=g||"BESbswy";this.f={};this.w=e||3E3;this.u=f||null;this.m=this.j=this.h=this.g=null;this.g=new M(this.c,this.s);this.h=new M(this.c,this.s);this.j=new M(this.c,this.s);this.m=new M(this.c,this.s);a=new G(this.a.c+",serif",J(this.a));a=O(a);this.g.a.style.cssText=a;a=new G(this.a.c+",sans-serif",J(this.a));a=O(a);this.h.a.style.cssText=a;a=new G("serif",J(this.a));a=O(a);this.j.a.style.cssText=a;a=new G("sans-serif",J(this.a));a=
-O(a);this.m.a.style.cssText=a;N(this.g);N(this.h);N(this.j);N(this.m)}var R={D:"serif",C:"sans-serif"},S=null;function T(){if(null===S){var a=/AppleWebKit\/([0-9]+)(?:\.([0-9]+))/.exec(window.navigator.userAgent);S=!!a&&(536>parseInt(a[1],10)||536===parseInt(a[1],10)&&11>=parseInt(a[2],10))}return S}Q.prototype.start=function(){this.f.serif=this.j.a.offsetWidth;this.f["sans-serif"]=this.m.a.offsetWidth;this.A=q();U(this)};
-function la(a,b,c){for(var d in R)if(R.hasOwnProperty(d)&&b===a.f[R[d]]&&c===a.f[R[d]])return!0;return!1}function U(a){var b=a.g.a.offsetWidth,c=a.h.a.offsetWidth,d;(d=b===a.f.serif&&c===a.f["sans-serif"])||(d=T()&&la(a,b,c));d?q()-a.A>=a.w?T()&&la(a,b,c)&&(null===a.u||a.u.hasOwnProperty(a.a.c))?V(a,a.v):V(a,a.B):ma(a):V(a,a.v)}function ma(a){setTimeout(p(function(){U(this)},a),50)}function V(a,b){setTimeout(p(function(){v(this.g.a);v(this.h.a);v(this.j.a);v(this.m.a);b(this.a)},a),0)};function W(a,b,c){this.c=a;this.a=b;this.f=0;this.m=this.j=!1;this.s=c}var X=null;W.prototype.g=function(a){var b=this.a;b.g&&w(b.f,[b.a.c("wf",a.c,J(a).toString(),"active")],[b.a.c("wf",a.c,J(a).toString(),"loading"),b.a.c("wf",a.c,J(a).toString(),"inactive")]);K(b,"fontactive",a);this.m=!0;na(this)};
-W.prototype.h=function(a){var b=this.a;if(b.g){var c=y(b.f,b.a.c("wf",a.c,J(a).toString(),"active")),d=[],e=[b.a.c("wf",a.c,J(a).toString(),"loading")];c||d.push(b.a.c("wf",a.c,J(a).toString(),"inactive"));w(b.f,d,e)}K(b,"fontinactive",a);na(this)};function na(a){0==--a.f&&a.j&&(a.m?(a=a.a,a.g&&w(a.f,[a.a.c("wf","active")],[a.a.c("wf","loading"),a.a.c("wf","inactive")]),K(a,"active")):L(a.a))};function oa(a){this.j=a;this.a=new ja;this.h=0;this.f=this.g=!0}oa.prototype.load=function(a){this.c=new ca(this.j,a.context||this.j);this.g=!1!==a.events;this.f=!1!==a.classes;pa(this,new ha(this.c,a),a)};
-function qa(a,b,c,d,e){var f=0==--a.h;(a.f||a.g)&&setTimeout(function(){var a=e||null,m=d||null||{};if(0===c.length&&f)L(b.a);else{b.f+=c.length;f&&(b.j=f);var h,l=[];for(h=0;h<c.length;h++){var k=c[h],n=m[k.c],r=b.a,x=k;r.g&&w(r.f,[r.a.c("wf",x.c,J(x).toString(),"loading")]);K(r,"fontloading",x);r=null;if(null===X)if(window.FontFace){var x=/Gecko.*Firefox\/(\d+)/.exec(window.navigator.userAgent),xa=/OS X.*Version\/10\..*Safari/.exec(window.navigator.userAgent)&&/Apple/.exec(window.navigator.vendor);
-X=x?42<parseInt(x[1],10):xa?!1:!0}else X=!1;X?r=new P(p(b.g,b),p(b.h,b),b.c,k,b.s,n):r=new Q(p(b.g,b),p(b.h,b),b.c,k,b.s,a,n);l.push(r)}for(h=0;h<l.length;h++)l[h].start()}},0)}function pa(a,b,c){var d=[],e=c.timeout;ia(b);var d=ka(a.a,c,a.c),f=new W(a.c,b,e);a.h=d.length;b=0;for(c=d.length;b<c;b++)d[b].load(function(b,d,c){qa(a,f,b,d,c)})};function ra(a,b){this.c=a;this.a=b}
-ra.prototype.load=function(a){function b(){if(f["__mti_fntLst"+d]){var c=f["__mti_fntLst"+d](),e=[],h;if(c)for(var l=0;l<c.length;l++){var k=c[l].fontfamily;void 0!=c[l].fontStyle&&void 0!=c[l].fontWeight?(h=c[l].fontStyle+c[l].fontWeight,e.push(new G(k,h))):e.push(new G(k))}a(e)}else setTimeout(function(){b()},50)}var c=this,d=c.a.projectId,e=c.a.version;if(d){var f=c.c.o;A(this.c,(c.a.api||"https://fast.fonts.net/jsapi")+"/"+d+".js"+(e?"?v="+e:""),function(e){e?a([]):(f["__MonotypeConfiguration__"+
-d]=function(){return c.a},b())}).id="__MonotypeAPIScript__"+d}else a([])};function sa(a,b){this.c=a;this.a=b}sa.prototype.load=function(a){var b,c,d=this.a.urls||[],e=this.a.families||[],f=this.a.testStrings||{},g=new B;b=0;for(c=d.length;b<c;b++)z(this.c,d[b],C(g));var m=[];b=0;for(c=e.length;b<c;b++)if(d=e[b].split(":"),d[1])for(var h=d[1].split(","),l=0;l<h.length;l+=1)m.push(new G(d[0],h[l]));else m.push(new G(d[0]));E(g,function(){a(m,f)})};function ta(a,b){a?this.c=a:this.c=ua;this.a=[];this.f=[];this.g=b||""}var ua="https://fonts.googleapis.com/css";function va(a,b){for(var c=b.length,d=0;d<c;d++){var e=b[d].split(":");3==e.length&&a.f.push(e.pop());var f="";2==e.length&&""!=e[1]&&(f=":");a.a.push(e.join(f))}}
-function wa(a){if(0==a.a.length)throw Error("No fonts to load!");if(-1!=a.c.indexOf("kit="))return a.c;for(var b=a.a.length,c=[],d=0;d<b;d++)c.push(a.a[d].replace(/ /g,"+"));b=a.c+"?family="+c.join("%7C");0<a.f.length&&(b+="&subset="+a.f.join(","));0<a.g.length&&(b+="&text="+encodeURIComponent(a.g));return b};function ya(a){this.f=a;this.a=[];this.c={}}
-var za={latin:"BESbswy","latin-ext":"\u00e7\u00f6\u00fc\u011f\u015f",cyrillic:"\u0439\u044f\u0416",greek:"\u03b1\u03b2\u03a3",khmer:"\u1780\u1781\u1782",Hanuman:"\u1780\u1781\u1782"},Aa={thin:"1",extralight:"2","extra-light":"2",ultralight:"2","ultra-light":"2",light:"3",regular:"4",book:"4",medium:"5","semi-bold":"6",semibold:"6","demi-bold":"6",demibold:"6",bold:"7","extra-bold":"8",extrabold:"8","ultra-bold":"8",ultrabold:"8",black:"9",heavy:"9",l:"3",r:"4",b:"7"},Ba={i:"i",italic:"i",n:"n",normal:"n"},
-Ca=/^(thin|(?:(?:extra|ultra)-?)?light|regular|book|medium|(?:(?:semi|demi|extra|ultra)-?)?bold|black|heavy|l|r|b|[1-9]00)?(n|i|normal|italic)?$/;
-function Da(a){for(var b=a.f.length,c=0;c<b;c++){var d=a.f[c].split(":"),e=d[0].replace(/\+/g," "),f=["n4"];if(2<=d.length){var g;var m=d[1];g=[];if(m)for(var m=m.split(","),h=m.length,l=0;l<h;l++){var k;k=m[l];if(k.match(/^[\w-]+$/)){var n=Ca.exec(k.toLowerCase());if(null==n)k="";else{k=n[2];k=null==k||""==k?"n":Ba[k];n=n[1];if(null==n||""==n)n="4";else var r=Aa[n],n=r?r:isNaN(n)?"4":n.substr(0,1);k=[k,n].join("")}}else k="";k&&g.push(k)}0<g.length&&(f=g);3==d.length&&(d=d[2],g=[],d=d?d.split(","):
-g,0<d.length&&(d=za[d[0]])&&(a.c[e]=d))}a.c[e]||(d=za[e])&&(a.c[e]=d);for(d=0;d<f.length;d+=1)a.a.push(new G(e,f[d]))}};function Ea(a,b){this.c=a;this.a=b}var Fa={Arimo:!0,Cousine:!0,Tinos:!0};Ea.prototype.load=function(a){var b=new B,c=this.c,d=new ta(this.a.api,this.a.text),e=this.a.families;va(d,e);var f=new ya(e);Da(f);z(c,wa(d),C(b));E(b,function(){a(f.a,f.c,Fa)})};function Ga(a,b){this.c=a;this.a=b}Ga.prototype.load=function(a){var b=this.a.id,c=this.c.o;b?A(this.c,(this.a.api||"https://use.typekit.net")+"/"+b+".js",function(b){if(b)a([]);else if(c.Typekit&&c.Typekit.config&&c.Typekit.config.fn){b=c.Typekit.config.fn;for(var e=[],f=0;f<b.length;f+=2)for(var g=b[f],m=b[f+1],h=0;h<m.length;h++)e.push(new G(g,m[h]));try{c.Typekit.load({events:!1,classes:!1,async:!0})}catch(l){}a(e)}},2E3):a([])};function Ha(a,b){this.c=a;this.f=b;this.a=[]}Ha.prototype.load=function(a){var b=this.f.id,c=this.c.o,d=this;b?(c.__webfontfontdeckmodule__||(c.__webfontfontdeckmodule__={}),c.__webfontfontdeckmodule__[b]=function(b,c){for(var g=0,m=c.fonts.length;g<m;++g){var h=c.fonts[g];d.a.push(new G(h.name,ga("font-weight:"+h.weight+";font-style:"+h.style)))}a(d.a)},A(this.c,(this.f.api||"https://f.fontdeck.com/s/css/js/")+ea(this.c)+"/"+b+".js",function(b){b&&a([])})):a([])};var Y=new oa(window);Y.a.c.custom=function(a,b){return new sa(b,a)};Y.a.c.fontdeck=function(a,b){return new Ha(b,a)};Y.a.c.monotype=function(a,b){return new ra(b,a)};Y.a.c.typekit=function(a,b){return new Ga(b,a)};Y.a.c.google=function(a,b){return new Ea(b,a)};var Z={load:p(Y.load,Y)}; true?!(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){return Z}).call(exports, __webpack_require__, exports, module),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):undefined;}());
-
-
-/***/ }),
-
 /***/ "./node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
@@ -44322,922 +44350,545 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./src/js/PowerMeterGame.js":
+/***/ "./src/js/BottleFlipGame.js":
 /*!**********************************!*\
-  !*** ./src/js/PowerMeterGame.js ***!
+  !*** ./src/js/BottleFlipGame.js ***!
   \**********************************/
-/*! exports provided: PowerMeterGame */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PowerMeterGame", function() { return PowerMeterGame; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
-/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./engine/WithPhysics.js */ "./src/js/engine/WithPhysics.js");
-
-
-
-
-
-
-
-/**Along with normal PIXI.Application options
- * oscillationTime The time it takes the sweeper to do one pass over the width in MS
- * greenAreaWidth 0-1 of the width of the container
- */
-
-var PowerMeterGame =
-/*#__PURE__*/
-function (_PIXI$Container) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(PowerMeterGame, _PIXI$Container);
-
-  function PowerMeterGame(options) {
-    var _this;
-
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PowerMeterGame);
-
-    options.transparent = true;
-    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(PowerMeterGame).call(this, options)); //Width and height to size this thing too
-
-    _this.intrinsicWidth = options.intrinsicWidth || 500;
-    _this.intrinsicHeight = options.intrinsicHeight || 200;
-    _this.oscillationTime = options.oscillationTime || 1000;
-    _this.greenAreaWidth = options.greenAreaWidth || 0.5;
-    _this.greenAreaPixelWidth = _this.intrinsicWidth * _this.greenAreaWidth; //Add all the elements
-
-    _this._redArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
-
-    _this._redArea.beginFill(0xAA5555);
-
-    _this._redArea.drawRectBound = _this._redArea.drawRect.bind(_this._redArea, 0, _this.intrinsicHeight / 6, _this.intrinsicWidth, 2 * _this.intrinsicHeight / 3);
-
-    _this._redArea.drawRectBound();
-
-    _this._redArea.endFill();
-
-    _this.addChild(_this._redArea);
-
-    _this._greenArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
-
-    _this._greenArea.beginFill(0x55AA55);
-
-    _this._greenArea.drawRectBound = _this._greenArea.drawRect.bind(_this._greenArea, (_this.intrinsicWidth - _this.greenAreaPixelWidth) / 2, _this.intrinsicHeight / 6, _this.greenAreaPixelWidth, 2 * _this.intrinsicHeight / 3);
-
-    _this._greenArea.drawRectBound();
-
-    _this._greenArea.endFill();
-
-    _this.addChild(_this._greenArea);
-
-    _this._stopBar = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
-
-    _this._stopBar.beginFill(0xFFFFFF);
-
-    _this._stopBar.lineStyle(4, 0x000000, 1);
-
-    _this._stopBar.drawRect(0, 0, 20, _this.intrinsicHeight);
-
-    _this._stopBar.endFill();
-
-    _this.addChild(_this._stopBar);
-
-    var text = _this._skillCheckText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("SKILL CHECK", {
-      fontFamily: 'Impact',
-      fontSize: 200,
-      fill: 0xffffff,
-      align: 'center',
-      stroke: 0x000000,
-      strokeThickness: 20
-    });
-    text.position.x = _this.intrinsicWidth / 2;
-    text.position.y = _this.intrinsicHeight / 2;
-    text._initialWidth = text.width;
-    text._initialHeight = text.height;
-    text.visible = false;
-
-    _this._skillCheckText.anchor.set(0.5);
-
-    _this.addChild(text);
-
-    _this._barPos = 0;
-    _this._initialTime = Date.now();
-    _this._started = false;
-    _this._startTime;
-    _this._stopped = false;
-    _this._hitGreenArea = undefined;
-    return _this;
-  }
-
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PowerMeterGame, [{
-    key: "onUpdate",
-    value: function onUpdate() {
-      if (!this._started || this._skillCheckText.visible) {
-        var now = Date.now() - this._initialTime;
-
-        if (now < 300) {
-          //0 - 300ms
-          this._skillCheckText.visible = true;
-          this._skillCheckText.width = this._skillCheckText._initialWidth * 0.5;
-          this._skillCheckText.height = this._skillCheckText._initialHeight * 0.5;
-        } else if (now < 600) {
-          //300 - 600ms
-          var tween = (now - 300) / 300;
-          tween = tween * 0.5 + 0.5;
-          console.log(tween);
-          this._skillCheckText.width = this._skillCheckText._initialWidth * tween;
-          this._skillCheckText.height = this._skillCheckText._initialHeight * tween;
-        } else if (now < 1000) {
-          //600 - 1000ms
-          var _tween = (now - 600) / 400;
-
-          _tween = 1 - _tween;
-          this._skillCheckText.width = this._skillCheckText._initialWidth * _tween;
-          this._skillCheckText.height = this._skillCheckText._initialHeight * _tween;
-        } else if (now > 1000) {
-          this._skillCheckText.visible = false;
-        }
-
-        if (now > 800) {
-          this._started = true;
-          this._startTime = Date.now();
-        }
-      } else {
-        if (!this._stopped) {
-          var _now = Date.now() - this._startTime;
-
-          var shouldMirror = Math.floor(_now / this.oscillationTime) % 2 === 0;
-          this._barPos = Math.abs((shouldMirror ? 0 : 1) - _now % this.oscillationTime / this.oscillationTime);
-          this._stopBar.x = this.intrinsicWidth * this._barPos - this._stopBar.getBounds().width / 2;
-        } else if (this._stopped) {
-          var blinkInterval = Math.floor(Date.now() / 300) % 2 === 0; //every 1 second
-
-          if (this._hitGreenArea) {
-            this._greenArea.beginFill(blinkInterval ? 0x00FF00 : 0x55AA55);
-
-            this._greenArea.drawRectBound();
-
-            this._greenArea.endFill();
-          } else {
-            this._redArea.beginFill(blinkInterval ? 0xFF0000 : 0xAA5555);
-
-            this._redArea.drawRectBound();
-
-            this._redArea.endFill();
-          }
-        }
-      }
-    }
-  }, {
-    key: "stop",
-    value: function stop() {
-      if (!this._started) {
-        return;
-      }
-
-      this._stopped = true;
-      var stopPos = this._barPos;
-      var greenBoxX = (this.intrinsicWidth - this.greenAreaPixelWidth) / 2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
-
-      var greenAreaStart = greenBoxX / this.intrinsicWidth;
-      var greenAreaEnd = (greenBoxX + this._greenArea.width) / this.intrinsicWidth;
-      this._hitGreenArea = stopPos > greenAreaStart && stopPos < greenAreaEnd;
-      this.emit("ended", {
-        won: this.won
-      });
-    } //Whether the player has won, undefiend if not finished
-
-  }, {
-    key: "won",
-    get: function get() {
-      return this._hitGreenArea;
-    }
-  }]);
-
-  return PowerMeterGame;
-}(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Container"]);
-
-/***/ }),
-
-/***/ "./src/js/chat.js":
-/*!************************!*\
-  !*** ./src/js/chat.js ***!
-  \************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
-/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! webfontloader */ "./node_modules/webfontloader/webfontloader.js");
-/* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(webfontloader__WEBPACK_IMPORTED_MODULE_6__);
-/* harmony import */ var _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./dialogue_node.js */ "./src/js/dialogue_node.js");
-/* harmony import */ var _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./PowerMeterGame.js */ "./src/js/PowerMeterGame.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/get */ "./node_modules/@babel/runtime/helpers/get.js");
+/* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./engine/WithPhysics.js */ "./src/js/engine/WithPhysics.js");
+/* harmony import */ var _engine_QuickParticleSystem_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./engine/QuickParticleSystem.js */ "./src/js/engine/QuickParticleSystem.js");
 
 
 
 
 
 
- //import { DialogTree as dialogTree } from "./MockDialogTree.js";
 
 
 
-var TYPING_SPEED = 10; //ms between letter
 
-var SCREEN_PADDING = 20;
 
-var DialogSceneApp =
+var dist = function dist(point) {
+  return Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
+};
+
+var KeyFlipGameApp =
 /*#__PURE__*/
 function (_PIXI$Application) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(DialogSceneApp, _PIXI$Application);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(KeyFlipGameApp, _PIXI$Application);
 
-  function DialogSceneApp(options, dialogTree) {
+  function KeyFlipGameApp(options) {
     var _this;
 
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DialogSceneApp);
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, KeyFlipGameApp);
 
-    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(DialogSceneApp).call(this, options));
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyFlipGameApp).call(this, options)); //Add all the elements
 
-    if (dialogTree == null) {
-      console.log("Dialogue tree null.");
-    }
+    var Key =
+    /*#__PURE__*/
+    function (_WithPhysics) {
+      _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(Key, _WithPhysics);
 
-    _this.optionButtons = [];
-    _this.actions = [];
-    _this.dialogTree = dialogTree;
-    _this._currentPrompt = undefined; //Add all the elements
+      function Key() {
+        var _this2;
 
-    var background = _this._background = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.bedroom.texture);
-    var backgroundAspect = background.height / background.width;
-    background.width = _this.screen.width;
-    background.height = background.width * backgroundAspect;
+        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Key);
 
-    _this.stage.addChild(background);
+        _this2 = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Key).call(this, pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.key.texture));
+        var keyAspect = _this2.height / _this2.width;
+        _this2.width = 200;
+        _this2.height = _this2.width * keyAspect;
+        _this2.interactive = true;
+        _this2.buttonMode = true;
+        _this2._lastPosition;
+        _this2._secondLastPosition;
+        _this2._lastVelocity;
+        _this2._vecToCenterFromMouse;
+        _this2._lastTime;
+        _this2._secondLastTime;
 
-    _this._dialogBox = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Container"]();
+        _this2.on("pointerdown", _this2.onPointerDown.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this2))));
 
-    _this.stage.addChild(_this._dialogBox);
+        _this2.on("pointermove", _this2.onPointerMove.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this2))));
 
-    var frame = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.dialogFrame.texture, 117, 117, 117, 117);
-    frame.width = 1000;
-    frame.height = 400;
-    frame.scale.x = 0.5;
-    frame.scale.y = 0.5;
+        _this2.on("pointerup", _this2.onPointerUp.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this2))));
 
-    _this._dialogBox.addChild(frame);
+        return _this2;
+      }
 
-    var name = _this._dialogName = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("NAME", {
-      fontFamily: 'Varela Round',
-      fontSize: 24,
-      fill: 0x000000,
-      align: 'center'
-    });
-    name.position.x = 50;
-    name.position.y = 50;
+      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0___default()(Key, [{
+        key: "onPointerDown",
+        value: function onPointerDown(e) {
+          if (this._frozen) {
+            return;
+          }
 
-    _this._dialogBox.addChild(name);
+          this.dragging = true;
+          this.data = e.data; //reset physics
 
-    var text = _this._dialogText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("Initial Text", {
-      fontFamily: 'Varela Round',
-      fontSize: 24,
-      fill: 0x000000,
-      align: 'left',
-      wordWrap: true,
-      wordWrapWidth: 400
-    });
-    text.position.x = 50;
-    text.position.y = 80;
-    _this._dialogInterval = undefined;
+          this.velocity.set(0);
+          this.acceleration.set(0); //set anchor pos to mouse position
 
-    _this._dialogBox.addChild(text);
+          var offsetPos = this.data.getLocalPosition(this); //relative to anchor
 
-    var face1 = _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.mc.texture);
-    var face1Aspect = face1.height / face1.width;
-    face1.width = _this.screen.width / 2.8;
-    face1.height = face1.width * face1Aspect;
+          console.log(offsetPos);
+          offsetPos.x /= 585;
+          offsetPos.y /= 183;
+          offsetPos.x += this.anchor.x; //Remove the anchor contribution to reset anchor from top left
 
-    _this.stage.addChild(face1);
+          offsetPos.y += this.anchor.y;
+          this.anchor.x = offsetPos.x;
+          this.anchor.y = offsetPos.y; //set the key position
 
-    var face2 = _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.carl.texture);
-    var face2Aspect = face2.height / face2.width;
-    face2.width = _this.screen.width / 2.8;
-    face2.height = face2.width * face2Aspect;
+          this._lastPosition = this.data.getLocalPosition(this.parent);
+          this.position.x = this._lastPosition.x;
+          this.position.y = this._lastPosition.y;
+          this._lastTime = Date.now(); //calculate the mouse offset for other stuff
 
-    _this.stage.addChild(face2);
+          this._vecToCenterFromMouse = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Point"]();
+          this._vecToCenterFromMouse.x = 0.5 - this.anchor.x;
+          this._vecToCenterFromMouse.x *= this.width;
+          this._vecToCenterFromMouse.y = 0.5 - this.anchor.y;
+          this._vecToCenterFromMouse.y *= this.height;
+        }
+      }, {
+        key: "onPointerMove",
+        value: function onPointerMove(e) {
+          if (!this.dragging || this._frozen) {
+            return;
+          } //set new position
+
+
+          var parentPosition = this.data.getLocalPosition(this.parent);
+          this.position.copy(parentPosition);
+          this._secondLastPosition = this._lastPosition;
+          this._lastPosition = parentPosition;
+          this._secondLastTime = this._lastTime;
+          this._lastTime = Date.now(); //adjust angular contribution
+          //get velocity
+
+          var mouseVelocity = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Point"]();
+          mouseVelocity.x = this._lastPosition.x - this._secondLastPosition.x;
+          mouseVelocity.y = this._lastPosition.y - this._secondLastPosition.y;
+          var deltaTime = this._lastTime - this._secondLastTime;
+          mouseVelocity.x = mouseVelocity.x / (deltaTime / 1000);
+          mouseVelocity.y = -mouseVelocity.y / (deltaTime / 1000);
+          this._lastVelocity = mouseVelocity;
+        }
+      }, {
+        key: "onPointerUp",
+        value: function onPointerUp(e) {
+          if (this._frozen) {
+            return;
+          }
+
+          this.dragging = false;
+          key.acceleration.y = -9.8 * 300; //gravity, 9.8m/s^2 * 450 pixels / meter?
+          //TODO
+          //set anchor to middle but keep key position
+          //let anchorDiff = new PIXI.Point();
+          //anchorDiff.x = this.anchor.x - 0.5;
+          //anchorDiff.y = this.anchor.y - 0.5;
+
+          this.anchor.set(0.5); //velocity on let go
+
+          this.velocity.set(Math.max(this._lastVelocity.x / 4, 40), Math.max(this._lastVelocity.y / 4, 40));
+          this.data = null;
+        }
+      }, {
+        key: "onPhysicsUpdate",
+        value: function onPhysicsUpdate(time, deltaTime) {
+          _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Key.prototype), "onPhysicsUpdate", this).call(this, time, deltaTime);
+
+          console.log(this.rotation % (2 * Math.PI));
+
+          if (this.dragging && this._lastVelocity && !this._frozen) {
+            //get velocity
+            var velocityMagnitude = dist(this._lastVelocity);
+
+            if (velocityMagnitude < 10) {
+              return;
+            } //decompose into parallel and perpendicular
+
+
+            var offset = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Point"]();
+            offset.copy(this._vecToCenterFromMouse); //rotate by rotation
+
+            offset.x = offset.x * Math.cos(this.rotation) - offset.y * Math.sin(this.rotation); // now x is something different than original vector x
+
+            offset.y = offset.x * Math.sin(this.rotation) + offset.y * Math.cos(this.rotation);
+            var angleBetweenOffsetAndVelocity = Math.atan2(offset.x * this._lastVelocity.y - offset.x * this._lastVelocity.x, offset.x * this._lastVelocity.x + offset.x * this._lastVelocity.y);
+            var magnitudeOfPerpendicular = dist(offset);
+            magnitudeOfPerpendicular *= Math.sin(angleBetweenOffsetAndVelocity); //Apply to acceleration
+
+            this.angularVelocity += magnitudeOfPerpendicular / 20000; //Math.sqrt(Math.pow(mouseOffset.x,2) + Math.pow(mouseOffset.y,2)) * deltaTime;
+
+            this.angularVelocity /= 1.1; //Math.sqrt(Math.pow(mouseOffset.x,2) + Math.pow(mouseOffset.y,2)) * deltaTime;
+
+            this._lastVelocity.set(0);
+          }
+        }
+      }, {
+        key: "freeze",
+        value: function freeze() {
+          this._frozen = true;
+          this.dragging = false;
+          this.acceleration.set(0);
+          this.velocity.set(0);
+          this.angularVelocity = 0;
+          this.linearVelocity = 0;
+        }
+      }]);
+
+      return Key;
+    }(Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["WithPhysics"])(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"]));
+
+    var key = _this._key = new Key();
+
+    _this.stage.addChild(key); //Landing pad for the key
+
+
+    var self = _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this));
+
+    var KeyHole =
+    /*#__PURE__*/
+    function (_WithPhysics2) {
+      _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(KeyHole, _WithPhysics2);
+
+      function KeyHole() {
+        var _getPrototypeOf2;
+
+        var _this3;
+
+        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, KeyHole);
+
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
+        }
+
+        _this3 = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, (_getPrototypeOf2 = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyHole)).call.apply(_getPrototypeOf2, [this].concat(args)));
+        _this3._keyTime = undefined;
+        return _this3;
+      }
+
+      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0___default()(KeyHole, [{
+        key: "onCollision",
+        value: function onCollision(otherObj) {
+          if (key._frozen || otherObj !== key) {
+            return;
+          }
+
+          var rot = Math.abs(key.rotation % (Math.PI * 2));
+          var inRotationRange = rot > Math.PI * 2 - 0.1 || rot < 0 + 0.1;
+
+          if (inRotationRange) {
+            this._keyTime = Date.now();
+            key.tint = 0xFFFF00;
+            key.freeze(); //Blink effect
+
+            this._blinkEffect = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.star.texture);
+            this._blinkEffect.alpha = 0.3;
+            var blinkAspect = this._blinkEffect.height / this._blinkEffect.width;
+            this._blinkEffect.width = 100;
+            this._blinkEffect.height = this._blinkEffect.width * blinkAspect;
+            this._blinkEffect.x = key.position.x + key.width / 2;
+            this._blinkEffect.y = key.position.y;
+
+            this._blinkEffect.anchor.set(0.5);
+
+            self.stage.addChild(this._blinkEffect); //Star particles
+
+            this._particleSystem = new _engine_QuickParticleSystem_js__WEBPACK_IMPORTED_MODULE_9__["QuickParticleSystem"]({
+              texture: pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.star.texture,
+              size: 10,
+              sizeVariance: 40,
+              tint: 0xFFFF00,
+              emitTime: 800,
+              lifeTime: 2000,
+              lifeTimeVariance: 500,
+              spawnRate: 20,
+              gravity: false,
+              velocityAmount: new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Point"](500, 500),
+              velocityDirectionalVariance: new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Point"](1, 1)
+            });
+            this._particleSystem.x = key.position.x + key.width / 2;
+            this._particleSystem.y = key.position.y;
+            self.stage.addChild(this._particleSystem);
+          } else {
+            key.angularAcceleration = 0;
+            key.angularVelocity /= 4;
+          }
+        }
+      }, {
+        key: "onPhysicsUpdate",
+        value: function onPhysicsUpdate() {
+          var _get2;
+
+          for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+          }
+
+          (_get2 = _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyHole.prototype), "onPhysicsUpdate", this)).call.apply(_get2, [this].concat(args));
+
+          if (this._keyTime) {
+            var tween = (Date.now() - this._keyTime) / 2000; //over 2000ms
+
+            var blinkAspect = this._blinkEffect.height / this._blinkEffect.width;
+            this._blinkEffect.width = 100 + 7000 * Math.pow(tween, 2); //100 to 7000 with tween^2 easing
+
+            this._blinkEffect.height = this._blinkEffect.width * blinkAspect;
+            this._blinkEffect.rotation += (Math.random() - 0.5) * 0.01; //Really small rotation changes
+
+            if (tween > 1.0) {
+              this._blinkEffect.visible = false;
+              this._keyTime = 0;
+            }
+          }
+        }
+      }]);
+
+      return KeyHole;
+    }(Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["WithPhysics"])(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Graphics"]));
+
+    _this._landingArea = new KeyHole();
+
+    _this._landingArea.beginFill(0xFFFF55);
+
+    _this._landingArea.drawRectBound = _this._landingArea.drawRect.bind(_this._landingArea, _this.screen.width - 20, _this.screen.height / 2, 20, _this.screen.height / 6);
+
+    _this._landingArea.drawRectBound();
+
+    _this._landingArea.endFill();
+
+    _this.stage.addChild(_this._landingArea);
+
+    var Floor =
+    /*#__PURE__*/
+    function (_WithPhysics3) {
+      _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(Floor, _WithPhysics3);
+
+      function Floor() {
+        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Floor);
+
+        return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Floor).apply(this, arguments));
+      }
+
+      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0___default()(Floor, [{
+        key: "onCollision",
+        value: function onCollision(otherObj) {
+          if (key._frozen || otherObj !== key) {
+            return;
+          }
+
+          key.velocity.set(0);
+          key.acceleration.set(0);
+          key.angularVelocity = 0;
+          key.angularAcceleration = 0;
+        }
+      }]);
+
+      return Floor;
+    }(Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["WithPhysics"])(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Graphics"]));
+
+    _this._floor = new Floor();
+
+    _this._floor.beginFill(0x555555);
+
+    _this._floor.drawRectBound = _this._floor.drawRect.bind(_this._floor, 0, _this.screen.height - 20, _this.screen.width, 20);
+
+    _this._floor.drawRectBound();
+
+    _this._floor.endFill();
+
+    _this.stage.addChild(_this._floor);
 
     return _this;
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogSceneApp, [{
-    key: "nextScene",
-    value: function nextScene() {
-      var _this2 = this;
+  return KeyFlipGameApp;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Application"]);
 
-      this.stopTyping();
-      this._currentPrompt = this.dialogTree.prompt(); //let { placement, name, options } = this._currentPrompt;
-
-      var placement = "left";
-      var name = "Test";
-      var options = this.dialogTree.options(this.actions);
-
-      for (var i in this.optionButtons) {
-        this.stage.removeChild(this.optionButtons[i]);
-      }
-
-      this.optionButtons = [];
-
-      var boxBounds = this._dialogBox.getBounds();
-
-      this._dialogBox.x = placement === "left" ? SCREEN_PADDING : this.screen.width - SCREEN_PADDING - boxBounds.width;
-      this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
-      this._dialogName.text = name;
-      this._leftFace.x = 20;
-      this._leftFace.y = this.screen.height / 4;
-      this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
-      this._rightFace.x = this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width;
-      this._rightFace.y = this.screen.height / 4;
-      this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
-
-      if (options) {
-        options.forEach(function (option, idx) {
-          var button = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.buttonFrame.texture, 231, 214, 231, 214);
-          button.width = 300 * 8;
-          button.height = 80 * 8;
-          button.scale.x = 0.125;
-          button.scale.y = 0.125;
-          button.position.x = 10;
-          button.position.y = 10 + 80 * idx;
-
-          _this2.stage.addChild(button);
-
-          var buttonText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"](option.text, {
-            fontFamily: 'Varela Round',
-            fontSize: 24,
-            fill: 0x000000,
-            align: 'left'
-          });
-          buttonText.anchor.y = 0.5;
-          button.addChild(buttonText);
-          buttonText.position.x = 30 * 8;
-          buttonText.position.y = 80 / 2 * 8;
-          buttonText.scale.x = 8;
-          buttonText.scale.y = 8;
-          button.interactive = true;
-          button.buttonMode = true;
-          button.on("pointerdown", function (evt) {
-            _this2.chooseOption(option);
-          });
-
-          _this2.optionButtons.push(button);
-        });
-      }
-
-      this.startTyping();
-    }
-  }, {
-    key: "chooseOption",
-    value: function chooseOption(option) {
-      console.log("Chose option " + option.text);
-      var actions = option.actions;
-
-      for (var i in actions) {
-        if (this.isGameAction(actions[i])) {
-          this.playGame(actions[i]);
-          return;
-        } else {
-          this.actions.push(actions[i]);
-        }
-      }
-
-      var dest = option.destination;
-
-      if (dest == -1) {
-        console.log("End of current tree.");
-        return;
-      }
-
-      this.dialogTree.selectNode(dest);
-      this.nextScene();
-    }
-  }, {
-    key: "isGameAction",
-    value: function isGameAction(action) {
-      var gameActions = ["PlayGame1", "PlayGame2", "PlayGame3"];
-
-      if (gameActions.indexOf(action) > -1) {
-        return true;
-      }
-
-      return false;
-    }
-  }, {
-    key: "playGame",
-    value: function playGame(action) {
-      if (action === "PlayGame1") {
-        var gameApp1 = new _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__["PowerMeterGame"]({
-          width: this._dialogBox.getBounds().width,
-          height: this._dialogBox.getBounds().height //oscillationTime: 1000,
-          //greenAreaWidth: 0.4
-
-        });
-        gameApp1.position.x = SCREEN_PADDING;
-        gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
-        var raf;
-
-        var loop = function loop() {
-          gameApp1.onUpdate();
-          raf = requestAnimationFrame(loop);
-        };
-
-        raf = requestAnimationFrame(loop);
-        this.view.addEventListener("pointerdown", function () {
-          gameApp1.stop();
-        });
-        window.addEventListener("keydown", function (e) {
-          if (e.key === " ") {
-            gameApp1.stop();
-            e.preventDefault(); //Stop the scrolling  
-          }
-        });
-        this.stage.addChild(gameApp1);
-        gameApp1.on("ended", function (e) {
-          console.log(e); //there's a .won with whether they won or not
-        });
-      }
-
-      if (action === "PlayGame2") {
-        console.log("Playing game 2");
-        this.actions.push("WinGame2");
-      }
-
-      if (action === "PlayGame3") {
-        console.log("Playing game 3");
-        this.actions.push("WinGame3");
-      }
-    }
-  }, {
-    key: "startTyping",
-    value: function startTyping() {
-      var _this3 = this;
-
-      if (this._dialogInterval) {
-        //Clear previous dialog
-        this.stopTyping();
-      }
-
-      console.log("Typing prompt:" + this._currentPrompt); //Start a new dialog
-
-      var letters = this._currentPrompt.split("");
-
-      var currLetter = 0;
-      this._dialogInterval = setInterval(function () {
-        console.log("Anything");
-        _this3._dialogText.text = letters.slice(0, currLetter).join("");
-        currLetter++;
-
-        if (currLetter > _this3._currentPrompt.length) {
-          _this3.stopTyping();
-
-          return;
-        }
-      }, TYPING_SPEED);
-    }
-  }, {
-    key: "stopTyping",
-    value: function stopTyping() {
-      clearInterval(this._dialogInterval);
-      this._dialogInterval = undefined;
-
-      if (this._currentPrompt) {
-        this._dialogText.text = this._currentPrompt;
-      }
-    }
-  }, {
-    key: "isTyping",
-    get: function get() {
-      return !!this._dialogInterval;
-    }
-  }]);
-
-  return DialogSceneApp;
-}(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Application"]);
-
-Promise.all([new Promise(function (resolve, reject) {
-  webfontloader__WEBPACK_IMPORTED_MODULE_6___default.a.load({
-    active: resolve,
-    google: {
-      families: ['Varela Round', 'ZCOOL KuaiLe']
-    }
-  });
-}), new Promise(function (resolve, reject) {
-  pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
-  .add("bedroom", "images/bedroom.png") //Characters
-  .add("carl", "images/crepycarl-clothed.png").add("mc", "images/mc-clothed.png") //Other assets
-  .add("dialogFrame", "images/frameyboi.png").add("buttonFrame", "images/buttonboi.png").load(resolve);
-}), new Promise(function (resolve, reject) {
-  document.addEventListener("DOMContentLoaded", resolve);
-})]).then(function () {
-  //WIRE UP THE APP
-  var app = new DialogSceneApp({
-    antialias: true,
-    width: window.innerWidth,
-    height: window.innerHeight
-  }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__["loadJsonFile"]("testTree"));
-  document.body.appendChild(app.view); //lock for mobile devices (throws if device doesn't support)
-
-  /*try {
-    screen.orientation.lock('landscape');
-  }
-  catch(e) {}*/
-
-  ["mouseup", "touchend"].forEach(function (eventName) {
-    app.view.addEventListener(eventName, function () {
-      if (app.isTyping) {
-        app.stopTyping();
-      } else {
-        app.nextScene();
-      }
+document.addEventListener("DOMContentLoaded", function () {
+  pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].add("key", "images/key.png").add("star", "images/star.png").load(function () {
+    //WIRE UP THE APP
+    var app = new KeyFlipGameApp({
+      antialias: true,
+      width: window.innerWidth,
+      height: window.innerHeight,
+      transparent: true
     });
+    document.body.appendChild(app.view);
+    setInterval(function () {
+      Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["physicsLoop"])(app.stage);
+    }, 10);
   });
 });
 
 /***/ }),
 
-/***/ "./src/js/dialogue_node.js":
-/*!*********************************!*\
-  !*** ./src/js/dialogue_node.js ***!
-  \*********************************/
-/*! exports provided: DialogueTree, DialogueNode, OptionNode, loadJsonFile, getJsonByFile */
+/***/ "./src/js/engine/QuickParticleSystem.js":
+/*!**********************************************!*\
+  !*** ./src/js/engine/QuickParticleSystem.js ***!
+  \**********************************************/
+/*! exports provided: QuickParticleSystem */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DialogueTree", function() { return DialogueTree; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DialogueNode", function() { return DialogueNode; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OptionNode", function() { return OptionNode; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadJsonFile", function() { return loadJsonFile; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getJsonByFile", function() { return getJsonByFile; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _json_test_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./json/test.js */ "./src/js/json/test.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "QuickParticleSystem", function() { return QuickParticleSystem; });
+/* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/get */ "./node_modules/@babel/runtime/helpers/get.js");
+/* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @babel/runtime/helpers/assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
+/* harmony import */ var _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_7__);
+/* harmony import */ var _WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./WithPhysics.js */ "./src/js/engine/WithPhysics.js");
 
 
 
 
-var DialogueTree =
+
+
+
+
+
+var QuickParticleSystem =
 /*#__PURE__*/
-function () {
-  function DialogueTree(name, nodes) {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DialogueTree);
+function (_PIXI$Container) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(QuickParticleSystem, _PIXI$Container);
 
-    this.name = name;
-    this.nodes = nodes;
-    this.currentNode = this.getNode(0);
-  }
+  function QuickParticleSystem(options) {
+    var _this;
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogueTree, [{
-    key: "prompt",
-    value: function prompt() {
-      return this.currentNode.prompt;
-    } // Return available options
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, QuickParticleSystem);
 
-  }, {
-    key: "options",
-    value: function options(actions) {
-      var ret = [];
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(QuickParticleSystem).call(this, options));
+    Object.assign(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this)), options);
 
-      for (var i in this.currentNode.options) {
-        var option = this.currentNode.options[i];
+    var self = _babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this));
 
-        if (option.performChecks(actions)) {
-          ret.push(option);
+    var QuickParticle =
+    /*#__PURE__*/
+    function (_WithPhysics) {
+      _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(QuickParticle, _WithPhysics);
+
+      function QuickParticle() {
+        var _getPrototypeOf2;
+
+        var _this2;
+
+        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, QuickParticle);
+
+        for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+          args[_key] = arguments[_key];
         }
+
+        _this2 = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, (_getPrototypeOf2 = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(QuickParticle)).call.apply(_getPrototypeOf2, [this].concat(args)));
+        _this2._endTime = Date.now() + self.lifeTime + self.lifeTimeVariance * Math.random();
+        return _this2;
       }
 
-      return ret;
-    }
-  }, {
-    key: "selectNode",
-    value: function selectNode(nodeId) {
-      this.currentNode = this.getNode(nodeId);
-    }
-  }, {
-    key: "toString",
-    value: function toString() {
-      var ret = this.name + ":\n";
+      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(QuickParticle, [{
+        key: "onPhysicsUpdate",
+        value: function onPhysicsUpdate() {
+          var _get2;
 
-      for (var i in this.nodes) {
-        var node = this.nodes[i];
-        ret += node.toString();
-      }
+          for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+          }
 
-      return ret;
-    }
-  }, {
-    key: "getNode",
-    value: function getNode(id) {
-      console.log("getNode: " + id);
+          (_get2 = _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(QuickParticle.prototype), "onPhysicsUpdate", this)).call.apply(_get2, [this].concat(args));
 
-      for (var i in this.nodes) {
-        var node = this.nodes[i];
-
-        if (node.id == id) {
-          return node;
+          if (Date.now() > this._endTime) {
+            this.visible = false;
+          }
         }
-      }
-
-      console.error("Node " + id + " does not exist");
-      return undefined;
-    }
-  }, {
-    key: "validate",
-    value: function validate() {
-      console.log("Validation start");
-
-      if (!this.hasRootNode()) {
-        console.error("No root node.");
-      }
-
-      if (this.badDestinations()) {
-        console.error("Bad destinations found");
-      }
-    }
-  }, {
-    key: "hasRootNode",
-    value: function hasRootNode() {
-      return this.getNode(0) != null;
-    }
-  }, {
-    key: "badDestinations",
-    value: function badDestinations() {
-      var destinations = this.getDestinations();
-      var ret = false;
-
-      for (var i in destinations) {
-        if (this.getNode(destinations[i]) == null && destinations[i] != -1) {
-          console.log("Destination " + destinations[i] + " is null.");
-          ret = true;
-        }
-      }
-
-      return ret;
-    }
-  }, {
-    key: "getDestinations",
-    value: function getDestinations() {
-      var ret = [];
-
-      for (var i in this.nodes) {
-        console.log('Pushing ' + this.nodes[i].getDestinations());
-        ret.concat(this.nodes[i].getDestinations());
-      }
-
-      return ret;
-    }
-  }], [{
-    key: "fromJson",
-    value: function fromJson(json) {
-      var ret = new DialogueTree();
-      ret.name = json.name;
-      ret.nodes = [];
-
-      for (var i in json.nodes) {
-        var nodeJson = json.nodes[i];
-        ret.nodes.push(DialogueNode.fromJson(nodeJson));
-      }
-
-      ret.selectNode(0);
-      return ret;
-    }
-  }]);
-
-  return DialogueTree;
-}();
-
-var DialogueNode =
-/*#__PURE__*/
-function () {
-  function DialogueNode(id, prompt, options) {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, DialogueNode);
-
-    this.id = id;
-    this.prompt = prompt;
-    this.options = options;
-  }
-
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(DialogueNode, [{
-    key: "toString",
-    value: function toString() {
-      var ret = "Node[" + this.id + "]:\n";
-      ret += "\"" + this.prompt + "\"\n";
-
-      for (var i in this.options) {
-        ret += "\t" + this.options[i].toString() + "\n";
-      }
-
-      return ret;
-    }
-  }, {
-    key: "getDestinations",
-    value: function getDestinations() {
-      var ret = [];
-
-      for (var i in this.options) {
-        ret.push(this.options[i].destination);
-      }
-
-      return ret;
-    }
-  }], [{
-    key: "fromJson",
-    value: function fromJson(json) {
-      var ret = new DialogueNode();
-      ret.id = json.id;
-      ret.prompt = json.prompt;
-      ret.speaker = json.speaker;
-      ret.background = json.background;
-      ret.options = [];
-
-      for (var i in json.options) {
-        var optionJson = json.options[i];
-        ret.options.push(OptionNode.fromJson(optionJson));
-      }
-
-      return ret;
-    }
-  }]);
-
-  return DialogueNode;
-}();
-
-var OptionNode =
-/*#__PURE__*/
-function () {
-  function OptionNode(destination, text, actions, checks) {
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, OptionNode);
-
-    this.destination = destination;
-    this.text = text;
-    this.actions = actions;
-    this.checks = checks;
-  }
-
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(OptionNode, [{
-    key: "toString",
-    value: function toString() {
-      var ret = "\"" + this.text + "\"";
-      ret += ": " + this.actions.length + " actions, ";
-      ret += this.checks.length + " checks";
-      return ret;
-    } // Make sure that each action has been fulfilled for each check.
-
-  }, {
-    key: "performChecks",
-    value: function performChecks(actions) {
-      if (this.checks.length == 0) {
-        return true;
-      }
-
-      for (var i in this.checks) {
-        var check = this.checks[i];
-
-        if (actions.indexOf(check) == -1) {
+      }, {
+        key: "doCollisions",
+        get: function get() {
           return false;
         }
+      }]);
+
+      return QuickParticle;
+    }(Object(_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["WithPhysics"])(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"]));
+
+    _this._particleCls = QuickParticle;
+    _this._spriteTexture = options.texture;
+
+    var endTime = Date.now() + _this.emitTime;
+
+    var interval = setInterval(function () {
+      _this.spawnParticle();
+
+      if (Date.now() > endTime) {
+        clearInterval(interval);
+      }
+    }, _this.spawnRate);
+    return _this;
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(QuickParticleSystem, [{
+    key: "spawnParticle",
+    value: function spawnParticle() {
+      var particle = new this._particleCls(this._spriteTexture);
+      var particleAspect = particle.height / particle.width;
+      particle.width = this.size + Math.random() * this.sizeVariance;
+      particle.height = particle.width * particleAspect;
+      particle.tint = this.tint;
+
+      if (this.gravity) {
+        particle.acceleration.set(0, -9.8 * 200);
       }
 
-      console.error("OptionNode.performChecks: How did you get here?");
-      return false;
-    }
-  }], [{
-    key: "fromJson",
-    value: function fromJson(json) {
-      var ret = new OptionNode();
-      ret.destination = json.destination;
-      ret.text = json.text;
-      ret.actions = json.actions;
-      ret.checks = json.checks;
-      return ret;
+      var normalRandom = function normalRandom() {
+        return Math.random();
+      };
+
+      var doubleRandom = function doubleRandom() {
+        return (Math.random() - 0.5) * 2;
+      };
+
+      particle.velocity.set((this.velocityDirectionalVariance.x ? doubleRandom : normalRandom)() * this.velocityAmount.x, (this.velocityDirectionalVariance.y ? doubleRandom : normalRandom)() * this.velocityAmount.y);
+      particle.angularAcceleration = Math.random() - 0.5;
+      particle.angularVelocity = (Math.random() - 0.5) / 4;
+      particle.anchor.set(0.5);
+      this.addChild(particle);
     }
   }]);
 
-  return OptionNode;
-}();
-
-function test() {
-  var json = getTestJson();
-  var tree = DialogueTree.fromJson(json);
-  console.log(tree.toString());
-  tree.validate();
-} // returns DialogueTree for jsonFile
-
-
-function loadJsonFile(fileName) {
-  var json = getJsonByFile(fileName);
-  var ret = DialogueTree.fromJson(json);
-
-  if (ret == null) {
-    console.error("Couldn't parse file " + fileName);
-  }
-
-  return ret;
-}
-
-function getJsonByFile(fileName) {
-  var objects = {
-    "testTree": _json_test_js__WEBPACK_IMPORTED_MODULE_2__["default"]
-  };
-  var ret = objects[fileName];
-
-  if (ret == null) {
-    console.error(fileName + " was Null.");
-  }
-
-  return ret;
-}
-
-function getTestJson() {
-  return {
-    name: "testTree",
-    nodes: [{
-      id: 0,
-      prompt: "Favorite color?",
-      speaker: "carl",
-      background: "background.png",
-      options: [{
-        destination: 1,
-        text: 'Green',
-        actions: [],
-        checks: []
-      }, {
-        destination: 2,
-        text: 'Blue',
-        actions: [],
-        checks: []
-      }]
-    }, {
-      id: 1,
-      prompt: "Good choice",
-      speaker: "carl",
-      background: "background.png",
-      options: [{
-        destination: 3,
-        text: 'thanks',
-        actions: [],
-        checks: []
-      }]
-    }, {
-      id: 2,
-      prompt: "Bad choice",
-      speaker: "carl",
-      background: "background.png",
-      options: [{
-        destination: 3,
-        text: 'Drat',
-        actions: [],
-        checks: []
-      }]
-    }, {
-      id: 3,
-      prompt: "Ok, gameover now.",
-      speaker: "carl",
-      background: "background.png",
-      options: [{
-        destination: -1,
-        text: '<continue>',
-        actions: [],
-        checks: []
-      }]
-    }]
-  };
-} //test();
-
-
-
+  return QuickParticleSystem;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Container"]);
 
 /***/ }),
 
@@ -45282,6 +44933,11 @@ function WithPhysics(pixiCls) {
 
     _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(_WithPhysicsCls, [{
       key: "hasPhysics",
+      get: function get() {
+        return true;
+      }
+    }, {
+      key: "doCollisions",
       get: function get() {
         return true;
       }
@@ -45374,7 +45030,10 @@ function physicsLoop(rootNode) {
     }
 
     obj.onPhysicsUpdate(time, deltaTime);
-    physObjs.push(obj);
+
+    if (obj.doCollisions) {
+      physObjs.push(obj);
+    }
   }); //Determine whether any objects
   //are colliding, O(n^2/2) it's not that smart
 
@@ -45385,7 +45044,7 @@ function physicsLoop(rootNode) {
       //Box test with pixi.rectangle
       var rect1 = obj1.getBounds();
       var rect2 = obj2.getBounds();
-      var instersects = //x direction
+      var intersects = //x direction
       rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && //y direction
       rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y;
 
@@ -45403,72 +45062,6 @@ function physicsLoop(rootNode) {
     });
   });
 }
-setInterval(physicsLoop, 100);
-
-/***/ }),
-
-/***/ "./src/js/json/test.js":
-/*!*****************************!*\
-  !*** ./src/js/json/test.js ***!
-  \*****************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony default export */ __webpack_exports__["default"] = ({
-  name: "testTree",
-  nodes: [{
-    id: 0,
-    prompt: "Favorite color?",
-    speaker: "carl",
-    background: "background.png",
-    options: [{
-      destination: 1,
-      text: 'Green',
-      actions: [],
-      checks: []
-    }, {
-      destination: 2,
-      text: 'Blue',
-      actions: [],
-      checks: []
-    }]
-  }, {
-    id: 1,
-    prompt: "Good choice",
-    speaker: "carl",
-    background: "background.png",
-    options: [{
-      destination: 3,
-      text: 'thanks',
-      actions: ["PlayGame1"],
-      checks: []
-    }]
-  }, {
-    id: 2,
-    prompt: "Bad choice",
-    speaker: "carl",
-    background: "background.png",
-    options: [{
-      destination: 3,
-      text: 'Drat',
-      actions: [],
-      checks: []
-    }]
-  }, {
-    id: 3,
-    prompt: "Ok, gameover now.",
-    speaker: "carl",
-    background: "background.png",
-    options: [{
-      destination: -1,
-      text: '<continue>',
-      actions: [],
-      checks: []
-    }]
-  }]
-});
 
 /***/ }),
 
@@ -45481,7 +45074,7 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _chat_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./chat.js */ "./src/js/chat.js");
+/* harmony import */ var _BottleFlipGame_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./BottleFlipGame.js */ "./src/js/BottleFlipGame.js");
 /* harmony import */ var _data_story__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data/story */ "./src/data/story/index.js");
 
 

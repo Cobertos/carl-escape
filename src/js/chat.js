@@ -22,8 +22,10 @@ class DialogSceneApp extends PIXI.Application {
       console.log("Dialogue tree null.");
     }
     this.renderer.autoResize = true; //I dont think this works?
+    this.renderer.resize(window.innerWidth, window.innerHeight);
     window.addEventListener("resize", ()=>{
       this.renderer.resize(window.innerWidth, window.innerHeight);
+      this.updateUI();
     });
     this.optionButtons = [];
     this.actions = [];
@@ -38,39 +40,26 @@ class DialogSceneApp extends PIXI.Application {
 
     this._dialogBox = new PIXI.Container();
     this.stage.addChild(this._dialogBox);
-    let frame = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.dialogFrame.texture, 117, 117, 117, 117);
-    frame.width = 1000;
-    frame.height = 400;
-    frame.scale.x = 0.5;
-    frame.scale.y = 0.5;
-    this._dialogBox.addChild(frame);
+    this._dialogFrame = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.dialogFrame.texture, 117, 117, 117, 117);
+    this._dialogBox.addChild(this._dialogFrame);
 
-    let name = this._dialogName = new PIXI.Text("NAME", {fontFamily : 'Varela Round', fontSize: 24, fill : 0x000000, align : 'center'});
-    name.position.x = 50;
-    name.position.y = 50;
-    this._dialogBox.addChild(name);
+    this._dialogName = new PIXI.Text("NAME", {fontFamily : 'Arial', fontSize: 24, fill : 0x000000, align : 'left', fontWeight: "bold"});
+    this._dialogFrame.addChild(this._dialogName);
 
-    let text = this._dialogText = new PIXI.Text("Initial Text", {fontFamily : 'Varela Round', fontSize: 24, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: 400});
-    text.position.x = 50;
-    text.position.y = 80;
+    this._dialogText = new PIXI.Text("Initial Text",
+      {fontFamily : 'Varela Round', fontSize: 24, fill : 0x000000, align : 'left', wordWrap: true, wordWrapWidth: 400});
     this._dialogInterval = undefined;
-    this._dialogBox.addChild(text);
+    this._dialogFrame.addChild(this._dialogText);
 
-    let face1 = this._leftFace = new PIXI.Sprite(
+    this._leftFace = new PIXI.Sprite(
       PIXI.loader.resources.mc.texture
     );
-    let face1Aspect = face1.height/face1.width;
-    face1.width = this.screen.width/2.8;
-    face1.height= face1.width*face1Aspect;
-    this.stage.addChild(face1);
+    this.stage.addChild(this._leftFace);
 
-    let face2 = this._rightFace = new PIXI.Sprite(
+    this._rightFace = new PIXI.Sprite(
       PIXI.loader.resources.carl.texture
     );
-    let face2Aspect = face2.height/face2.width;
-    face2.width = this.screen.width/2.8;
-    face2.height= face2.width*face2Aspect;
-    this.stage.addChild(face2);
+    this.stage.addChild(this._rightFace);
 
     this.view.addEventListener("pointerdown", this.stopTyping.bind(this));
     window.addEventListener("keydown", (e)=>{
@@ -81,59 +70,82 @@ class DialogSceneApp extends PIXI.Application {
     });
 
     this.nextScene();
+    this.render();
+    setTimeout(this.render(),200);
   }
 
-  get isTyping(){
-    return !!this._dialogInterval;
-  }
-
-  nextScene(){
-    this.stopTyping();
-    this._currentNode = this.dialogTree.currentNode2();
+  updateUI() {
     let { speaker : name, background } = this._currentNode;
 
-    let placement = "left";
-    let options = this.dialogTree.options(this.actions);
-    
+    let heightMul = Math.min(1, Math.max(0.5, this.screen.height/900)); //Scale down if less than 900
+    console.log(heightMul, this.screen.height);
+
+    //at a screen size of 1400 will start decreasing
+    //at a screen size of 600
+    //at a screen size of 400
+    let cremsStart = 1400;
+    let crems = Math.min(0.025 * this.screen.width / 35, 1);
+
+
     //Set background image
     this._background.style.backgroundImage = `url(${BACKGROUND_TO_URL[background]})`;
 
+    let face1Aspect = this._leftFace.height/this._leftFace.width;
+    this._leftFace.width = this.screen.width/4 * crems;
+    this._leftFace.height= this._leftFace.width*face1Aspect;
+    this._leftFace.position.x = SCREEN_PADDING;
+    this._leftFace.position.y = SCREEN_PADDING;
+    let placement = name === "" ? "left" : "right"; //name === "" is MC
+    this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
+
+    let face2Aspect = this._rightFace.height/this._rightFace.width;
+    this._rightFace.width = this.screen.width/4 * crems;
+    this._rightFace.height= this._rightFace.width*face2Aspect;
+    this._rightFace.position.y = SCREEN_PADDING;
+    this._rightFace.position.x = this.screen.width-this._rightFace.width-SCREEN_PADDING;
+    this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
+
+    console.log(crems);
+    this._dialogBox.width = cremsStart/2*crems;
+    this._dialogBox.height = 300*crems;
+    console.log(cremsStart/2*crems, this._dialogBox.width);
+    
+    this._dialogBox.x = SCREEN_PADDING;
+    this._dialogBox.y = this.screen.height - SCREEN_PADDING - this._dialogBox.height;
+
+    this._dialogFrame.width = this._dialogBox.width;
+    this._dialogFrame.height = this._dialogBox.height;
+    this._dialogName.style.fontSize = 24*crems;
+    this._dialogName.position.x = 140/2;
+    this._dialogName.position.y = 117/2;
+    this._dialogText.style.fontSize = 24*crems;
+    this._dialogText.style.wordWrapWidth = this._dialogBox.width - 117;
+    this._dialogText.position.x = 140/2;
+    this._dialogText.position.y = 117/2+30;
+
+    this._dialogName.text = name;
+
+    //options
+    let options = this.dialogTree.options(this.actions);
     for(let i in this.optionButtons){
       this.stage.removeChild(this.optionButtons[i]);
     }
     this.optionButtons = [];
 
-    let boxBounds = this._dialogBox.getBounds();
-    this._dialogBox.x = placement === "left" ? SCREEN_PADDING : (this.screen.width - SCREEN_PADDING - boxBounds.width);
-    this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
-    this._dialogName.text = name;
-
-    this._leftFace.x = 20;
-    this._leftFace.y = this.screen.height/4;
-    this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
-
-    this._rightFace.x = (this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width);
-    this._rightFace.y = this.screen.height/4;
-    this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
-
     if(options) {
       options.forEach((option, idx)=>{
-        let button = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.buttonFrame.texture, 231, 214, 231, 214);
-        button.width = 300 * 8;
-        button.height = 80 * 8;
-        button.scale.x = 0.125;
-        button.scale.y = 0.125;
-        button.position.x = 10;
-        button.position.y = 10 + 80 * idx;
+        let button = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.buttonFrame.texture, 70, 70, 70, 70);
+        button.width = 600*crems;
+        button.height = 150*crems;
+        button.position.x = this.screen.width - SCREEN_PADDING - button.width;
+        button.position.y = this.screen.height - SCREEN_PADDING - button.height * (1-idx) - button.height;
         this.stage.addChild(button);
 
-        let buttonText = new PIXI.Text(option.text, {fontFamily : 'Varela Round', fontSize: 24, fill : 0x000000, align : 'left'});
+        let buttonText = new PIXI.Text(option.text, {fontFamily : 'Varela Round', fontSize: 24*crems, fill : 0x000000, align : 'left'});
         buttonText.anchor.y = 0.5;
         button.addChild(buttonText);
-        buttonText.position.x = 30 * 8;
-        buttonText.position.y = 80/2 * 8;
-        buttonText.scale.x = 8;
-        buttonText.scale.y = 8;
+        buttonText.position.x = 70*crems;
+        buttonText.position.y = 70*crems;
 
         button.interactive = true;
         button.buttonMode = true;
@@ -144,6 +156,16 @@ class DialogSceneApp extends PIXI.Application {
         this.optionButtons.push(button);
       });
     }
+  }
+
+  get isTyping(){
+    return !!this._dialogInterval;
+  }
+
+  nextScene(){
+    this.stopTyping();
+    this._currentNode = this.dialogTree.currentNode2();
+    this.updateUI();
 
     this.startTyping();
   }
@@ -354,7 +376,7 @@ Promise.all([
   }, Dialogue.loadJsonFile("mainTree"));
   app.view.classList.add("renderer");
   document.body.appendChild(app.view);
-  app.playSound("audio/Unsettle1.wav");
+  //app.playSound("audio/Unsettle1.wav");
   //lock for mobile devices (throws if device doesn't support)
   /*try {
     screen.orientation.lock('landscape');

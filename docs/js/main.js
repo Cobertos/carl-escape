@@ -1268,329 +1268,6 @@ earcut.flatten = function (data) {
 
 /***/ }),
 
-/***/ "./node_modules/eventemitter3/index.js":
-/*!*********************************************!*\
-  !*** ./node_modules/eventemitter3/index.js ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var has = Object.prototype.hasOwnProperty
-  , prefix = '~';
-
-/**
- * Constructor to create a storage for our `EE` objects.
- * An `Events` instance is a plain object whose properties are event names.
- *
- * @constructor
- * @api private
- */
-function Events() {}
-
-//
-// We try to not inherit from `Object.prototype`. In some engines creating an
-// instance in this way is faster than calling `Object.create(null)` directly.
-// If `Object.create(null)` is not supported we prefix the event names with a
-// character to make sure that the built-in object properties are not
-// overridden or used as an attack vector.
-//
-if (Object.create) {
-  Events.prototype = Object.create(null);
-
-  //
-  // This hack is needed because the `__proto__` property is still inherited in
-  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
-  //
-  if (!new Events().__proto__) prefix = false;
-}
-
-/**
- * Representation of a single event listener.
- *
- * @param {Function} fn The listener function.
- * @param {Mixed} context The context to invoke the listener with.
- * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
- * @constructor
- * @api private
- */
-function EE(fn, context, once) {
-  this.fn = fn;
-  this.context = context;
-  this.once = once || false;
-}
-
-/**
- * Minimal `EventEmitter` interface that is molded against the Node.js
- * `EventEmitter` interface.
- *
- * @constructor
- * @api public
- */
-function EventEmitter() {
-  this._events = new Events();
-  this._eventsCount = 0;
-}
-
-/**
- * Return an array listing the events for which the emitter has registered
- * listeners.
- *
- * @returns {Array}
- * @api public
- */
-EventEmitter.prototype.eventNames = function eventNames() {
-  var names = []
-    , events
-    , name;
-
-  if (this._eventsCount === 0) return names;
-
-  for (name in (events = this._events)) {
-    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
-  }
-
-  if (Object.getOwnPropertySymbols) {
-    return names.concat(Object.getOwnPropertySymbols(events));
-  }
-
-  return names;
-};
-
-/**
- * Return the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Boolean} exists Only check if there are listeners.
- * @returns {Array|Boolean}
- * @api public
- */
-EventEmitter.prototype.listeners = function listeners(event, exists) {
-  var evt = prefix ? prefix + event : event
-    , available = this._events[evt];
-
-  if (exists) return !!available;
-  if (!available) return [];
-  if (available.fn) return [available.fn];
-
-  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
-    ee[i] = available[i].fn;
-  }
-
-  return ee;
-};
-
-/**
- * Calls each of the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @returns {Boolean} `true` if the event had listeners, else `false`.
- * @api public
- */
-EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return false;
-
-  var listeners = this._events[evt]
-    , len = arguments.length
-    , args
-    , i;
-
-  if (listeners.fn) {
-    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
-
-    switch (len) {
-      case 1: return listeners.fn.call(listeners.context), true;
-      case 2: return listeners.fn.call(listeners.context, a1), true;
-      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
-      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
-      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-    }
-
-    for (i = 1, args = new Array(len -1); i < len; i++) {
-      args[i - 1] = arguments[i];
-    }
-
-    listeners.fn.apply(listeners.context, args);
-  } else {
-    var length = listeners.length
-      , j;
-
-    for (i = 0; i < length; i++) {
-      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
-
-      switch (len) {
-        case 1: listeners[i].fn.call(listeners[i].context); break;
-        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
-        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
-        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
-        default:
-          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
-            args[j - 1] = arguments[j];
-          }
-
-          listeners[i].fn.apply(listeners[i].context, args);
-      }
-    }
-  }
-
-  return true;
-};
-
-/**
- * Add a listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.on = function on(event, fn, context) {
-  var listener = new EE(fn, context || this)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Add a one-time listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.once = function once(event, fn, context) {
-  var listener = new EE(fn, context || this, true)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Remove the listeners of a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn Only remove the listeners that match this function.
- * @param {Mixed} context Only remove the listeners that have this context.
- * @param {Boolean} once Only remove one-time listeners.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return this;
-  if (!fn) {
-    if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-    return this;
-  }
-
-  var listeners = this._events[evt];
-
-  if (listeners.fn) {
-    if (
-         listeners.fn === fn
-      && (!once || listeners.once)
-      && (!context || listeners.context === context)
-    ) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
-      if (
-           listeners[i].fn !== fn
-        || (once && !listeners[i].once)
-        || (context && listeners[i].context !== context)
-      ) {
-        events.push(listeners[i]);
-      }
-    }
-
-    //
-    // Reset the array, or remove it completely if we have no more listeners.
-    //
-    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
-    else if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-  }
-
-  return this;
-};
-
-/**
- * Remove all listeners, or those of the specified event.
- *
- * @param {String|Symbol} [event] The event name.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
-  var evt;
-
-  if (event) {
-    evt = prefix ? prefix + event : event;
-    if (this._events[evt]) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    this._events = new Events();
-    this._eventsCount = 0;
-  }
-
-  return this;
-};
-
-//
-// Alias methods names because people roll like that.
-//
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-//
-// This function doesn't apply anymore.
-//
-EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
-  return this;
-};
-
-//
-// Expose the prefix.
-//
-EventEmitter.prefixed = prefix;
-
-//
-// Allow `EventEmitter` to be imported as module namespace.
-//
-EventEmitter.EventEmitter = EventEmitter;
-
-//
-// Expose the module.
-//
-if (true) {
-  module.exports = EventEmitter;
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/howler/dist/howler.js":
 /*!********************************************!*\
   !*** ./node_modules/howler/dist/howler.js ***!
@@ -10024,7 +9701,7 @@ exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -16724,7 +16401,7 @@ var _RenderTexture = __webpack_require__(/*! ../textures/RenderTexture */ "./nod
 
 var _RenderTexture2 = _interopRequireDefault(_RenderTexture);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -26301,7 +25978,7 @@ var _settings = __webpack_require__(/*! ../settings */ "./node_modules/pixi.js/l
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -27668,7 +27345,7 @@ var _TextureUvs = __webpack_require__(/*! ./TextureUvs */ "./node_modules/pixi.j
 
 var _TextureUvs2 = _interopRequireDefault(_TextureUvs);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -29933,7 +29610,7 @@ var _settings = __webpack_require__(/*! ../settings */ "./node_modules/pixi.js/l
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -36834,7 +36511,7 @@ var _InteractionTrackingData = __webpack_require__(/*! ./InteractionTrackingData
 
 var _InteractionTrackingData2 = _interopRequireDefault(_InteractionTrackingData);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -39257,7 +38934,7 @@ var _resourceLoader2 = _interopRequireDefault(_resourceLoader);
 
 var _blob = __webpack_require__(/*! resource-loader/lib/middlewares/parsing/blob */ "./node_modules/resource-loader/lib/middlewares/parsing/blob.js");
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -43691,6 +43368,329 @@ function findGraphics(item, queue) {
 
 core.WebGLRenderer.registerPlugin('prepare', WebGLPrepare);
 //# sourceMappingURL=WebGLPrepare.js.map
+
+/***/ }),
+
+/***/ "./node_modules/pixi.js/node_modules/eventemitter3/index.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/pixi.js/node_modules/eventemitter3/index.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if (true) {
+  module.exports = EventEmitter;
+}
+
 
 /***/ }),
 
@@ -48447,6 +48447,8 @@ function (_PIXI$Container) {
   }, {
     key: "stop",
     value: function stop() {
+      var _this2 = this;
+
       if (!this._started) {
         return;
       }
@@ -48458,9 +48460,11 @@ function (_PIXI$Container) {
       var greenAreaStart = greenBoxX / this.intrinsicWidth;
       var greenAreaEnd = (greenBoxX + this._greenArea.width) / this.intrinsicWidth;
       this._hitGreenArea = stopPos > greenAreaStart && stopPos < greenAreaEnd;
-      this.emit("ended", {
-        won: this.won
-      });
+      setTimeout(function () {
+        _this2.emit("ended", {
+          won: _this2.won
+        });
+      }, 1500);
     } //Whether the player has won, undefiend if not finished
 
   }, {
@@ -48549,8 +48553,12 @@ function (_PIXI$Application) {
 
     _this.renderer.autoResize = true; //I dont think this works?
 
+    _this.renderer.resize(window.innerWidth, window.innerHeight);
+
     window.addEventListener("resize", function () {
       _this.renderer.resize(window.innerWidth, window.innerHeight);
+
+      _this.updateUI();
     });
     _this.optionButtons = [];
     _this.actions = [];
@@ -48565,26 +48573,21 @@ function (_PIXI$Application) {
 
     _this.stage.addChild(_this._dialogBox);
 
-    var frame = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.dialogFrame.texture, 117, 117, 117, 117);
-    frame.width = 1000;
-    frame.height = 400;
-    frame.scale.x = 0.5;
-    frame.scale.y = 0.5;
+    _this._dialogFrame = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.dialogFrame.texture, 117, 117, 117, 117);
 
-    _this._dialogBox.addChild(frame);
+    _this._dialogBox.addChild(_this._dialogFrame);
 
-    var name = _this._dialogName = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("NAME", {
-      fontFamily: 'Varela Round',
+    _this._dialogName = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("NAME", {
+      fontFamily: 'Arial',
       fontSize: 24,
       fill: 0x000000,
-      align: 'center'
+      align: 'left',
+      fontWeight: "bold"
     });
-    name.position.x = 50;
-    name.position.y = 50;
 
-    _this._dialogBox.addChild(name);
+    _this._dialogFrame.addChild(_this._dialogName);
 
-    var text = _this._dialogText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("Initial Text", {
+    _this._dialogText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("Initial Text", {
       fontFamily: 'Varela Round',
       fontSize: 24,
       fill: 0x000000,
@@ -48592,25 +48595,17 @@ function (_PIXI$Application) {
       wordWrap: true,
       wordWrapWidth: 400
     });
-    text.position.x = 50;
-    text.position.y = 80;
     _this._dialogInterval = undefined;
 
-    _this._dialogBox.addChild(text);
+    _this._dialogFrame.addChild(_this._dialogText);
 
-    var face1 = _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.mc.texture);
-    var face1Aspect = face1.height / face1.width;
-    face1.width = _this.screen.width / 2.8;
-    face1.height = face1.width * face1Aspect;
+    _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.mc.texture);
 
-    _this.stage.addChild(face1);
+    _this.stage.addChild(_this._leftFace);
 
-    var face2 = _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.carl.texture);
-    var face2Aspect = face2.height / face2.width;
-    face2.width = _this.screen.width / 2.8;
-    face2.height = face2.width * face2Aspect;
+    _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.carl.texture);
 
-    _this.stage.addChild(face2);
+    _this.stage.addChild(_this._rightFace);
 
     _this.view.addEventListener("pointerdown", _this.stopTyping.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this))));
 
@@ -48624,23 +48619,62 @@ function (_PIXI$Application) {
 
     _this.nextScene();
 
+    _this.render();
+
+    setTimeout(_this.render(), 200);
     return _this;
   }
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(DialogSceneApp, [{
-    key: "nextScene",
-    value: function nextScene() {
+    key: "updateUI",
+    value: function updateUI() {
       var _this2 = this;
 
-      this.stopTyping();
-      this._currentNode = this.dialogTree.currentNode2();
       var _this$_currentNode = this._currentNode,
           name = _this$_currentNode.speaker,
           background = _this$_currentNode.background;
-      var placement = "left";
-      var options = this.dialogTree.options(this.actions); //Set background image
+      var heightMul = Math.min(1, Math.max(0.5, this.screen.height / 900)); //Scale down if less than 900
+
+      console.log(heightMul, this.screen.height); //at a screen size of 1400 will start decreasing
+      //at a screen size of 600
+      //at a screen size of 400
+
+      var cremsStart = 1400;
+      var crems = Math.min(0.025 * this.screen.width / 35, 1); //Set background image
 
       this._background.style.backgroundImage = "url(".concat(BACKGROUND_TO_URL[background], ")");
+      var face1Aspect = this._leftFace.height / this._leftFace.width;
+      this._leftFace.width = this.screen.width / 4 * crems;
+      this._leftFace.height = this._leftFace.width * face1Aspect;
+      this._leftFace.position.x = SCREEN_PADDING;
+      this._leftFace.position.y = SCREEN_PADDING;
+      var placement = name === "" ? "left" : "right"; //name === "" is MC
+
+      this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
+      var face2Aspect = this._rightFace.height / this._rightFace.width;
+      this._rightFace.width = this.screen.width / 4 * crems;
+      this._rightFace.height = this._rightFace.width * face2Aspect;
+      this._rightFace.position.y = SCREEN_PADDING;
+      this._rightFace.position.x = this.screen.width - this._rightFace.width - SCREEN_PADDING;
+      this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
+      console.log(crems);
+      this._dialogBox.width = cremsStart / 2 * crems;
+      this._dialogBox.height = 300 * crems;
+      console.log(cremsStart / 2 * crems, this._dialogBox.width);
+      this._dialogBox.x = SCREEN_PADDING;
+      this._dialogBox.y = this.screen.height - SCREEN_PADDING - this._dialogBox.height;
+      this._dialogFrame.width = this._dialogBox.width;
+      this._dialogFrame.height = this._dialogBox.height;
+      this._dialogName.style.fontSize = 24 * crems;
+      this._dialogName.position.x = 140 / 2;
+      this._dialogName.position.y = 117 / 2;
+      this._dialogText.style.fontSize = 24 * crems;
+      this._dialogText.style.wordWrapWidth = this._dialogBox.width - 117;
+      this._dialogText.position.x = 140 / 2;
+      this._dialogText.position.y = 117 / 2 + 30;
+      this._dialogName.text = name; //options
+
+      var options = this.dialogTree.options(this.actions);
 
       for (var i in this.optionButtons) {
         this.stage.removeChild(this.optionButtons[i]);
@@ -48648,42 +48682,26 @@ function (_PIXI$Application) {
 
       this.optionButtons = [];
 
-      var boxBounds = this._dialogBox.getBounds();
-
-      this._dialogBox.x = placement === "left" ? SCREEN_PADDING : this.screen.width - SCREEN_PADDING - boxBounds.width;
-      this._dialogBox.y = this.screen.height - SCREEN_PADDING - boxBounds.height;
-      this._dialogName.text = name;
-      this._leftFace.x = 20;
-      this._leftFace.y = this.screen.height / 4;
-      this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
-      this._rightFace.x = this.screen.width - SCREEN_PADDING - this._rightFace.getBounds().width;
-      this._rightFace.y = this.screen.height / 4;
-      this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
-
       if (options) {
         options.forEach(function (option, idx) {
-          var button = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.buttonFrame.texture, 231, 214, 231, 214);
-          button.width = 300 * 8;
-          button.height = 80 * 8;
-          button.scale.x = 0.125;
-          button.scale.y = 0.125;
-          button.position.x = 10;
-          button.position.y = 10 + 80 * idx;
+          var button = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.buttonFrame.texture, 70, 70, 70, 70);
+          button.width = 600 * crems;
+          button.height = 150 * crems;
+          button.position.x = _this2.screen.width - SCREEN_PADDING - button.width;
+          button.position.y = _this2.screen.height - SCREEN_PADDING - button.height * (1 - idx) - button.height;
 
           _this2.stage.addChild(button);
 
           var buttonText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"](option.text, {
             fontFamily: 'Varela Round',
-            fontSize: 24,
+            fontSize: 24 * crems,
             fill: 0x000000,
             align: 'left'
           });
           buttonText.anchor.y = 0.5;
           button.addChild(buttonText);
-          buttonText.position.x = 30 * 8;
-          buttonText.position.y = 80 / 2 * 8;
-          buttonText.scale.x = 8;
-          buttonText.scale.y = 8;
+          buttonText.position.x = 70 * crems;
+          buttonText.position.y = 70 * crems;
           button.interactive = true;
           button.buttonMode = true;
           button.on("pointerdown", function (evt) {
@@ -48693,7 +48711,13 @@ function (_PIXI$Application) {
           _this2.optionButtons.push(button);
         });
       }
-
+    }
+  }, {
+    key: "nextScene",
+    value: function nextScene() {
+      this.stopTyping();
+      this._currentNode = this.dialogTree.currentNode2();
+      this.updateUI();
       this.startTyping();
     }
   }, {
@@ -48920,8 +48944,8 @@ Promise.all([new Promise(function (resolve, reject) {
     transparent: true
   }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_9__["loadJsonFile"]("mainTree"));
   app.view.classList.add("renderer");
-  document.body.appendChild(app.view);
-  app.playSound("audio/Unsettle1.wav"); //lock for mobile devices (throws if device doesn't support)
+  document.body.appendChild(app.view); //app.playSound("audio/Unsettle1.wav");
+  //lock for mobile devices (throws if device doesn't support)
 
   /*try {
     screen.orientation.lock('landscape');

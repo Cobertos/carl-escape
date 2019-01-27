@@ -125,7 +125,9 @@ export class PowerMeterGame extends PIXI.Container {
     let greenAreaStart = greenBoxX/this.intrinsicWidth;
     let greenAreaEnd = (greenBoxX+this._greenArea.width)/this.intrinsicWidth;
     this._hitGreenArea = (stopPos > greenAreaStart) && (stopPos < greenAreaEnd);
-    this.emit("ended", { won: this.won });
+    setTimeout(()=>{
+      this.emit("ended", { won: this.won });
+    }, 1500);
   }
 
   //Whether the player has won, undefiend if not finished

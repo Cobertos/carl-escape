@@ -48784,11 +48784,11 @@ function (_PIXI$Application) {
         }
 
         game = new _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_10__["PowerMeterGame"](_babel_runtime_helpers_objectSpread__WEBPACK_IMPORTED_MODULE_0___default()({
-          width: this._dialogBox.getBounds().width,
-          height: this._dialogBox.getBounds().height
+          intrinsicWidth: this.screen.width / 3,
+          intrinsicHeight: this.screen.width / 3 * 2 / 5
         }, extraOptions));
-        game.position.x = SCREEN_PADDING;
-        game.position.y = this.screen.height - 200 - SCREEN_PADDING;
+        game.position.x = this.screen.width / 2 - this.screen.width / 3 / 2;
+        game.position.y = SCREEN_PADDING;
         var listener1 = game.stop.bind(game);
 
         var listener2 = function listener2(e) {

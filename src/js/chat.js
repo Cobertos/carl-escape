@@ -228,14 +228,14 @@ class DialogSceneApp extends PIXI.Application {
         };
       }
       game = new PowerMeterGame({
-        width: this._dialogBox.getBounds().width,
-        height: this._dialogBox.getBounds().height,
+        intrinsicWidth: this.screen.width/3,
+        intrinsicHeight: this.screen.width/3*2/5,
         //oscillationTime: 1000,
         //greenAreaWidth: 0.4
         ...extraOptions
       });
-      game.position.x = SCREEN_PADDING;
-      game.position.y = this.screen.height - 200 - SCREEN_PADDING;
+      game.position.x = this.screen.width/2 - this.screen.width/3/2;
+      game.position.y = SCREEN_PADDING;
       let listener1 = game.stop.bind(game);
       let listener2 = (e)=>{
         if(e.key === " ") {

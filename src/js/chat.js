@@ -60,7 +60,10 @@ class DialogSceneApp extends PIXI.Application {
     this._rightFace = new PIXI.Sprite(
       PIXI.loader.resources.carl.texture
     );
+    this._rightFace.visible = false;
     this.stage.addChild(this._rightFace);
+
+    this._optionsButtons = [];
 
     this.view.addEventListener("pointerdown", this.stopTyping.bind(this));
     window.addEventListener("keydown", (e)=>{
@@ -99,6 +102,10 @@ class DialogSceneApp extends PIXI.Application {
     let placement = name === "" ? "left" : "right"; //name === "" is MC
     this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
 
+    if(name === "Carl" && !this._rightFace.gone) {
+      this._rightFace.visible = true;
+    }
+
     let face2Aspect = this._rightFace.height/this._rightFace.width;
     this._rightFace.width = this.screen.width/4 * crems;
     this._rightFace.height= this._rightFace.width*face2Aspect;
@@ -128,13 +135,12 @@ class DialogSceneApp extends PIXI.Application {
 
     //options
     let options = this.dialogTree.options(this.actions);
-    for(let i in this.optionButtons){
-      this.stage.removeChild(this.optionButtons[i]);
+    for(let i in this._optionsButtons){
+      this.stage.removeChild(this._optionsButtons[i]);
     }
-    this.optionButtons = [];
 
     if(options) {
-      options.forEach((option, idx)=>{
+      this._optionsButtons = options.map((option, idx)=>{
         let button = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.buttonFrame.texture, 70, 70, 70, 70);
         button.width = 600*crems;
         button.height = 150*crems;
@@ -154,7 +160,7 @@ class DialogSceneApp extends PIXI.Application {
           this.chooseOption(option);
         });
 
-        this.optionButtons.push(button);
+        return button;
       });
     }
   }
@@ -263,11 +269,16 @@ class DialogSceneApp extends PIXI.Application {
         physicsLoop(game);
       }, 10);
       teardown = ()=>{
-        this._rightFace.visible = true;
+        this._rightFace.visible = false;
+        this._rightFace.gone = true;
         clearInterval(interval);
       };
     }
     this.stage.addChild(game);
+    this._optionsButtons.forEach((button)=>{
+      button.visible = false;
+      button.interactive = false;
+    });
 
     let raf;
     const loop = ()=>{
@@ -277,7 +288,10 @@ class DialogSceneApp extends PIXI.Application {
     raf = requestAnimationFrame(loop);
     let difficulty = action.replace("PlayGame", "");
     game.on("ended", (e)=>{
-      console.log(e);
+      this._optionsButtons.forEach((button)=>{
+        button.visible = true;
+        button.interactive = true;
+      });
       teardown();
 
       if(e.won){

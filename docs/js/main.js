@@ -48123,7 +48123,7 @@ function (_PIXI$Container) {
 
     _this._loseBg.alpha = 0.0; //fades in
 
-    _this._loseBg.drawRect(0, 0, _this.intrinsicWidth * 5, _this.intrinsicHeight * 5); //cover whole screen
+    _this._loseBg.drawRect(-_this.intrinsicWidth * 5, -_this.intrinsicWidth * 5, _this.intrinsicWidth * 5, _this.intrinsicHeight * 5); //cover whole screen
 
 
     _this._loseBg.endFill();
@@ -48608,8 +48608,11 @@ function (_PIXI$Application) {
     _this.stage.addChild(_this._leftFace);
 
     _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.carl.texture);
+    _this._rightFace.visible = false;
 
     _this.stage.addChild(_this._rightFace);
+
+    _this._optionsButtons = [];
 
     _this.view.addEventListener("pointerdown", _this.stopTyping.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this))));
 
@@ -48655,6 +48658,11 @@ function (_PIXI$Application) {
       var placement = name === "" ? "left" : "right"; //name === "" is MC
 
       this._leftFace.tint = placement === "left" ? 0xFFFFFF : 0x444444;
+
+      if (name === "Carl" && !this._rightFace.gone) {
+        this._rightFace.visible = true;
+      }
+
       var face2Aspect = this._rightFace.height / this._rightFace.width;
       this._rightFace.width = this.screen.width / 4 * crems;
       this._rightFace.height = this._rightFace.width * face2Aspect;
@@ -48680,14 +48688,12 @@ function (_PIXI$Application) {
 
       var options = this.dialogTree.options(this.actions);
 
-      for (var i in this.optionButtons) {
-        this.stage.removeChild(this.optionButtons[i]);
+      for (var i in this._optionsButtons) {
+        this.stage.removeChild(this._optionsButtons[i]);
       }
 
-      this.optionButtons = [];
-
       if (options) {
-        options.forEach(function (option, idx) {
+        this._optionsButtons = options.map(function (option, idx) {
           var button = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.buttonFrame.texture, 70, 70, 70, 70);
           button.width = 600 * crems;
           button.height = 150 * crems;
@@ -48711,8 +48717,7 @@ function (_PIXI$Application) {
           button.on("pointerdown", function (evt) {
             _this2.chooseOption(option);
           });
-
-          _this2.optionButtons.push(button);
+          return button;
         });
       }
     }
@@ -48825,12 +48830,19 @@ function (_PIXI$Application) {
         }, 10);
 
         teardown = function teardown() {
-          _this3._rightFace.visible = true;
+          _this3._rightFace.visible = false;
+          _this3._rightFace.gone = true;
           clearInterval(interval);
         };
       }
 
       this.stage.addChild(game);
+
+      this._optionsButtons.forEach(function (button) {
+        button.visible = false;
+        button.interactive = false;
+      });
+
       var raf;
 
       var loop = function loop() {
@@ -48841,7 +48853,11 @@ function (_PIXI$Application) {
       raf = requestAnimationFrame(loop);
       var difficulty = action.replace("PlayGame", "");
       game.on("ended", function (e) {
-        console.log(e);
+        _this3._optionsButtons.forEach(function (button) {
+          button.visible = true;
+          button.interactive = true;
+        });
+
         teardown();
 
         if (e.won) {

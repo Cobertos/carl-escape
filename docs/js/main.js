@@ -1268,6 +1268,329 @@ earcut.flatten = function (data) {
 
 /***/ }),
 
+/***/ "./node_modules/eventemitter3/index.js":
+/*!*********************************************!*\
+  !*** ./node_modules/eventemitter3/index.js ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if (true) {
+  module.exports = EventEmitter;
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/howler/dist/howler.js":
 /*!********************************************!*\
   !*** ./node_modules/howler/dist/howler.js ***!
@@ -9701,7 +10024,7 @@ exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -16401,7 +16724,7 @@ var _RenderTexture = __webpack_require__(/*! ../textures/RenderTexture */ "./nod
 
 var _RenderTexture2 = _interopRequireDefault(_RenderTexture);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -25978,7 +26301,7 @@ var _settings = __webpack_require__(/*! ../settings */ "./node_modules/pixi.js/l
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -27345,7 +27668,7 @@ var _TextureUvs = __webpack_require__(/*! ./TextureUvs */ "./node_modules/pixi.j
 
 var _TextureUvs2 = _interopRequireDefault(_TextureUvs);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -29610,7 +29933,7 @@ var _settings = __webpack_require__(/*! ../settings */ "./node_modules/pixi.js/l
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -36511,7 +36834,7 @@ var _InteractionTrackingData = __webpack_require__(/*! ./InteractionTrackingData
 
 var _InteractionTrackingData2 = _interopRequireDefault(_InteractionTrackingData);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -38934,7 +39257,7 @@ var _resourceLoader2 = _interopRequireDefault(_resourceLoader);
 
 var _blob = __webpack_require__(/*! resource-loader/lib/middlewares/parsing/blob */ "./node_modules/resource-loader/lib/middlewares/parsing/blob.js");
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -43368,329 +43691,6 @@ function findGraphics(item, queue) {
 
 core.WebGLRenderer.registerPlugin('prepare', WebGLPrepare);
 //# sourceMappingURL=WebGLPrepare.js.map
-
-/***/ }),
-
-/***/ "./node_modules/pixi.js/node_modules/eventemitter3/index.js":
-/*!******************************************************************!*\
-  !*** ./node_modules/pixi.js/node_modules/eventemitter3/index.js ***!
-  \******************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var has = Object.prototype.hasOwnProperty
-  , prefix = '~';
-
-/**
- * Constructor to create a storage for our `EE` objects.
- * An `Events` instance is a plain object whose properties are event names.
- *
- * @constructor
- * @api private
- */
-function Events() {}
-
-//
-// We try to not inherit from `Object.prototype`. In some engines creating an
-// instance in this way is faster than calling `Object.create(null)` directly.
-// If `Object.create(null)` is not supported we prefix the event names with a
-// character to make sure that the built-in object properties are not
-// overridden or used as an attack vector.
-//
-if (Object.create) {
-  Events.prototype = Object.create(null);
-
-  //
-  // This hack is needed because the `__proto__` property is still inherited in
-  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
-  //
-  if (!new Events().__proto__) prefix = false;
-}
-
-/**
- * Representation of a single event listener.
- *
- * @param {Function} fn The listener function.
- * @param {Mixed} context The context to invoke the listener with.
- * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
- * @constructor
- * @api private
- */
-function EE(fn, context, once) {
-  this.fn = fn;
-  this.context = context;
-  this.once = once || false;
-}
-
-/**
- * Minimal `EventEmitter` interface that is molded against the Node.js
- * `EventEmitter` interface.
- *
- * @constructor
- * @api public
- */
-function EventEmitter() {
-  this._events = new Events();
-  this._eventsCount = 0;
-}
-
-/**
- * Return an array listing the events for which the emitter has registered
- * listeners.
- *
- * @returns {Array}
- * @api public
- */
-EventEmitter.prototype.eventNames = function eventNames() {
-  var names = []
-    , events
-    , name;
-
-  if (this._eventsCount === 0) return names;
-
-  for (name in (events = this._events)) {
-    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
-  }
-
-  if (Object.getOwnPropertySymbols) {
-    return names.concat(Object.getOwnPropertySymbols(events));
-  }
-
-  return names;
-};
-
-/**
- * Return the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Boolean} exists Only check if there are listeners.
- * @returns {Array|Boolean}
- * @api public
- */
-EventEmitter.prototype.listeners = function listeners(event, exists) {
-  var evt = prefix ? prefix + event : event
-    , available = this._events[evt];
-
-  if (exists) return !!available;
-  if (!available) return [];
-  if (available.fn) return [available.fn];
-
-  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
-    ee[i] = available[i].fn;
-  }
-
-  return ee;
-};
-
-/**
- * Calls each of the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @returns {Boolean} `true` if the event had listeners, else `false`.
- * @api public
- */
-EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return false;
-
-  var listeners = this._events[evt]
-    , len = arguments.length
-    , args
-    , i;
-
-  if (listeners.fn) {
-    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
-
-    switch (len) {
-      case 1: return listeners.fn.call(listeners.context), true;
-      case 2: return listeners.fn.call(listeners.context, a1), true;
-      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
-      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
-      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-    }
-
-    for (i = 1, args = new Array(len -1); i < len; i++) {
-      args[i - 1] = arguments[i];
-    }
-
-    listeners.fn.apply(listeners.context, args);
-  } else {
-    var length = listeners.length
-      , j;
-
-    for (i = 0; i < length; i++) {
-      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
-
-      switch (len) {
-        case 1: listeners[i].fn.call(listeners[i].context); break;
-        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
-        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
-        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
-        default:
-          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
-            args[j - 1] = arguments[j];
-          }
-
-          listeners[i].fn.apply(listeners[i].context, args);
-      }
-    }
-  }
-
-  return true;
-};
-
-/**
- * Add a listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.on = function on(event, fn, context) {
-  var listener = new EE(fn, context || this)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Add a one-time listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.once = function once(event, fn, context) {
-  var listener = new EE(fn, context || this, true)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Remove the listeners of a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn Only remove the listeners that match this function.
- * @param {Mixed} context Only remove the listeners that have this context.
- * @param {Boolean} once Only remove one-time listeners.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return this;
-  if (!fn) {
-    if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-    return this;
-  }
-
-  var listeners = this._events[evt];
-
-  if (listeners.fn) {
-    if (
-         listeners.fn === fn
-      && (!once || listeners.once)
-      && (!context || listeners.context === context)
-    ) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
-      if (
-           listeners[i].fn !== fn
-        || (once && !listeners[i].once)
-        || (context && listeners[i].context !== context)
-      ) {
-        events.push(listeners[i]);
-      }
-    }
-
-    //
-    // Reset the array, or remove it completely if we have no more listeners.
-    //
-    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
-    else if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-  }
-
-  return this;
-};
-
-/**
- * Remove all listeners, or those of the specified event.
- *
- * @param {String|Symbol} [event] The event name.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
-  var evt;
-
-  if (event) {
-    evt = prefix ? prefix + event : event;
-    if (this._events[evt]) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    this._events = new Events();
-    this._eventsCount = 0;
-  }
-
-  return this;
-};
-
-//
-// Alias methods names because people roll like that.
-//
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-//
-// This function doesn't apply anymore.
-//
-EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
-  return this;
-};
-
-//
-// Expose the prefix.
-//
-EventEmitter.prefixed = prefix;
-
-//
-// Allow `EventEmitter` to be imported as module namespace.
-//
-EventEmitter.EventEmitter = EventEmitter;
-
-//
-// Expose the module.
-//
-if (true) {
-  module.exports = EventEmitter;
-}
-
 
 /***/ }),
 
@@ -49720,7 +49720,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 6,
     prompt: "You hear a rustling from around the back of your house. Do you check it out?",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 7,
       text: "Yeah, go see what it is.",
@@ -49736,7 +49736,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 7,
     prompt: "You creep around the side of your house. You see Carl from the office crouched under your bedroom window.",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 9,
       text: "Talk to him",
@@ -49752,7 +49752,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 8,
     prompt: " ",
     speaker: "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 10,
       text: "I told you to go home when I saw you in my bushes two days ago, Carl.",
@@ -49763,7 +49763,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 9,
     prompt: "You ask him what he's doing at your house. He responds with 'I've been waiting for you'.",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 10,
       text: "I told you to go home when I saw you in my bushes two days ago, Carl.",
@@ -49774,7 +49774,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 10,
     prompt: "I couldn't bear to be apart from you~",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 11,
       text: "Ok, but I didn't want you here in the first place",
@@ -49790,7 +49790,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 11,
     prompt: "Hush, silly. Doesn't matter, since I'm here anyway. Can I have a ride to work?",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 13,
       text: "No way, dude. Go home.",
@@ -49806,7 +49806,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 12,
     prompt: "Well, maybe you should stop going to work without me~ Can I ride with you to work?",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 13,
       text: "No way, dude. Go home.",
@@ -49822,7 +49822,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 13,
     prompt: "You try to start your car, but all it does is sputter. Carl grins maniacally.",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 14,
       text: "Did you do something to my car?",
@@ -49838,7 +49838,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 14,
     prompt: "I'm not telling~",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 16,
       text: "[Get out of your car.]",
@@ -49849,7 +49849,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 15,
     prompt: "Oh goodie! I'll come with you.",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 16,
       text: "Ummm, that's not necessary. [Get out of your car.]",
@@ -49860,7 +49860,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 16,
     prompt: " ",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 17,
       text: "You safely exit your car and put a little distance between Carl and yourself.",
@@ -49876,7 +49876,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 17,
     prompt: "You feel Carl's eyes on you.",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 18,
       text: "What are you looking at?",
@@ -49892,7 +49892,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 18,
     prompt: "Oh, nothing. I just like the color of your tie.",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 20,
       text: "....Uhh, thanks?",
@@ -49903,7 +49903,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 19,
     prompt: "You're looking pretty casual today. I never get to see you this way~<3",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 20,
       text: "...I don't know how to feel about that.",
@@ -49924,7 +49924,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 20,
     prompt: "You try to inch your way closer to your front door while Carl is distracted.",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 22,
       text: "[Calmly back away.]",
@@ -49935,7 +49935,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 21,
     prompt: "And that scene is...*Big sniff* Your natural musk is intoxicating.",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 23,
       text: "[Back away in a hurry.]",
@@ -49946,7 +49946,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 22,
     prompt: " ",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 24,
       text: "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
@@ -49962,7 +49962,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 23,
     prompt: " ",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 24,
       text: "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
@@ -49978,7 +49978,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 24,
     prompt: "What do you do next?",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 26,
       text: "[Discretely fish your key out of your pocket.]",
@@ -49994,7 +49994,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 25,
     prompt: "Oh, are you trying to invite me inside? owo I suppose I could come in for a bit.",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 28,
       text: "Wha-nonononono, that's not what I meant.",
@@ -50010,7 +50010,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 26,
     prompt: "Hey, watcha doin'? Trying to get me to come in for a drink? Well, if you insist.",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 28,
       text: "Actually, I have some work that I need to get done on my own.",
@@ -50026,7 +50026,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 27,
     prompt: "I did go home. I mean, I went to your home, anyway. That's better~",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 29,
       text: "No, go to your actual place of living.",
@@ -50042,7 +50042,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 28,
     prompt: "[Carl looks upset that you denied him. He's reaching for your arm...]",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 30,
       text: "Put your key in the lock and get into your house.",
@@ -50053,7 +50053,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 29,
     prompt: "[Carl looks upset about your tone of voice, and is reaching for your arm...]",
     speaker: "",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 30,
       text: "Put your key in the lock and get into your house.",
@@ -50091,7 +50091,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 32,
     prompt: "Mmmmm, this is nice~",
     speaker: "Carl",
-    background: "bedroom",
+    background: "frontyard",
     options: [{
       destination: 34,
       text: "Struggle",

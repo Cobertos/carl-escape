@@ -184,8 +184,7 @@ class OptionNode {
             }
         }
 
-        console.error("OptionNode.performChecks: How did you get here?");
-        return false;
+        return true;
     }
 }
 

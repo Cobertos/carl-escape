@@ -78,9 +78,14 @@ class DialogSceneApp extends PIXI.Application {
     //let { placement, name, options } = this._currentPrompt;
 
     let placement = "left";
-    let name = "Test";
+    let name = "Test"; //TODO: Add name here from this.dialogTree?
     let options = this.dialogTree.options(this.actions);
+    //TODO: Add background grabbing code and name
+    let background = "bedroom";
     
+    //Set background image
+    this._background.style.backgroundImage = `url(${BACKGROUND_TO_URL[background]})`;
+
     for(let i in this.optionButtons){
       this.stage.removeChild(this.optionButtons[i]);
     }

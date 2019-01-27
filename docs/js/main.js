@@ -45465,8 +45465,13 @@ function (_PIXI$Application) {
       this._currentPrompt = this.dialogTree.prompt(); //let { placement, name, options } = this._currentPrompt;
 
       var placement = "left";
-      var name = "Test";
-      var options = this.dialogTree.options(this.actions);
+      var name = "Test"; //TODO: Add name here from this.dialogTree?
+
+      var options = this.dialogTree.options(this.actions); //TODO: Add background grabbing code and name
+
+      var background = "bedroom"; //Set background image
+
+      this._background.style.backgroundImage = "url(".concat(BACKGROUND_TO_URL[background], ")");
 
       for (var i in this.optionButtons) {
         this.stage.removeChild(this.optionButtons[i]);

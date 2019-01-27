@@ -145,13 +145,13 @@ export default {
                 {
                     destination : 9,
                     text : "Talk to him",
-                    actions : [],
+                    actions : ["CreepyMusic"],
                     checks : [],
                 },
                 {
                     destination : 8,
                     text : "Run back to your car.",
-                    actions : [],
+                    actions : ["CreepyMusic"],
                     checks : [],
                 }
 

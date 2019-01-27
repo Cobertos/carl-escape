@@ -45356,6 +45356,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./PowerMeterGame.js */ "./src/js/PowerMeterGame.js");
 /* harmony import */ var _BottleFlipGame_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./BottleFlipGame.js */ "./src/js/BottleFlipGame.js");
 /* harmony import */ var _engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./engine/WithPhysics.js */ "./src/js/engine/WithPhysics.js");
+!(function webpackMissingModule() { var e = new Error("Cannot find module 'howler'"); e.code = 'MODULE_NOT_FOUND'; throw e; }());
 
 
 
@@ -45364,6 +45365,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
  //import { DialogTree as dialogTree } from "./MockDialogTree.js";
+
 
 
 
@@ -45396,7 +45398,7 @@ function (_PIXI$Application) {
     _this.optionButtons = [];
     _this.actions = [];
     _this.dialogTree = dialogTree;
-    _this._currentPrompt = undefined; //Add all the elements
+    _this._currentNode = undefined; //Add all the elements
 
     var background = _this._background = document.createElement("div");
     background.classList.add("bg");
@@ -45464,14 +45466,12 @@ function (_PIXI$Application) {
       var _this2 = this;
 
       this.stopTyping();
-      this._currentPrompt = this.dialogTree.prompt(); //let { placement, name, options } = this._currentPrompt;
-
+      this._currentNode = this.dialogueTree.currentNode();
+      var _this$_currentNode = this._currentNode,
+          speaker = _this$_currentNode.name,
+          background = _this$_currentNode.background;
       var placement = "left";
-      var name = "Test"; //TODO: Add name here from this.dialogTree?
-
-      var options = this.dialogTree.options(this.actions); //TODO: Add background grabbing code and name
-
-      var background = "bedroom"; //Set background image
+      var options = this.dialogTree.options(this.actions); //Set background image
 
       this._background.style.backgroundImage = "url(".concat(BACKGROUND_TO_URL[background], ")");
 
@@ -45536,6 +45536,10 @@ function (_PIXI$Application) {
       var actions = option.actions;
 
       for (var i in actions) {
+        if (actions[i] === "CreepyMusic") {
+          this.playSound("audio/AmbientAlert.wav");
+        }
+
         if (this.isGameAction(actions[i])) {
           this.playGame(actions[i], option.destination);
           return;
@@ -45669,17 +45673,16 @@ function (_PIXI$Application) {
         this.stopTyping();
       }
 
-      console.log("Typing prompt:" + this._currentPrompt); //Start a new dialog
+      var prompt = this._currentNode.prompt;
+      console.log("Typing prompt:" + prompt); //Start a new dialog
 
-      var letters = this._currentPrompt.split("");
-
+      var letters = prompt.split("");
       var currLetter = 0;
       this._dialogInterval = setInterval(function () {
-        console.log("Anything");
         _this4._dialogText.text = letters.slice(0, currLetter).join("");
         currLetter++;
 
-        if (currLetter > _this4._currentPrompt.length) {
+        if (currLetter > prompt.length) {
           _this4.stopTyping();
 
           return;
@@ -45692,9 +45695,25 @@ function (_PIXI$Application) {
       clearInterval(this._dialogInterval);
       this._dialogInterval = undefined;
 
-      if (this._currentPrompt) {
-        this._dialogText.text = this._currentPrompt;
+      if (this._currentNode) {
+        this._dialogText.text = this._currentNode.prompt;
       }
+    }
+  }, {
+    key: "playSound",
+    value: function playSound(path) {
+      if (this.activeSound) {
+        this.activeSound.stop();
+      } // Setup the new Howl.
+
+
+      this.activeSound = new !(function webpackMissingModule() { var e = new Error("Cannot find module 'howler'"); e.code = 'MODULE_NOT_FOUND'; throw e; }())({
+        src: [path]
+      }); // Play the sound.
+
+      this.activeSound.play(); // Change global volume.
+
+      !(function webpackMissingModule() { var e = new Error("Cannot find module 'howler'"); e.code = 'MODULE_NOT_FOUND'; throw e; }()).volume(0.5);
     }
   }, {
     key: "isTyping",
@@ -45728,7 +45747,8 @@ Promise.all([new Promise(function (resolve, reject) {
     height: window.innerHeight,
     transparent: true
   }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_8__["loadJsonFile"]("mainTree"));
-  document.body.appendChild(app.view); //lock for mobile devices (throws if device doesn't support)
+  document.body.appendChild(app.view);
+  app.playSound("audio/Unsettle1.wav"); //lock for mobile devices (throws if device doesn't support)
 
   /*try {
     screen.orientation.lock('landscape');
@@ -45778,6 +45798,16 @@ function () {
     key: "prompt",
     value: function prompt() {
       return this.currentNode.prompt;
+    }
+  }, {
+    key: "background",
+    value: function background() {
+      return this.currentNode.background;
+    }
+  }, {
+    key: "currentNode",
+    value: function currentNode() {
+      return this.currentNode;
     } // Return available options
 
   }, {
@@ -46543,12 +46573,12 @@ __webpack_require__.r(__webpack_exports__);
     options: [{
       destination: 9,
       text: "Talk to him",
-      actions: [],
+      actions: ["CreepyMusic"],
       checks: []
     }, {
       destination: 8,
       text: "Run back to your car.",
-      actions: [],
+      actions: ["CreepyMusic"],
       checks: []
     }]
   }, {

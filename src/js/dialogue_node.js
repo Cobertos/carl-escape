@@ -13,6 +13,14 @@ class DialogueTree {
         return this.currentNode.prompt;
     }
 
+    background(){
+        return this.currentNode.background;
+    }
+
+    currentNode(){
+        return this.currentNode;
+    }
+
     // Return available options
     options(actions){
         let ret = [];

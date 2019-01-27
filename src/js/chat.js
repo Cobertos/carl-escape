@@ -5,6 +5,7 @@ import * as Dialogue from "./dialogue_node.js";
 import { PowerMeterGame } from "./PowerMeterGame.js";
 import { KeyFlipGame } from "./BottleFlipGame.js";
 import { physicsLoop } from "./engine/WithPhysics.js";
+import {Howl, Howler} from 'howler';
 
 const TYPING_SPEED = 10; //ms between letter
 const SCREEN_PADDING = 20;
@@ -144,6 +145,9 @@ class DialogSceneApp extends PIXI.Application {
     let actions = option.actions;
 
     for(let i in actions){
+      if(actions[i] === "CreepyMusic"){
+        this.playSound("audio/AmbientAlert.wav");
+      }
       if(this.isGameAction(actions[i])){
         this.playGame(actions[i], option.destination);
         return;
@@ -283,6 +287,25 @@ class DialogSceneApp extends PIXI.Application {
     }
   }
 
+  playSound(path){
+    if(this.activeSound){
+      this.activeSound.stop();
+    }
+
+    // Setup the new Howl.
+
+    this.activeSound = new Howl({
+      src: [path]
+    });
+
+    // Play the sound.
+    this.activeSound.play();
+
+    // Change global volume.
+    Howler.volume(0.5);
+  }
+
+
 }
 
 Promise.all([
@@ -318,7 +341,7 @@ Promise.all([
     transparent: true
   }, Dialogue.loadJsonFile("mainTree"));
   document.body.appendChild(app.view);
-
+  app.playSound("audio/Unsettle1.wav");
   //lock for mobile devices (throws if device doesn't support)
   /*try {
     screen.orientation.lock('landscape');

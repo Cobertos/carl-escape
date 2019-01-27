@@ -48734,6 +48734,7 @@ function (_PIXI$Application) {
       var teardown;
 
       if (action === "PlayGameEasy" || action === "PlayGameNormal" || action === "PlayGameHard") {
+        this.playSound("audio/SkillCheck1.wav");
         var extraOptions;
 
         if (action === "PlayGameEasy") {
@@ -48812,8 +48813,12 @@ function (_PIXI$Application) {
           console.log("Won the game!");
 
           _this3.actions.push("WinGame" + difficulty);
+
+          _this3.playSound("audio/correctAnswer2.wav");
         } else {
           console.log("Lost the game");
+
+          _this3.playSound("audio/wrongAnswer.wav");
 
           _this3.actions.push("LoseGame" + difficulty);
         }
@@ -49909,6 +49914,11 @@ __webpack_require__.r(__webpack_exports__);
       text: "...I don't know how to feel about that.",
       actions: [],
       checks: ["Scrub"]
+    }, {
+      destination: 21,
+      text: "Wait, what?!",
+      actions: [],
+      checks: []
     }]
   }, {
     id: 20,

@@ -181,6 +181,7 @@ class DialogSceneApp extends PIXI.Application {
     let game;
     let teardown;
     if(action === "PlayGameEasy" || action === "PlayGameNormal" || action === "PlayGameHard"){
+      this.playSound("audio/SkillCheck1.wav");
       let extraOptions;
       if(action === "PlayGameEasy") {
         extraOptions = {
@@ -253,9 +254,11 @@ class DialogSceneApp extends PIXI.Application {
       if(e.won){
         console.log("Won the game!");
         this.actions.push("WinGame" + difficulty);
+        this.playSound("audio/correctAnswer2.wav");
       }
       else{
         console.log("Lost the game");
+        this.playSound("audio/wrongAnswer.wav"); 
         this.actions.push("LoseGame" + difficulty);
       }
       this.stage.removeChild(game);

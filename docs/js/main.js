@@ -1153,329 +1153,6 @@ earcut.flatten = function (data) {
 
 /***/ }),
 
-/***/ "./node_modules/eventemitter3/index.js":
-/*!*********************************************!*\
-  !*** ./node_modules/eventemitter3/index.js ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var has = Object.prototype.hasOwnProperty
-  , prefix = '~';
-
-/**
- * Constructor to create a storage for our `EE` objects.
- * An `Events` instance is a plain object whose properties are event names.
- *
- * @constructor
- * @api private
- */
-function Events() {}
-
-//
-// We try to not inherit from `Object.prototype`. In some engines creating an
-// instance in this way is faster than calling `Object.create(null)` directly.
-// If `Object.create(null)` is not supported we prefix the event names with a
-// character to make sure that the built-in object properties are not
-// overridden or used as an attack vector.
-//
-if (Object.create) {
-  Events.prototype = Object.create(null);
-
-  //
-  // This hack is needed because the `__proto__` property is still inherited in
-  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
-  //
-  if (!new Events().__proto__) prefix = false;
-}
-
-/**
- * Representation of a single event listener.
- *
- * @param {Function} fn The listener function.
- * @param {Mixed} context The context to invoke the listener with.
- * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
- * @constructor
- * @api private
- */
-function EE(fn, context, once) {
-  this.fn = fn;
-  this.context = context;
-  this.once = once || false;
-}
-
-/**
- * Minimal `EventEmitter` interface that is molded against the Node.js
- * `EventEmitter` interface.
- *
- * @constructor
- * @api public
- */
-function EventEmitter() {
-  this._events = new Events();
-  this._eventsCount = 0;
-}
-
-/**
- * Return an array listing the events for which the emitter has registered
- * listeners.
- *
- * @returns {Array}
- * @api public
- */
-EventEmitter.prototype.eventNames = function eventNames() {
-  var names = []
-    , events
-    , name;
-
-  if (this._eventsCount === 0) return names;
-
-  for (name in (events = this._events)) {
-    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
-  }
-
-  if (Object.getOwnPropertySymbols) {
-    return names.concat(Object.getOwnPropertySymbols(events));
-  }
-
-  return names;
-};
-
-/**
- * Return the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Boolean} exists Only check if there are listeners.
- * @returns {Array|Boolean}
- * @api public
- */
-EventEmitter.prototype.listeners = function listeners(event, exists) {
-  var evt = prefix ? prefix + event : event
-    , available = this._events[evt];
-
-  if (exists) return !!available;
-  if (!available) return [];
-  if (available.fn) return [available.fn];
-
-  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
-    ee[i] = available[i].fn;
-  }
-
-  return ee;
-};
-
-/**
- * Calls each of the listeners registered for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @returns {Boolean} `true` if the event had listeners, else `false`.
- * @api public
- */
-EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return false;
-
-  var listeners = this._events[evt]
-    , len = arguments.length
-    , args
-    , i;
-
-  if (listeners.fn) {
-    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
-
-    switch (len) {
-      case 1: return listeners.fn.call(listeners.context), true;
-      case 2: return listeners.fn.call(listeners.context, a1), true;
-      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
-      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
-      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
-      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
-    }
-
-    for (i = 1, args = new Array(len -1); i < len; i++) {
-      args[i - 1] = arguments[i];
-    }
-
-    listeners.fn.apply(listeners.context, args);
-  } else {
-    var length = listeners.length
-      , j;
-
-    for (i = 0; i < length; i++) {
-      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
-
-      switch (len) {
-        case 1: listeners[i].fn.call(listeners[i].context); break;
-        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
-        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
-        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
-        default:
-          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
-            args[j - 1] = arguments[j];
-          }
-
-          listeners[i].fn.apply(listeners[i].context, args);
-      }
-    }
-  }
-
-  return true;
-};
-
-/**
- * Add a listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.on = function on(event, fn, context) {
-  var listener = new EE(fn, context || this)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Add a one-time listener for a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn The listener function.
- * @param {Mixed} [context=this] The context to invoke the listener with.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.once = function once(event, fn, context) {
-  var listener = new EE(fn, context || this, true)
-    , evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
-  else if (!this._events[evt].fn) this._events[evt].push(listener);
-  else this._events[evt] = [this._events[evt], listener];
-
-  return this;
-};
-
-/**
- * Remove the listeners of a given event.
- *
- * @param {String|Symbol} event The event name.
- * @param {Function} fn Only remove the listeners that match this function.
- * @param {Mixed} context Only remove the listeners that have this context.
- * @param {Boolean} once Only remove one-time listeners.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
-  var evt = prefix ? prefix + event : event;
-
-  if (!this._events[evt]) return this;
-  if (!fn) {
-    if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-    return this;
-  }
-
-  var listeners = this._events[evt];
-
-  if (listeners.fn) {
-    if (
-         listeners.fn === fn
-      && (!once || listeners.once)
-      && (!context || listeners.context === context)
-    ) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
-      if (
-           listeners[i].fn !== fn
-        || (once && !listeners[i].once)
-        || (context && listeners[i].context !== context)
-      ) {
-        events.push(listeners[i]);
-      }
-    }
-
-    //
-    // Reset the array, or remove it completely if we have no more listeners.
-    //
-    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
-    else if (--this._eventsCount === 0) this._events = new Events();
-    else delete this._events[evt];
-  }
-
-  return this;
-};
-
-/**
- * Remove all listeners, or those of the specified event.
- *
- * @param {String|Symbol} [event] The event name.
- * @returns {EventEmitter} `this`.
- * @api public
- */
-EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
-  var evt;
-
-  if (event) {
-    evt = prefix ? prefix + event : event;
-    if (this._events[evt]) {
-      if (--this._eventsCount === 0) this._events = new Events();
-      else delete this._events[evt];
-    }
-  } else {
-    this._events = new Events();
-    this._eventsCount = 0;
-  }
-
-  return this;
-};
-
-//
-// Alias methods names because people roll like that.
-//
-EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
-EventEmitter.prototype.addListener = EventEmitter.prototype.on;
-
-//
-// This function doesn't apply anymore.
-//
-EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
-  return this;
-};
-
-//
-// Expose the prefix.
-//
-EventEmitter.prefixed = prefix;
-
-//
-// Allow `EventEmitter` to be imported as module namespace.
-//
-EventEmitter.EventEmitter = EventEmitter;
-
-//
-// Expose the module.
-//
-if (true) {
-  module.exports = EventEmitter;
-}
-
-
-/***/ }),
-
 /***/ "./node_modules/ismobilejs/dist/isMobile.min.js":
 /*!******************************************************!*\
   !*** ./node_modules/ismobilejs/dist/isMobile.min.js ***!
@@ -6761,7 +6438,7 @@ exports.__esModule = true;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -13461,7 +13138,7 @@ var _RenderTexture = __webpack_require__(/*! ../textures/RenderTexture */ "./nod
 
 var _RenderTexture2 = _interopRequireDefault(_RenderTexture);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -23038,7 +22715,7 @@ var _settings = __webpack_require__(/*! ../settings */ "./node_modules/pixi.js/l
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -24405,7 +24082,7 @@ var _TextureUvs = __webpack_require__(/*! ./TextureUvs */ "./node_modules/pixi.j
 
 var _TextureUvs2 = _interopRequireDefault(_TextureUvs);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -26670,7 +26347,7 @@ var _settings = __webpack_require__(/*! ../settings */ "./node_modules/pixi.js/l
 
 var _settings2 = _interopRequireDefault(_settings);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -33571,7 +33248,7 @@ var _InteractionTrackingData = __webpack_require__(/*! ./InteractionTrackingData
 
 var _InteractionTrackingData2 = _interopRequireDefault(_InteractionTrackingData);
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -35994,7 +35671,7 @@ var _resourceLoader2 = _interopRequireDefault(_resourceLoader);
 
 var _blob = __webpack_require__(/*! resource-loader/lib/middlewares/parsing/blob */ "./node_modules/resource-loader/lib/middlewares/parsing/blob.js");
 
-var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/eventemitter3/index.js");
+var _eventemitter = __webpack_require__(/*! eventemitter3 */ "./node_modules/pixi.js/node_modules/eventemitter3/index.js");
 
 var _eventemitter2 = _interopRequireDefault(_eventemitter);
 
@@ -40431,6 +40108,329 @@ core.WebGLRenderer.registerPlugin('prepare', WebGLPrepare);
 
 /***/ }),
 
+/***/ "./node_modules/pixi.js/node_modules/eventemitter3/index.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/pixi.js/node_modules/eventemitter3/index.js ***!
+  \******************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if (true) {
+  module.exports = EventEmitter;
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/process/browser.js":
 /*!*****************************************!*\
   !*** ./node_modules/process/browser.js ***!
@@ -44110,6 +44110,35 @@ module.exports = {
 
 /***/ }),
 
+/***/ "./node_modules/webfontloader/webfontloader.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/webfontloader/webfontloader.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_RESULT__;/* Web Font Loader v1.6.28 - (c) Adobe Systems, Google. License: Apache 2.0 */(function(){function aa(a,b,c){return a.call.apply(a.bind,arguments)}function ba(a,b,c){if(!a)throw Error();if(2<arguments.length){var d=Array.prototype.slice.call(arguments,2);return function(){var c=Array.prototype.slice.call(arguments);Array.prototype.unshift.apply(c,d);return a.apply(b,c)}}return function(){return a.apply(b,arguments)}}function p(a,b,c){p=Function.prototype.bind&&-1!=Function.prototype.bind.toString().indexOf("native code")?aa:ba;return p.apply(null,arguments)}var q=Date.now||function(){return+new Date};function ca(a,b){this.a=a;this.o=b||a;this.c=this.o.document}var da=!!window.FontFace;function t(a,b,c,d){b=a.c.createElement(b);if(c)for(var e in c)c.hasOwnProperty(e)&&("style"==e?b.style.cssText=c[e]:b.setAttribute(e,c[e]));d&&b.appendChild(a.c.createTextNode(d));return b}function u(a,b,c){a=a.c.getElementsByTagName(b)[0];a||(a=document.documentElement);a.insertBefore(c,a.lastChild)}function v(a){a.parentNode&&a.parentNode.removeChild(a)}
+function w(a,b,c){b=b||[];c=c||[];for(var d=a.className.split(/\s+/),e=0;e<b.length;e+=1){for(var f=!1,g=0;g<d.length;g+=1)if(b[e]===d[g]){f=!0;break}f||d.push(b[e])}b=[];for(e=0;e<d.length;e+=1){f=!1;for(g=0;g<c.length;g+=1)if(d[e]===c[g]){f=!0;break}f||b.push(d[e])}a.className=b.join(" ").replace(/\s+/g," ").replace(/^\s+|\s+$/,"")}function y(a,b){for(var c=a.className.split(/\s+/),d=0,e=c.length;d<e;d++)if(c[d]==b)return!0;return!1}
+function ea(a){return a.o.location.hostname||a.a.location.hostname}function z(a,b,c){function d(){m&&e&&f&&(m(g),m=null)}b=t(a,"link",{rel:"stylesheet",href:b,media:"all"});var e=!1,f=!0,g=null,m=c||null;da?(b.onload=function(){e=!0;d()},b.onerror=function(){e=!0;g=Error("Stylesheet failed to load");d()}):setTimeout(function(){e=!0;d()},0);u(a,"head",b)}
+function A(a,b,c,d){var e=a.c.getElementsByTagName("head")[0];if(e){var f=t(a,"script",{src:b}),g=!1;f.onload=f.onreadystatechange=function(){g||this.readyState&&"loaded"!=this.readyState&&"complete"!=this.readyState||(g=!0,c&&c(null),f.onload=f.onreadystatechange=null,"HEAD"==f.parentNode.tagName&&e.removeChild(f))};e.appendChild(f);setTimeout(function(){g||(g=!0,c&&c(Error("Script load timeout")))},d||5E3);return f}return null};function B(){this.a=0;this.c=null}function C(a){a.a++;return function(){a.a--;D(a)}}function E(a,b){a.c=b;D(a)}function D(a){0==a.a&&a.c&&(a.c(),a.c=null)};function F(a){this.a=a||"-"}F.prototype.c=function(a){for(var b=[],c=0;c<arguments.length;c++)b.push(arguments[c].replace(/[\W_]+/g,"").toLowerCase());return b.join(this.a)};function G(a,b){this.c=a;this.f=4;this.a="n";var c=(b||"n4").match(/^([nio])([1-9])$/i);c&&(this.a=c[1],this.f=parseInt(c[2],10))}function fa(a){return H(a)+" "+(a.f+"00")+" 300px "+I(a.c)}function I(a){var b=[];a=a.split(/,\s*/);for(var c=0;c<a.length;c++){var d=a[c].replace(/['"]/g,"");-1!=d.indexOf(" ")||/^\d/.test(d)?b.push("'"+d+"'"):b.push(d)}return b.join(",")}function J(a){return a.a+a.f}function H(a){var b="normal";"o"===a.a?b="oblique":"i"===a.a&&(b="italic");return b}
+function ga(a){var b=4,c="n",d=null;a&&((d=a.match(/(normal|oblique|italic)/i))&&d[1]&&(c=d[1].substr(0,1).toLowerCase()),(d=a.match(/([1-9]00|normal|bold)/i))&&d[1]&&(/bold/i.test(d[1])?b=7:/[1-9]00/.test(d[1])&&(b=parseInt(d[1].substr(0,1),10))));return c+b};function ha(a,b){this.c=a;this.f=a.o.document.documentElement;this.h=b;this.a=new F("-");this.j=!1!==b.events;this.g=!1!==b.classes}function ia(a){a.g&&w(a.f,[a.a.c("wf","loading")]);K(a,"loading")}function L(a){if(a.g){var b=y(a.f,a.a.c("wf","active")),c=[],d=[a.a.c("wf","loading")];b||c.push(a.a.c("wf","inactive"));w(a.f,c,d)}K(a,"inactive")}function K(a,b,c){if(a.j&&a.h[b])if(c)a.h[b](c.c,J(c));else a.h[b]()};function ja(){this.c={}}function ka(a,b,c){var d=[],e;for(e in b)if(b.hasOwnProperty(e)){var f=a.c[e];f&&d.push(f(b[e],c))}return d};function M(a,b){this.c=a;this.f=b;this.a=t(this.c,"span",{"aria-hidden":"true"},this.f)}function N(a){u(a.c,"body",a.a)}function O(a){return"display:block;position:absolute;top:-9999px;left:-9999px;font-size:300px;width:auto;height:auto;line-height:normal;margin:0;padding:0;font-variant:normal;white-space:nowrap;font-family:"+I(a.c)+";"+("font-style:"+H(a)+";font-weight:"+(a.f+"00")+";")};function P(a,b,c,d,e,f){this.g=a;this.j=b;this.a=d;this.c=c;this.f=e||3E3;this.h=f||void 0}P.prototype.start=function(){var a=this.c.o.document,b=this,c=q(),d=new Promise(function(d,e){function f(){q()-c>=b.f?e():a.fonts.load(fa(b.a),b.h).then(function(a){1<=a.length?d():setTimeout(f,25)},function(){e()})}f()}),e=null,f=new Promise(function(a,d){e=setTimeout(d,b.f)});Promise.race([f,d]).then(function(){e&&(clearTimeout(e),e=null);b.g(b.a)},function(){b.j(b.a)})};function Q(a,b,c,d,e,f,g){this.v=a;this.B=b;this.c=c;this.a=d;this.s=g||"BESbswy";this.f={};this.w=e||3E3;this.u=f||null;this.m=this.j=this.h=this.g=null;this.g=new M(this.c,this.s);this.h=new M(this.c,this.s);this.j=new M(this.c,this.s);this.m=new M(this.c,this.s);a=new G(this.a.c+",serif",J(this.a));a=O(a);this.g.a.style.cssText=a;a=new G(this.a.c+",sans-serif",J(this.a));a=O(a);this.h.a.style.cssText=a;a=new G("serif",J(this.a));a=O(a);this.j.a.style.cssText=a;a=new G("sans-serif",J(this.a));a=
+O(a);this.m.a.style.cssText=a;N(this.g);N(this.h);N(this.j);N(this.m)}var R={D:"serif",C:"sans-serif"},S=null;function T(){if(null===S){var a=/AppleWebKit\/([0-9]+)(?:\.([0-9]+))/.exec(window.navigator.userAgent);S=!!a&&(536>parseInt(a[1],10)||536===parseInt(a[1],10)&&11>=parseInt(a[2],10))}return S}Q.prototype.start=function(){this.f.serif=this.j.a.offsetWidth;this.f["sans-serif"]=this.m.a.offsetWidth;this.A=q();U(this)};
+function la(a,b,c){for(var d in R)if(R.hasOwnProperty(d)&&b===a.f[R[d]]&&c===a.f[R[d]])return!0;return!1}function U(a){var b=a.g.a.offsetWidth,c=a.h.a.offsetWidth,d;(d=b===a.f.serif&&c===a.f["sans-serif"])||(d=T()&&la(a,b,c));d?q()-a.A>=a.w?T()&&la(a,b,c)&&(null===a.u||a.u.hasOwnProperty(a.a.c))?V(a,a.v):V(a,a.B):ma(a):V(a,a.v)}function ma(a){setTimeout(p(function(){U(this)},a),50)}function V(a,b){setTimeout(p(function(){v(this.g.a);v(this.h.a);v(this.j.a);v(this.m.a);b(this.a)},a),0)};function W(a,b,c){this.c=a;this.a=b;this.f=0;this.m=this.j=!1;this.s=c}var X=null;W.prototype.g=function(a){var b=this.a;b.g&&w(b.f,[b.a.c("wf",a.c,J(a).toString(),"active")],[b.a.c("wf",a.c,J(a).toString(),"loading"),b.a.c("wf",a.c,J(a).toString(),"inactive")]);K(b,"fontactive",a);this.m=!0;na(this)};
+W.prototype.h=function(a){var b=this.a;if(b.g){var c=y(b.f,b.a.c("wf",a.c,J(a).toString(),"active")),d=[],e=[b.a.c("wf",a.c,J(a).toString(),"loading")];c||d.push(b.a.c("wf",a.c,J(a).toString(),"inactive"));w(b.f,d,e)}K(b,"fontinactive",a);na(this)};function na(a){0==--a.f&&a.j&&(a.m?(a=a.a,a.g&&w(a.f,[a.a.c("wf","active")],[a.a.c("wf","loading"),a.a.c("wf","inactive")]),K(a,"active")):L(a.a))};function oa(a){this.j=a;this.a=new ja;this.h=0;this.f=this.g=!0}oa.prototype.load=function(a){this.c=new ca(this.j,a.context||this.j);this.g=!1!==a.events;this.f=!1!==a.classes;pa(this,new ha(this.c,a),a)};
+function qa(a,b,c,d,e){var f=0==--a.h;(a.f||a.g)&&setTimeout(function(){var a=e||null,m=d||null||{};if(0===c.length&&f)L(b.a);else{b.f+=c.length;f&&(b.j=f);var h,l=[];for(h=0;h<c.length;h++){var k=c[h],n=m[k.c],r=b.a,x=k;r.g&&w(r.f,[r.a.c("wf",x.c,J(x).toString(),"loading")]);K(r,"fontloading",x);r=null;if(null===X)if(window.FontFace){var x=/Gecko.*Firefox\/(\d+)/.exec(window.navigator.userAgent),xa=/OS X.*Version\/10\..*Safari/.exec(window.navigator.userAgent)&&/Apple/.exec(window.navigator.vendor);
+X=x?42<parseInt(x[1],10):xa?!1:!0}else X=!1;X?r=new P(p(b.g,b),p(b.h,b),b.c,k,b.s,n):r=new Q(p(b.g,b),p(b.h,b),b.c,k,b.s,a,n);l.push(r)}for(h=0;h<l.length;h++)l[h].start()}},0)}function pa(a,b,c){var d=[],e=c.timeout;ia(b);var d=ka(a.a,c,a.c),f=new W(a.c,b,e);a.h=d.length;b=0;for(c=d.length;b<c;b++)d[b].load(function(b,d,c){qa(a,f,b,d,c)})};function ra(a,b){this.c=a;this.a=b}
+ra.prototype.load=function(a){function b(){if(f["__mti_fntLst"+d]){var c=f["__mti_fntLst"+d](),e=[],h;if(c)for(var l=0;l<c.length;l++){var k=c[l].fontfamily;void 0!=c[l].fontStyle&&void 0!=c[l].fontWeight?(h=c[l].fontStyle+c[l].fontWeight,e.push(new G(k,h))):e.push(new G(k))}a(e)}else setTimeout(function(){b()},50)}var c=this,d=c.a.projectId,e=c.a.version;if(d){var f=c.c.o;A(this.c,(c.a.api||"https://fast.fonts.net/jsapi")+"/"+d+".js"+(e?"?v="+e:""),function(e){e?a([]):(f["__MonotypeConfiguration__"+
+d]=function(){return c.a},b())}).id="__MonotypeAPIScript__"+d}else a([])};function sa(a,b){this.c=a;this.a=b}sa.prototype.load=function(a){var b,c,d=this.a.urls||[],e=this.a.families||[],f=this.a.testStrings||{},g=new B;b=0;for(c=d.length;b<c;b++)z(this.c,d[b],C(g));var m=[];b=0;for(c=e.length;b<c;b++)if(d=e[b].split(":"),d[1])for(var h=d[1].split(","),l=0;l<h.length;l+=1)m.push(new G(d[0],h[l]));else m.push(new G(d[0]));E(g,function(){a(m,f)})};function ta(a,b){a?this.c=a:this.c=ua;this.a=[];this.f=[];this.g=b||""}var ua="https://fonts.googleapis.com/css";function va(a,b){for(var c=b.length,d=0;d<c;d++){var e=b[d].split(":");3==e.length&&a.f.push(e.pop());var f="";2==e.length&&""!=e[1]&&(f=":");a.a.push(e.join(f))}}
+function wa(a){if(0==a.a.length)throw Error("No fonts to load!");if(-1!=a.c.indexOf("kit="))return a.c;for(var b=a.a.length,c=[],d=0;d<b;d++)c.push(a.a[d].replace(/ /g,"+"));b=a.c+"?family="+c.join("%7C");0<a.f.length&&(b+="&subset="+a.f.join(","));0<a.g.length&&(b+="&text="+encodeURIComponent(a.g));return b};function ya(a){this.f=a;this.a=[];this.c={}}
+var za={latin:"BESbswy","latin-ext":"\u00e7\u00f6\u00fc\u011f\u015f",cyrillic:"\u0439\u044f\u0416",greek:"\u03b1\u03b2\u03a3",khmer:"\u1780\u1781\u1782",Hanuman:"\u1780\u1781\u1782"},Aa={thin:"1",extralight:"2","extra-light":"2",ultralight:"2","ultra-light":"2",light:"3",regular:"4",book:"4",medium:"5","semi-bold":"6",semibold:"6","demi-bold":"6",demibold:"6",bold:"7","extra-bold":"8",extrabold:"8","ultra-bold":"8",ultrabold:"8",black:"9",heavy:"9",l:"3",r:"4",b:"7"},Ba={i:"i",italic:"i",n:"n",normal:"n"},
+Ca=/^(thin|(?:(?:extra|ultra)-?)?light|regular|book|medium|(?:(?:semi|demi|extra|ultra)-?)?bold|black|heavy|l|r|b|[1-9]00)?(n|i|normal|italic)?$/;
+function Da(a){for(var b=a.f.length,c=0;c<b;c++){var d=a.f[c].split(":"),e=d[0].replace(/\+/g," "),f=["n4"];if(2<=d.length){var g;var m=d[1];g=[];if(m)for(var m=m.split(","),h=m.length,l=0;l<h;l++){var k;k=m[l];if(k.match(/^[\w-]+$/)){var n=Ca.exec(k.toLowerCase());if(null==n)k="";else{k=n[2];k=null==k||""==k?"n":Ba[k];n=n[1];if(null==n||""==n)n="4";else var r=Aa[n],n=r?r:isNaN(n)?"4":n.substr(0,1);k=[k,n].join("")}}else k="";k&&g.push(k)}0<g.length&&(f=g);3==d.length&&(d=d[2],g=[],d=d?d.split(","):
+g,0<d.length&&(d=za[d[0]])&&(a.c[e]=d))}a.c[e]||(d=za[e])&&(a.c[e]=d);for(d=0;d<f.length;d+=1)a.a.push(new G(e,f[d]))}};function Ea(a,b){this.c=a;this.a=b}var Fa={Arimo:!0,Cousine:!0,Tinos:!0};Ea.prototype.load=function(a){var b=new B,c=this.c,d=new ta(this.a.api,this.a.text),e=this.a.families;va(d,e);var f=new ya(e);Da(f);z(c,wa(d),C(b));E(b,function(){a(f.a,f.c,Fa)})};function Ga(a,b){this.c=a;this.a=b}Ga.prototype.load=function(a){var b=this.a.id,c=this.c.o;b?A(this.c,(this.a.api||"https://use.typekit.net")+"/"+b+".js",function(b){if(b)a([]);else if(c.Typekit&&c.Typekit.config&&c.Typekit.config.fn){b=c.Typekit.config.fn;for(var e=[],f=0;f<b.length;f+=2)for(var g=b[f],m=b[f+1],h=0;h<m.length;h++)e.push(new G(g,m[h]));try{c.Typekit.load({events:!1,classes:!1,async:!0})}catch(l){}a(e)}},2E3):a([])};function Ha(a,b){this.c=a;this.f=b;this.a=[]}Ha.prototype.load=function(a){var b=this.f.id,c=this.c.o,d=this;b?(c.__webfontfontdeckmodule__||(c.__webfontfontdeckmodule__={}),c.__webfontfontdeckmodule__[b]=function(b,c){for(var g=0,m=c.fonts.length;g<m;++g){var h=c.fonts[g];d.a.push(new G(h.name,ga("font-weight:"+h.weight+";font-style:"+h.style)))}a(d.a)},A(this.c,(this.f.api||"https://f.fontdeck.com/s/css/js/")+ea(this.c)+"/"+b+".js",function(b){b&&a([])})):a([])};var Y=new oa(window);Y.a.c.custom=function(a,b){return new sa(b,a)};Y.a.c.fontdeck=function(a,b){return new Ha(b,a)};Y.a.c.monotype=function(a,b){return new ra(b,a)};Y.a.c.typekit=function(a,b){return new Ga(b,a)};Y.a.c.google=function(a,b){return new Ea(b,a)};var Z={load:p(Y.load,Y)}; true?!(__WEBPACK_AMD_DEFINE_RESULT__ = (function(){return Z}).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):undefined;}());
+
+
+/***/ }),
+
 /***/ "./node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
@@ -44293,6 +44322,213 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./src/js/PowerMeterGame.js":
+/*!**********************************!*\
+  !*** ./src/js/PowerMeterGame.js ***!
+  \**********************************/
+/*! exports provided: PowerMeterGame */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PowerMeterGame", function() { return PowerMeterGame; });
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
+/* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./engine/WithPhysics.js */ "./src/js/engine/WithPhysics.js");
+
+
+
+
+
+
+
+/**Along with normal PIXI.Application options
+ * oscillationTime The time it takes the sweeper to do one pass over the width in MS
+ * greenAreaWidth 0-1 of the width of the container
+ */
+
+var PowerMeterGame =
+/*#__PURE__*/
+function (_PIXI$Container) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(PowerMeterGame, _PIXI$Container);
+
+  function PowerMeterGame(options) {
+    var _this;
+
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, PowerMeterGame);
+
+    options.transparent = true;
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_2___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_3___default()(PowerMeterGame).call(this, options)); //Width and height to size this thing too
+
+    _this.intrinsicWidth = options.intrinsicWidth || 500;
+    _this.intrinsicHeight = options.intrinsicHeight || 200;
+    _this.oscillationTime = options.oscillationTime || 1000;
+    _this.greenAreaWidth = options.greenAreaWidth || 0.5;
+    _this.greenAreaPixelWidth = _this.intrinsicWidth * _this.greenAreaWidth; //Add all the elements
+
+    _this._redArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._redArea.beginFill(0xAA5555);
+
+    _this._redArea.drawRectBound = _this._redArea.drawRect.bind(_this._redArea, 0, _this.intrinsicHeight / 6, _this.intrinsicWidth, 2 * _this.intrinsicHeight / 3);
+
+    _this._redArea.drawRectBound();
+
+    _this._redArea.endFill();
+
+    _this.addChild(_this._redArea);
+
+    _this._greenArea = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._greenArea.beginFill(0x55AA55);
+
+    _this._greenArea.drawRectBound = _this._greenArea.drawRect.bind(_this._greenArea, (_this.intrinsicWidth - _this.greenAreaPixelWidth) / 2, _this.intrinsicHeight / 6, _this.greenAreaPixelWidth, 2 * _this.intrinsicHeight / 3);
+
+    _this._greenArea.drawRectBound();
+
+    _this._greenArea.endFill();
+
+    _this.addChild(_this._greenArea);
+
+    _this._stopBar = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
+
+    _this._stopBar.beginFill(0xFFFFFF);
+
+    _this._stopBar.lineStyle(4, 0x000000, 1);
+
+    _this._stopBar.drawRect(0, 0, 20, _this.intrinsicHeight);
+
+    _this._stopBar.endFill();
+
+    _this.addChild(_this._stopBar);
+
+    var text = _this._skillCheckText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("SKILL CHECK", {
+      fontFamily: 'Impact',
+      fontSize: 200,
+      fill: 0xffffff,
+      align: 'center',
+      stroke: 0x000000,
+      strokeThickness: 20
+    });
+    text.position.x = _this.intrinsicWidth / 2;
+    text.position.y = _this.intrinsicHeight / 2;
+    text._initialWidth = text.width;
+    text._initialHeight = text.height;
+    text.visible = false;
+
+    _this._skillCheckText.anchor.set(0.5);
+
+    _this.addChild(text);
+
+    _this._barPos = 0;
+    _this._initialTime = Date.now();
+    _this._started = false;
+    _this._startTime;
+    _this._stopped = false;
+    _this._hitGreenArea = undefined;
+    return _this;
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(PowerMeterGame, [{
+    key: "onUpdate",
+    value: function onUpdate() {
+      if (!this._started || this._skillCheckText.visible) {
+        var now = Date.now() - this._initialTime;
+
+        if (now < 300) {
+          //0 - 300ms
+          this._skillCheckText.visible = true;
+          this._skillCheckText.width = this._skillCheckText._initialWidth * 0.5;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * 0.5;
+        } else if (now < 600) {
+          //300 - 600ms
+          var tween = (now - 300) / 300;
+          tween = tween * 0.5 + 0.5;
+          console.log(tween);
+          this._skillCheckText.width = this._skillCheckText._initialWidth * tween;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * tween;
+        } else if (now < 1000) {
+          //600 - 1000ms
+          var _tween = (now - 600) / 400;
+
+          _tween = 1 - _tween;
+          this._skillCheckText.width = this._skillCheckText._initialWidth * _tween;
+          this._skillCheckText.height = this._skillCheckText._initialHeight * _tween;
+        } else if (now > 1000) {
+          this._skillCheckText.visible = false;
+        }
+
+        if (now > 800) {
+          this._started = true;
+          this._startTime = Date.now();
+        }
+      } else {
+        if (!this._stopped) {
+          var _now = Date.now() - this._startTime;
+
+          var shouldMirror = Math.floor(_now / this.oscillationTime) % 2 === 0;
+          this._barPos = Math.abs((shouldMirror ? 0 : 1) - _now % this.oscillationTime / this.oscillationTime);
+          this._stopBar.x = this.intrinsicWidth * this._barPos - this._stopBar.getBounds().width / 2;
+        } else if (this._stopped) {
+          var blinkInterval = Math.floor(Date.now() / 300) % 2 === 0; //every 1 second
+
+          if (this._hitGreenArea) {
+            this._greenArea.beginFill(blinkInterval ? 0x00FF00 : 0x55AA55);
+
+            this._greenArea.drawRectBound();
+
+            this._greenArea.endFill();
+          } else {
+            this._redArea.beginFill(blinkInterval ? 0xFF0000 : 0xAA5555);
+
+            this._redArea.drawRectBound();
+
+            this._redArea.endFill();
+          }
+        }
+      }
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      if (!this._started) {
+        return;
+      }
+
+      this._stopped = true;
+      var stopPos = this._barPos;
+      var greenBoxX = (this.intrinsicWidth - this.greenAreaPixelWidth) / 2; //can't use .x because the object is at 0,0 but the rectangle is drawn at the offset...
+
+      var greenAreaStart = greenBoxX / this.intrinsicWidth;
+      var greenAreaEnd = (greenBoxX + this._greenArea.width) / this.intrinsicWidth;
+      this._hitGreenArea = stopPos > greenAreaStart && stopPos < greenAreaEnd;
+      this.emit("ended", {
+        won: this.won
+      });
+    } //Whether the player has won, undefiend if not finished
+
+  }, {
+    key: "won",
+    get: function get() {
+      return this._hitGreenArea;
+    }
+  }]);
+
+  return PowerMeterGame;
+}(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Container"]);
+
+/***/ }),
+
 /***/ "./src/js/chat.js":
 /*!************************!*\
   !*** ./src/js/chat.js ***!
@@ -44314,13 +44550,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! pixi.js */ "./node_modules/pixi.js/lib/index.js");
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(pixi_js__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _dialogue_node_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./dialogue_node.js */ "./src/js/dialogue_node.js");
+/* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! webfontloader */ "./node_modules/webfontloader/webfontloader.js");
+/* harmony import */ var webfontloader__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(webfontloader__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./dialogue_node.js */ "./src/js/dialogue_node.js");
+/* harmony import */ var _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./PowerMeterGame.js */ "./src/js/PowerMeterGame.js");
+
 
 
 
 
 
  //import { DialogTree as dialogTree } from "./MockDialogTree.js";
+
 
 
 var TYPING_SPEED = 10; //ms between letter
@@ -44355,13 +44596,9 @@ function (_PIXI$Application) {
 
     _this.stage.addChild(background);
 
-    var box = _this._dialogBox = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Graphics"]();
-    box.beginFill(0xFFF0CC);
-    box.lineStyle(4, 0xFF3300, 1);
-    box.drawRect(0, 0, 500, 200);
-    box.endFill();
+    _this._dialogBox = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Container"]();
 
-    _this.stage.addChild(box);
+    _this.stage.addChild(_this._dialogBox);
 
     var frame = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.dialogFrame.texture, 117, 117, 117, 117);
     frame.width = 1000;
@@ -44372,9 +44609,9 @@ function (_PIXI$Application) {
     _this._dialogBox.addChild(frame);
 
     var name = _this._dialogName = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("NAME", {
-      fontFamily: 'Arial',
+      fontFamily: 'Varela Round',
       fontSize: 24,
-      fill: 0xff1010,
+      fill: 0x000000,
       align: 'center'
     });
     name.position.x = 50;
@@ -44383,9 +44620,9 @@ function (_PIXI$Application) {
     _this._dialogBox.addChild(name);
 
     var text = _this._dialogText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"]("Initial Text", {
-      fontFamily: 'Arial',
+      fontFamily: 'Varela Round',
       fontSize: 24,
-      fill: 0xff1010,
+      fill: 0x000000,
       align: 'left',
       wordWrap: true,
       wordWrapWidth: 400
@@ -44398,14 +44635,14 @@ function (_PIXI$Application) {
 
     var face1 = _this._leftFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.mc.texture);
     var face1Aspect = face1.height / face1.width;
-    face1.width = 400;
+    face1.width = _this.screen.width / 2.8;
     face1.height = face1.width * face1Aspect;
 
     _this.stage.addChild(face1);
 
     var face2 = _this._rightFace = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.carl.texture);
     var face2Aspect = face2.height / face2.width;
-    face2.width = 400;
+    face2.width = _this.screen.width / 2.8;
     face2.height = face2.width * face2Aspect;
 
     _this.stage.addChild(face2);
@@ -44422,7 +44659,7 @@ function (_PIXI$Application) {
       this._currentPrompt = this.dialogTree.prompt(); //let { placement, name, options } = this._currentPrompt;
 
       var placement = "left";
-      var name = "";
+      var name = "Test";
       var options = this.dialogTree.options(this.actions);
 
       for (var i in this.optionButtons) {
@@ -44445,27 +44682,28 @@ function (_PIXI$Application) {
 
       if (options) {
         options.forEach(function (option, idx) {
-          var button = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.buttonFrame.texture, 117, 117, 117, 117);
-          button.width = 200 * 4;
-          button.height = 70 * 4;
-          button.scale.x = 0.25;
-          button.scale.y = 0.25;
-          button.position.x = 30;
-          button.position.y = 30 + 50 * idx;
+          var button = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"].resources.buttonFrame.texture, 231, 214, 231, 214);
+          button.width = 300 * 8;
+          button.height = 80 * 8;
+          button.scale.x = 0.125;
+          button.scale.y = 0.125;
+          button.position.x = 10;
+          button.position.y = 10 + 80 * idx;
 
           _this2.stage.addChild(button);
 
           var buttonText = new pixi_js__WEBPACK_IMPORTED_MODULE_5__["Text"](option.text, {
-            fontFamily: 'Arial',
+            fontFamily: 'Varela Round',
             fontSize: 24,
-            fill: 0xff1010,
+            fill: 0x000000,
             align: 'left'
           });
-          buttonText.position.x = 20 * 4;
-          buttonText.position.y = 20 * 4;
-          buttonText.scale.x = 4;
-          buttonText.scale.y = 4;
+          buttonText.anchor.y = 0.5;
           button.addChild(buttonText);
+          buttonText.position.x = 30 * 8;
+          buttonText.position.y = 80 / 2 * 8;
+          buttonText.scale.x = 8;
+          buttonText.scale.y = 8;
           button.interactive = true;
           button.buttonMode = true;
           button.on("pointerdown", function (evt) {
@@ -44487,6 +44725,7 @@ function (_PIXI$Application) {
       for (var i in actions) {
         if (this.isGameAction(actions[i])) {
           this.playGame(actions[i]);
+          return;
         } else {
           this.actions.push(actions[i]);
         }
@@ -44517,8 +44756,35 @@ function (_PIXI$Application) {
     key: "playGame",
     value: function playGame(action) {
       if (action === "PlayGame1") {
-        console.log("Playing game 1");
-        this.actions.push("WinGame1");
+        var gameApp1 = new _PowerMeterGame_js__WEBPACK_IMPORTED_MODULE_8__["PowerMeterGame"]({
+          width: this._dialogBox.getBounds().width,
+          height: this._dialogBox.getBounds().height //oscillationTime: 1000,
+          //greenAreaWidth: 0.4
+
+        });
+        gameApp1.position.x = SCREEN_PADDING;
+        gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
+        var raf;
+
+        var loop = function loop() {
+          gameApp1.onUpdate();
+          raf = requestAnimationFrame(loop);
+        };
+
+        raf = requestAnimationFrame(loop);
+        this.view.addEventListener("pointerdown", function () {
+          gameApp1.stop();
+        });
+        window.addEventListener("keydown", function (e) {
+          if (e.key === " ") {
+            gameApp1.stop();
+            e.preventDefault(); //Stop the scrolling  
+          }
+        });
+        this.stage.addChild(gameApp1);
+        gameApp1.on("ended", function (e) {
+          console.log(e); //there's a .won with whether they won or not
+        });
       }
 
       if (action === "PlayGame2") {
@@ -44578,26 +44844,41 @@ function (_PIXI$Application) {
   return DialogSceneApp;
 }(pixi_js__WEBPACK_IMPORTED_MODULE_5__["Application"]);
 
-document.addEventListener("DOMContentLoaded", function () {
+Promise.all([new Promise(function (resolve, reject) {
+  webfontloader__WEBPACK_IMPORTED_MODULE_6___default.a.load({
+    active: resolve,
+    google: {
+      families: ['Varela Round', 'ZCOOL KuaiLe']
+    }
+  });
+}), new Promise(function (resolve, reject) {
   pixi_js__WEBPACK_IMPORTED_MODULE_5__["loader"] //Backgrounds
   .add("bedroom", "images/bedroom.png") //Characters
-  .add("carl", "images/crepycarl.png").add("mc", "images/mc.png") //Other assets
-  .add("dialogFrame", "images/frameyboi.png").add("buttonFrame", "images/frameyboi.png").load(function () {
-    //WIRE UP THE APP
-    var app = new DialogSceneApp({
-      antialias: true,
-      width: window.innerWidth,
-      height: window.innerHeight
-    }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_6__["loadJsonFile"]("testTree"));
-    document.body.appendChild(app.view);
-    ["mouseup", "touchend"].forEach(function (eventName) {
-      app.view.addEventListener(eventName, function () {
-        if (app.isTyping) {
-          app.stopTyping();
-        } else {
-          app.nextScene();
-        }
-      });
+  .add("carl", "images/crepycarl-clothed.png").add("mc", "images/mc-clothed.png") //Other assets
+  .add("dialogFrame", "images/frameyboi.png").add("buttonFrame", "images/buttonboi.png").load(resolve);
+}), new Promise(function (resolve, reject) {
+  document.addEventListener("DOMContentLoaded", resolve);
+})]).then(function () {
+  //WIRE UP THE APP
+  var app = new DialogSceneApp({
+    antialias: true,
+    width: window.innerWidth,
+    height: window.innerHeight
+  }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_7__["loadJsonFile"]("testTree"));
+  document.body.appendChild(app.view); //lock for mobile devices (throws if device doesn't support)
+
+  /*try {
+    screen.orientation.lock('landscape');
+  }
+  catch(e) {}*/
+
+  ["mouseup", "touchend"].forEach(function (eventName) {
+    app.view.addEventListener(eventName, function () {
+      if (app.isTyping) {
+        app.stopTyping();
+      } else {
+        app.nextScene();
+      }
     });
   });
 });
@@ -44960,6 +45241,172 @@ function getTestJson() {
 
 /***/ }),
 
+/***/ "./src/js/engine/WithPhysics.js":
+/*!**************************************!*\
+  !*** ./src/js/engine/WithPhysics.js ***!
+  \**************************************/
+/*! exports provided: WithPhysics, physicsLoop */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WithPhysics", function() { return WithPhysics; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "physicsLoop", function() { return physicsLoop; });
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4__);
+
+
+
+
+
+
+/**Returns the passed PIXI class wrapped in a class that supports physics simulation
+ * Usage:
+ * class MyNewPhysicsClass extends WithPhysics(PIXI.Sprite) {
+ *     //...
+ * }
+ */
+function WithPhysics(pixiCls) {
+  var _WithPhysicsCls =
+  /*#__PURE__*/
+  function (_pixiCls) {
+    _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_4___default()(_WithPhysicsCls, _pixiCls);
+
+    _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(_WithPhysicsCls, [{
+      key: "hasPhysics",
+      get: function get() {
+        return true;
+      }
+    }]);
+
+    function _WithPhysicsCls() {
+      var _getPrototypeOf2;
+
+      var _this;
+
+      _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, _WithPhysicsCls);
+
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+
+      _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_1___default()(this, (_getPrototypeOf2 = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_2___default()(_WithPhysicsCls)).call.apply(_getPrototypeOf2, [this].concat(args))); //Units per second
+
+      _this.velocity = new PIXI.Point();
+      _this.acceleration = new PIXI.Point();
+      _this.angularVelocity = 0;
+      _this.angularAcceleration = 0;
+      return _this;
+    }
+    /**Override with your things to do when physics is updating
+     * and super call to do normal stuff
+     */
+
+
+    _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_3___default()(_WithPhysicsCls, [{
+      key: "onPhysicsUpdate",
+      value: function onPhysicsUpdate(time, deltaTime) {
+        this.velocity.x += this.acceleration.x * deltaTime / 1000;
+        this.velocity.y += this.acceleration.y * deltaTime / 1000;
+        this.position.x += this.velocity.x * deltaTime / 1000;
+        this.position.y -= this.velocity.y * deltaTime / 1000;
+        this.angularVelocity += this.angularAcceleration;
+        this.rotation += this.angularVelocity;
+      }
+      /**Override to do things when we collide with an object
+       */
+
+    }, {
+      key: "onCollision",
+      value: function onCollision(otherObjects) {}
+    }]);
+
+    return _WithPhysicsCls;
+  }(pixiCls);
+
+  return _WithPhysicsCls;
+}
+/* Stub tests...
+let physicsCls = WithPhysics(PIXI.Container);
+it("has a velocity and an acceleration", ()=>{
+  //arrange
+  let container = new physicsCls();
+
+  //assert
+  expect(container.velocity instanceof PIXI.Point);
+  expect(container.acceleration instanceof PIXI.Point);
+});*/
+
+function depthFirstIterate(obj, func) {
+  if (!obj) {
+    return;
+  }
+
+  obj.children.forEach(function (child) {
+    return depthFirstIterate(child, func);
+  });
+  func(obj);
+}
+
+var lastTime = Date.now();
+/**From a given rootNode, loops through all children and
+ * does the physics simulation on them
+ */
+
+function physicsLoop(rootNode) {
+  var time = Date.now();
+  var deltaTime = time - lastTime;
+  lastTime = time; //Iterate over all objects, collect the physics objects
+  //and call the physics simulation
+
+  var physObjs = [];
+  depthFirstIterate(rootNode, function (obj) {
+    if (!obj.hasPhysics) {
+      return;
+    }
+
+    obj.onPhysicsUpdate(time, deltaTime);
+    physObjs.push(obj);
+  }); //Determine whether any objects
+  //are colliding, O(n^2/2) it's not that smart
+
+  physObjs.forEach(function (obj1, idx) {
+    //.slice(idx to NOT REPEAT), should also never get
+    //obj1 === obj2
+    physObjs.slice(idx + 1).forEach(function (obj2) {
+      //Box test with pixi.rectangle
+      var rect1 = obj1.getBounds();
+      var rect2 = obj2.getBounds();
+      var instersects = //x direction
+      rect1.x < rect2.x + rect2.width && rect1.x + rect1.width > rect2.x && //y direction
+      rect1.y < rect2.y + rect2.height && rect1.y + rect1.height > rect2.y;
+
+      if (intersects) {
+        //Let them know
+        obj1.onCollision(obj2);
+        obj2.onCollision(obj1); //General collision event
+
+        var evt = new Event("collision");
+        evt.obj1 = obj1;
+        evt.obj2 = obj2;
+        evt.time = time;
+        window.dispatchEvent(evt);
+      }
+    });
+  });
+}
+setInterval(physicsLoop, 100);
+
+/***/ }),
+
 /***/ "./src/js/json/test.js":
 /*!*****************************!*\
   !*** ./src/js/json/test.js ***!
@@ -44995,7 +45442,7 @@ __webpack_require__.r(__webpack_exports__);
     options: [{
       destination: 3,
       text: 'thanks',
-      actions: [],
+      actions: ["PlayGame1"],
       checks: []
     }]
   }, {
@@ -45038,7 +45485,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _data_story__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data/story */ "./src/data/story/index.js");
 
 
-console.log("We did it reddit", _data_story__WEBPACK_IMPORTED_MODULE_1__["default"].story1.scene_1.big);
 
 /***/ })
 

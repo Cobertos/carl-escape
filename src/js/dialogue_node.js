@@ -17,7 +17,7 @@ class DialogueTree {
         return this.currentNode.background;
     }
 
-    currentNode(){
+    currentNode2(){
         return this.currentNode;
     }
 
@@ -53,7 +53,7 @@ class DialogueTree {
         for (let i in this.nodes) {
             let node = this.nodes[i];
             
-            if (node.id == id) {
+            if (node.id === id) {
                 return node;
             }
         }

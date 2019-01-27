@@ -5,7 +5,7 @@ export default {
             id : 0,
             prompt : "You awake warm and safe in your bed. You are home. All is well.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 1,
@@ -26,7 +26,7 @@ export default {
             id : 1,
             prompt : "You've got work today. Time to get dressed and head out.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 3,
@@ -47,7 +47,7 @@ export default {
             id : 2,
             prompt : "Great. Now you're late. You're going to look like a scrub all day. Which do you have time for?",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 4,
@@ -68,7 +68,7 @@ export default {
             id : 3,
             prompt : "You are looking s h a r p. Let's get you out the door and to the office. It's a workday, after all.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 6,
@@ -89,7 +89,7 @@ export default {
             id : 4,
             prompt : "Well, at least your breath doesn't stink. No time to pack lunch. Let's giddy-up and head out.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 6,
@@ -104,7 +104,7 @@ export default {
             id : 5,
             prompt : "At least you semi-look like you have your life together. Let's giddypup and head out.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 6,
@@ -119,7 +119,7 @@ export default {
             id : 6,
             prompt : "You hear a rustling from around the back of your house. Do you check it out?",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 7,
@@ -140,7 +140,7 @@ export default {
             id : 7,
             prompt : "You creep around the side of your house. You see Carl from the office crouched under your bedroom window.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 9,
@@ -161,7 +161,7 @@ export default {
             id : 8,
             prompt : " ",
             speaker: "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 10,
@@ -176,7 +176,7 @@ export default {
             id : 9,
             prompt : "You ask him what he's doing at your house. He responds with 'I've been waiting for you'.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 10,
@@ -190,8 +190,8 @@ export default {
         {
             id : 10,
             prompt : "I couldn't bear to be apart from you~",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 11,
@@ -211,8 +211,8 @@ export default {
         {
             id : 11,
             prompt : "Hush, silly. Doesn't matter, since I'm here anyway. Can I have a ride to work?",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 13,
@@ -232,8 +232,8 @@ export default {
         {
             id : 12,
             prompt : "Well, maybe you should stop going to work without me~ Can I ride with you to work?",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 13,
@@ -254,7 +254,7 @@ export default {
             id : 13,
             prompt : "You try to start your car, but all it does is sputter. Carl grins maniacally.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 14,
@@ -274,8 +274,8 @@ export default {
         {
             id : 14,
             prompt : "I'm not telling~",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 16,
@@ -289,8 +289,8 @@ export default {
         {
             id : 15,
             prompt : "Oh goodie! I'll come with you.",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 16,
@@ -305,7 +305,7 @@ export default {
             id : 16,
             prompt : " ",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 17,
@@ -325,8 +325,8 @@ export default {
         {
             id : 17,
             prompt : "You feel Carl's eyes on you.",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 18,
@@ -346,8 +346,8 @@ export default {
         {
             id : 18,
             prompt : "Oh, nothing. I just like the color of your tie.",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 20,
@@ -361,8 +361,8 @@ export default {
         {
             id : 19,
             prompt : "You're looking pretty casual today. I never get to see you this way~<3",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 20,
@@ -383,7 +383,7 @@ export default {
             id : 20,
             prompt : "You try to inch your way closer to your front door while Carl is distracted.",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 22,
@@ -397,8 +397,8 @@ export default {
         {
             id : 21,
             prompt : "And that scene is...*Big sniff* Your natural musk is intoxicating.",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 23,
@@ -411,8 +411,8 @@ export default {
         {
             id : 22,
             prompt : " ",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 24,
@@ -432,8 +432,8 @@ export default {
         {
             id : 23,
             prompt : " ",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 24,
@@ -454,7 +454,7 @@ export default {
             id : 24,
             prompt : "What do you do next?",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 26,
@@ -474,8 +474,8 @@ export default {
         {
             id : 25,
             prompt : "Oh, are you trying to invite me inside? owo I suppose I could come in for a bit.",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 28,
@@ -495,8 +495,8 @@ export default {
         {
             id : 26,
             prompt : "Hey, watcha doin'? Trying to get me to come in for a drink? Well, if you insist.",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 28,
@@ -516,8 +516,8 @@ export default {
         {
             id : 27,
             prompt : "I did go home. I mean, I went to your home, anyway. That's better~",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 29,
@@ -538,7 +538,7 @@ export default {
             id : 28,
             prompt : "[Carl looks upset that you denied him. He's reaching for your arm...]",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 30,
@@ -553,7 +553,7 @@ export default {
             id : 29,
             prompt : "[Carl looks upset about your tone of voice, and is reaching for your arm...]",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 30,
@@ -568,7 +568,7 @@ export default {
             id : 30,
             prompt : " ",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 31,
@@ -589,7 +589,7 @@ export default {
             id : 31,
             prompt : "[You hear Carl knocking at the door.]",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 33,
@@ -603,8 +603,8 @@ export default {
         {
             id : 32,
             prompt : "Mmmmm, this is nice~",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : 34,
@@ -618,8 +618,8 @@ export default {
         {
             id : 33,
             prompt : "[You've escaped Carl. :)]",
-            speaker: "carl",
-            background : "background.png",
+            speaker: "Carl",
+            background : "bedroom",
             options : [
                 {
                     destination : -1,
@@ -634,7 +634,7 @@ export default {
             id : 34,
             prompt : " ",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : 31,
@@ -655,7 +655,7 @@ export default {
             id : 35,
             prompt : "[You are trapped in a seemingly endless hug from Carl. There is no escape.]",
             speaker: "",
-            background : "background.png",
+            background : "bedroom",
             options : [
                 {
                     destination : -1,

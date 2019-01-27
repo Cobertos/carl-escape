@@ -24,7 +24,7 @@ class DialogSceneApp extends PIXI.Application {
     this.optionButtons = [];
     this.actions = [];
     this.dialogTree = dialogTree;
-    this._currentPrompt = undefined;
+    this._currentNode = undefined;
 
     //Add all the elements
     let background = this._background = document.createElement("div");
@@ -68,6 +68,14 @@ class DialogSceneApp extends PIXI.Application {
     face2.height= face2.width*face2Aspect;
     this.stage.addChild(face2);
 
+    this.view.addEventListener("pointerdown", this.stopTyping.bind(this));
+    window.addEventListener("keydown", (e)=>{
+      if(e.key === " ") {
+        this.stopTyping();
+        e.preventDefault(); //Stop the scrolling  
+      }
+    });
+
     this.nextScene();
   }
 
@@ -77,14 +85,11 @@ class DialogSceneApp extends PIXI.Application {
 
   nextScene(){
     this.stopTyping();
-    this._currentPrompt = this.dialogTree.prompt();
-    //let { placement, name, options } = this._currentPrompt;
+    this._currentNode = this.dialogTree.currentNode2();
+    let { speaker : name, background } = this._currentNode;
 
     let placement = "left";
-    let name = "Test"; //TODO: Add name here from this.dialogTree?
     let options = this.dialogTree.options(this.actions);
-    //TODO: Add background grabbing code and name
-    let background = "bedroom";
     
     //Set background image
     this._background.style.backgroundImage = `url(${BACKGROUND_TO_URL[background]})`;
@@ -264,15 +269,15 @@ class DialogSceneApp extends PIXI.Application {
       //Clear previous dialog
       this.stopTyping();
     }
-    console.log("Typing prompt:" + this._currentPrompt);
+    let prompt = this._currentNode.prompt;
+    console.log("Typing prompt:" + prompt);
     //Start a new dialog
-    let letters = this._currentPrompt.split("");
+    let letters = prompt.split("");
     let currLetter = 0;
     this._dialogInterval = setInterval(()=>{
-      console.log("Anything");
       this._dialogText.text = letters.slice(0,currLetter).join("");
       currLetter++;
-      if(currLetter > this._currentPrompt.length) {
+      if(currLetter > prompt.length) {
         this.stopTyping();
         return;
       }
@@ -282,8 +287,8 @@ class DialogSceneApp extends PIXI.Application {
   stopTyping(){
     clearInterval(this._dialogInterval);
     this._dialogInterval = undefined;
-    if(this._currentPrompt){
-      this._dialogText.text = this._currentPrompt;
+    if(this._currentNode){
+      this._dialogText.text = this._currentNode.prompt;
     }
   }
 

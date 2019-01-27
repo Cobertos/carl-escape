@@ -375,6 +375,12 @@ export default {
                     text : "...I don't know how to feel about that.",
                     actions : [],
                     checks : ["Scrub"],
+                },
+                {
+                    destination : 21,
+                    text : "Wait, what?!",
+                    actions : [],
+                    checks : [],
                 }
 
             ]

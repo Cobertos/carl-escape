@@ -1,2 +1,2 @@
-import "./chat.js";
+import "./BottleFlipGame.js";
 import story from '../data/story';

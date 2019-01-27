@@ -44359,12 +44359,12 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/get */ "./node_modules/@babel/runtime/helpers/get.js");
-/* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/get */ "./node_modules/@babel/runtime/helpers/get.js");
+/* harmony import */ var _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "./node_modules/@babel/runtime/helpers/classCallCheck.js");
+/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
+/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
 /* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
@@ -44392,6 +44392,8 @@ var dist = function dist(point) {
   return Math.sqrt(Math.pow(point.x, 2) + Math.pow(point.y, 2));
 };
 
+var COUNTDOWN_LENGTH = 2;
+
 var KeyFlipGameApp =
 /*#__PURE__*/
 function (_PIXI$Application) {
@@ -44400,9 +44402,34 @@ function (_PIXI$Application) {
   function KeyFlipGameApp(options) {
     var _this;
 
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, KeyFlipGameApp);
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, KeyFlipGameApp);
 
-    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyFlipGameApp).call(this, options)); //Add all the elements
+    _this = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyFlipGameApp).call(this, options));
+    _this._started = false;
+    _this._stopped = false;
+    _this._spawnTime = Date.now();
+    _this._stoppedTime = undefined;
+    _this._startedTime = undefined;
+    _this._won = false;
+    _this._lastTime = 0;
+    _this._timeText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"](COUNTDOWN_LENGTH + "", {
+      fontFamily: 'Impact',
+      fontSize: 200,
+      fill: 0xffffff,
+      align: 'center',
+      stroke: 0x000000,
+      strokeThickness: 20
+    });
+    _this._timeText.position.x = _this.screen.width / 2;
+    _this._timeText.position.y = _this.screen.height / 2;
+    _this._timeText._initialWidth = _this._timeText.width;
+    _this._timeText._initialHeight = _this._timeText.height;
+    _this._timeText.visible = false;
+
+    _this._timeText.anchor.set(0.5);
+
+    _this.stage.addChild(_this._timeText); //Add all the elements
+
 
     var Key =
     /*#__PURE__*/
@@ -44412,31 +44439,31 @@ function (_PIXI$Application) {
       function Key() {
         var _this2;
 
-        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Key);
+        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Key);
 
         _this2 = _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Key).call(this, pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.key.texture));
         var keyAspect = _this2.height / _this2.width;
         _this2.width = 200;
         _this2.height = _this2.width * keyAspect;
         _this2.interactive = true;
-        _this2.buttonMode = true;
         _this2._lastPosition;
         _this2._secondLastPosition;
         _this2._lastVelocity;
         _this2._vecToCenterFromMouse;
         _this2._lastTime;
         _this2._secondLastTime;
-
-        _this2.on("pointerdown", _this2.onPointerDown.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this2))));
-
-        _this2.on("pointermove", _this2.onPointerMove.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this2))));
-
-        _this2.on("pointerup", _this2.onPointerUp.bind(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_babel_runtime_helpers_assertThisInitialized__WEBPACK_IMPORTED_MODULE_6___default()(_this2))));
-
         return _this2;
       }
 
-      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0___default()(Key, [{
+      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Key, [{
+        key: "start",
+        value: function start() {
+          this.buttonMode = true;
+          this.on("pointerdown", this.onPointerDown.bind(this));
+          this.on("pointermove", this.onPointerMove.bind(this));
+          this.on("pointerup", this.onPointerUp.bind(this));
+        }
+      }, {
         key: "onPointerDown",
         value: function onPointerDown(e) {
           if (this._frozen) {
@@ -44450,8 +44477,8 @@ function (_PIXI$Application) {
           this.acceleration.set(0); //set anchor pos to mouse position
 
           var offsetPos = this.data.getLocalPosition(this); //relative to anchor
+          //console.log(offsetPos);
 
-          console.log(offsetPos);
           offsetPos.x /= 585;
           offsetPos.y /= 183;
           offsetPos.x += this.anchor.x; //Remove the anchor contribution to reset anchor from top left
@@ -44518,9 +44545,8 @@ function (_PIXI$Application) {
       }, {
         key: "onPhysicsUpdate",
         value: function onPhysicsUpdate(time, deltaTime) {
-          _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Key.prototype), "onPhysicsUpdate", this).call(this, time, deltaTime);
+          _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Key.prototype), "onPhysicsUpdate", this).call(this, time, deltaTime); //console.log(this.rotation % (2*Math.PI));
 
-          console.log(this.rotation % (2 * Math.PI));
 
           if (this.dragging && this._lastVelocity && !this._frozen) {
             //get velocity
@@ -44552,6 +44578,7 @@ function (_PIXI$Application) {
         key: "freeze",
         value: function freeze() {
           this._frozen = true;
+          this.buttonMode = false;
           this.dragging = false;
           this.acceleration.set(0);
           this.velocity.set(0);
@@ -44580,7 +44607,7 @@ function (_PIXI$Application) {
 
         var _this3;
 
-        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, KeyHole);
+        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, KeyHole);
 
         for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
           args[_key] = arguments[_key];
@@ -44591,7 +44618,7 @@ function (_PIXI$Application) {
         return _this3;
       }
 
-      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0___default()(KeyHole, [{
+      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(KeyHole, [{
         key: "onCollision",
         value: function onCollision(otherObj) {
           if (key._frozen || otherObj !== key) {
@@ -44634,6 +44661,7 @@ function (_PIXI$Application) {
             this._particleSystem.x = key.position.x + key.width / 2;
             this._particleSystem.y = key.position.y;
             self.stage.addChild(this._particleSystem);
+            self.win();
           } else {
             key.angularAcceleration = 0;
             key.angularVelocity /= 4;
@@ -44648,7 +44676,7 @@ function (_PIXI$Application) {
             args[_key2] = arguments[_key2];
           }
 
-          (_get2 = _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_1___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyHole.prototype), "onPhysicsUpdate", this)).call.apply(_get2, [this].concat(args));
+          (_get2 = _babel_runtime_helpers_get__WEBPACK_IMPORTED_MODULE_0___default()(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(KeyHole.prototype), "onPhysicsUpdate", this)).call.apply(_get2, [this].concat(args));
 
           if (this._keyTime) {
             var tween = (Date.now() - this._keyTime) / 2000; //over 2000ms
@@ -44688,12 +44716,12 @@ function (_PIXI$Application) {
       _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(Floor, _WithPhysics3);
 
       function Floor() {
-        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_2___default()(this, Floor);
+        _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, Floor);
 
         return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Floor).apply(this, arguments));
       }
 
-      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_0___default()(Floor, [{
+      _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Floor, [{
         key: "onCollision",
         value: function onCollision(otherObj) {
           if (key._frozen || otherObj !== key) {
@@ -44720,16 +44748,176 @@ function (_PIXI$Application) {
 
     _this._floor.endFill();
 
-    _this.stage.addChild(_this._floor);
+    _this.stage.addChild(_this._floor); //Win loss stuff
+
+
+    _this._instructText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("PUT THE KEY IN", {
+      fontFamily: 'Impact',
+      fontSize: 200,
+      fill: 0xffffff,
+      align: 'center',
+      stroke: 0x000000,
+      strokeThickness: 20
+    });
+    _this._instructText.position.x = _this.screen.width / 2;
+    _this._instructText.position.y = _this.screen.height / 2;
+    _this._instructText._initialWidth = _this._instructText.width;
+    _this._instructText._initialHeight = _this._instructText.height;
+
+    _this._instructText.anchor.set(0.5);
+
+    _this.stage.addChild(_this._instructText);
+
+    _this._arrowSprite = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Sprite"](pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.arrow.texture);
+    _this._arrowSprite.position.x = 50;
+    _this._arrowSprite.position.y = 50;
+    var arrowAspect = _this._arrowSprite.height / _this._arrowSprite.width;
+    _this._arrowSprite.width = 200;
+    _this._arrowSprite.height = _this._arrowSprite.width * arrowAspect;
+
+    _this.stage.addChild(_this._arrowSprite);
+
+    _this._winText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("AYYY YOU DID IT", {
+      fontFamily: 'Impact',
+      fontSize: 200,
+      fill: 0xffffff,
+      align: 'center',
+      stroke: 0x000000,
+      strokeThickness: 20
+    });
+    _this._winText.position.x = _this.screen.width / 2;
+    _this._winText.position.y = _this.screen.height / 2;
+    _this._winText._initialWidth = _this._winText.width;
+    _this._winText._initialHeight = _this._winText.height;
+    _this._winText.visible = false;
+
+    _this._winText.anchor.set(0.5);
+
+    _this.stage.addChild(_this._winText);
+
+    _this._loseBg = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Graphics"]();
+
+    _this._loseBg.beginFill(0xFF0000);
+
+    _this._loseBg.alpha = 0.0; //fades in
+
+    _this._loseBg.drawRect(0, 0, _this.screen.width, _this.screen.height);
+
+    _this._loseBg.endFill();
+
+    _this._loseBg.visible = false;
+
+    _this.stage.addChild(_this._loseBg);
+
+    _this._loseText = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["Text"]("N", {
+      fontFamily: 'Impact',
+      fontSize: 200,
+      fill: 0xffffff,
+      align: 'center',
+      stroke: 0x000000,
+      strokeThickness: 20
+    });
+    _this._loseText.position.x = _this.screen.width / 2;
+    _this._loseText.position.y = _this.screen.height / 2;
+    _this._loseText._initialWidth = _this._loseText.width;
+    _this._loseText._initialHeight = _this._loseText.height;
+    _this._loseText.visible = false;
+
+    _this._loseText.anchor.set(0.5);
+
+    _this.stage.addChild(_this._loseText);
 
     return _this;
   }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(KeyFlipGameApp, [{
+    key: "win",
+    value: function win() {
+      this._stopped = true;
+      this._stoppedTime = Date.now();
+      this._won = true;
+    }
+  }, {
+    key: "lose",
+    value: function lose() {
+      this._stopped = true;
+      this._stoppedTime = Date.now();
+      this._won = false;
+
+      this._key.freeze();
+
+      this._key.tint = 0xFF4444;
+    }
+  }, {
+    key: "onUpdate",
+    value: function onUpdate() {
+      var time = Date.now();
+      var deltaTime = time - this._lastTime;
+      this._lastTime = time;
+
+      if (!this._started) {
+        var now = Date.now() - this._spawnTime;
+
+        this._arrowSprite.visible = Math.floor(now / 500) % 2 === 0;
+
+        if (now > 3000) {
+          this._instructText.visible = false;
+          this._arrowSprite.visible = false;
+          this._timeText.visible = true;
+          this._started = true;
+          this._startedTime = Date.now();
+
+          this._key.start();
+        }
+      } else if (!this._stopped) {
+        var _now = Date.now() - this._startedTime;
+
+        var timeLeft = COUNTDOWN_LENGTH - _now / 1000;
+
+        if (timeLeft < 0) {
+          this.lose();
+          return;
+        }
+
+        this._timeText.text = Math.floor(timeLeft) + "";
+      } else {
+        var _now2 = Date.now() - this._stoppedTime;
+
+        this._timeText.visible = false;
+
+        if (this._won) {
+          this._winText.visible = true;
+          this._winText.rotation = Math.sin(_now2 / 2000 * Math.PI * 2) / 5; //Period ever 2 seconds, -0.2 to 0.2
+        } else {
+          this._timeText.visible = false;
+          this._loseText.visible = true;
+          this._loseBg.visible = true;
+          var tween = Math.min(_now2 / 1000 * 0.6, 0.6);
+          this._loseBg.alpha = tween; //Scrolling end text
+
+          var endText = "NAAAAAHHHHHHH";
+          var tween2 = Math.pow(Math.min(_now2 / 3000, 1.0), 2);
+          tween2 = Math.floor(tween2 * endText.length) + 1;
+          this._loseText.text = endText.slice(0, tween2);
+
+          if (_now2 > 10000) {
+            this._loseText.text = "D:";
+          }
+        }
+      }
+    }
+  }, {
+    key: "won",
+    get: function get() {
+      return this._stopped ? this._won : undefined;
+    }
+  }]);
 
   return KeyFlipGameApp;
 }(pixi_js__WEBPACK_IMPORTED_MODULE_7__["Application"]);
 
 document.addEventListener("DOMContentLoaded", function () {
-  pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].add("key", "images/key.png").add("star", "images/star.png").load(function () {
+  pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].add("key", "images/key.png").add("star", "images/star.png").add("arrow", "images/arrow.png").load(function () {
     //WIRE UP THE APP
     var app = new KeyFlipGameApp({
       antialias: true,
@@ -44741,6 +44929,14 @@ document.addEventListener("DOMContentLoaded", function () {
     setInterval(function () {
       Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_8__["physicsLoop"])(app.stage);
     }, 10);
+    var raf;
+
+    var loop = function loop() {
+      app.onUpdate();
+      raf = requestAnimationFrame(loop);
+    };
+
+    raf = requestAnimationFrame(loop);
   });
 });
 

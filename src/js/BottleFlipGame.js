@@ -3,10 +3,29 @@ import { WithPhysics, physicsLoop } from "./engine/WithPhysics.js";
 import { QuickParticleSystem } from "./engine/QuickParticleSystem.js";
 
 const dist = (point)=>Math.sqrt(Math.pow(point.x,2) + Math.pow(point.y,2))
+const COUNTDOWN_LENGTH = 20;
 
 class KeyFlipGameApp extends PIXI.Application {
   constructor(options){
     super(options);
+    this._started = false;
+    this._stopped = false;
+    this._spawnTime = Date.now();
+    this._stoppedTime = undefined;
+    this._startedTime = undefined;
+    this._won = false;
+    this._lastTime = 0;
+    
+    this._timeText = new PIXI.Text(COUNTDOWN_LENGTH+"",
+      {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
+        stroke: 0x000000, strokeThickness: 20 });
+    this._timeText.position.x = this.screen.width/2;
+    this._timeText.position.y = this.screen.height/2;
+    this._timeText._initialWidth = this._timeText.width;
+    this._timeText._initialHeight = this._timeText.height;
+    this._timeText.visible = false;
+    this._timeText.anchor.set(0.5);
+    this.stage.addChild(this._timeText);
 
     //Add all the elements
     class Key extends WithPhysics(PIXI.Sprite) {
@@ -16,7 +35,6 @@ class KeyFlipGameApp extends PIXI.Application {
         this.width = 200;
         this.height= this.width*keyAspect;
         this.interactive = true;
-        this.buttonMode = true;
 
         this._lastPosition;
         this._secondLastPosition;
@@ -24,6 +42,10 @@ class KeyFlipGameApp extends PIXI.Application {
         this._vecToCenterFromMouse;
         this._lastTime;
         this._secondLastTime;
+      }
+
+      start() {
+        this.buttonMode = true;
         this.on("pointerdown", this.onPointerDown.bind(this));
         this.on("pointermove", this.onPointerMove.bind(this));
         this.on("pointerup", this.onPointerUp.bind(this));
@@ -40,7 +62,7 @@ class KeyFlipGameApp extends PIXI.Application {
         this.acceleration.set(0);
         //set anchor pos to mouse position
         let offsetPos = this.data.getLocalPosition(this); //relative to anchor
-        console.log(offsetPos);
+        //console.log(offsetPos);
         offsetPos.x /= 585;
         offsetPos.y /= 183;
         offsetPos.x += this.anchor.x; //Remove the anchor contribution to reset anchor from top left
@@ -103,7 +125,7 @@ class KeyFlipGameApp extends PIXI.Application {
       onPhysicsUpdate(time, deltaTime) {
         super.onPhysicsUpdate(time, deltaTime);
 
-        console.log(this.rotation % (2*Math.PI));
+        //console.log(this.rotation % (2*Math.PI));
         if(this.dragging && this._lastVelocity && !this._frozen) {
           //get velocity
           let velocityMagnitude = dist(this._lastVelocity);
@@ -130,10 +152,9 @@ class KeyFlipGameApp extends PIXI.Application {
         }
       }
 
-
-
       freeze(){
         this._frozen = true;
+        this.buttonMode = false;
         this.dragging = false;
         this.acceleration.set(0);
         this.velocity.set(0);
@@ -191,6 +212,8 @@ class KeyFlipGameApp extends PIXI.Application {
           this._particleSystem.x = key.position.x + key.width/2;
           this._particleSystem.y = key.position.y;
           self.stage.addChild(this._particleSystem);
+
+          self.win();
         }
         else {
           key.angularAcceleration = 0;
@@ -240,6 +263,126 @@ class KeyFlipGameApp extends PIXI.Application {
     this._floor.drawRectBound();
     this._floor.endFill();
     this.stage.addChild(this._floor);
+
+    //Win loss stuff
+    this._instructText = new PIXI.Text("PUT THE KEY IN",
+      {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
+        stroke: 0x000000, strokeThickness: 20 });
+    this._instructText.position.x = this.screen.width/2;
+    this._instructText.position.y = this.screen.height/2;
+    this._instructText._initialWidth = this._instructText.width;
+    this._instructText._initialHeight = this._instructText.height;
+    this._instructText.anchor.set(0.5);
+    this.stage.addChild(this._instructText);
+
+    this._arrowSprite = new PIXI.Sprite(PIXI.loader.resources.arrow.texture);
+    this._arrowSprite.position.x = 50;
+    this._arrowSprite.position.y = 50;
+    let arrowAspect = this._arrowSprite.height/this._arrowSprite.width;
+    this._arrowSprite.width = 200;
+    this._arrowSprite.height= this._arrowSprite.width*arrowAspect;
+    this.stage.addChild(this._arrowSprite);
+
+    this._winText = new PIXI.Text("AYYY YOU DID IT",
+      {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
+        stroke: 0x000000, strokeThickness: 20 });
+    this._winText.position.x = this.screen.width/2;
+    this._winText.position.y = this.screen.height/2;
+    this._winText._initialWidth = this._winText.width;
+    this._winText._initialHeight = this._winText.height;
+    this._winText.visible = false;
+    this._winText.anchor.set(0.5);
+    this.stage.addChild(this._winText);
+
+    this._loseBg = new PIXI.Graphics();
+    this._loseBg.beginFill(0xFF0000);
+    this._loseBg.alpha = 0.0; //fades in
+    this._loseBg.drawRect(0, 0, this.screen.width, this.screen.height);
+    this._loseBg.endFill();
+    this._loseBg.visible = false;
+    this.stage.addChild(this._loseBg);
+
+    this._loseText = new PIXI.Text("N",
+      {fontFamily : 'Impact', fontSize: 200, fill : 0xffffff, align : 'center',
+        stroke: 0x000000, strokeThickness: 20 });
+    this._loseText.position.x = this.screen.width/2;
+    this._loseText.position.y = this.screen.height/2;
+    this._loseText._initialWidth = this._loseText.width;
+    this._loseText._initialHeight = this._loseText.height;
+    this._loseText.visible = false;
+    this._loseText.anchor.set(0.5);
+    this.stage.addChild(this._loseText);
+  }
+
+  win() {
+    this._stopped = true;
+    this._stoppedTime = Date.now();
+    this._won = true;
+    
+  }
+
+  lose() {
+    this._stopped = true;
+    this._stoppedTime = Date.now();
+    this._won = false;
+    this._key.freeze();
+    this._key.tint = 0xFF4444;
+  }
+
+  onUpdate() {
+    let time = Date.now();
+    let deltaTime = time - this._lastTime;
+    this._lastTime = time;
+    if(!this._started) {
+      let now = Date.now() - this._spawnTime;
+      this._arrowSprite.visible = Math.floor(now / 500) % 2 === 0;
+      if(now > 3000) {
+        this._instructText.visible = false;
+        this._arrowSprite.visible = false;
+        this._timeText.visible = true;
+        this._started = true;
+        this._startedTime = Date.now();
+        this._key.start();
+      }
+    }
+    else if(!this._stopped) {
+      let now = Date.now() - this._startedTime;
+      let timeLeft = COUNTDOWN_LENGTH - now/1000;
+      if(timeLeft < 0) {
+        this.lose();
+        return;
+      }
+      this._timeText.text = Math.floor(timeLeft)+"";
+    }
+    else {
+      let now = Date.now() - this._stoppedTime;
+      this._timeText.visible = false;
+      if(this._won) {
+        this._winText.visible = true;
+        this._winText.rotation = Math.sin(now/2000*Math.PI*2)/5;//Period ever 2 seconds, -0.2 to 0.2
+      }
+      else {
+        this._timeText.visible = false;
+        this._loseText.visible = true;
+        this._loseBg.visible = true;
+        let tween = Math.min(now / 1000 * 0.6, 0.6);
+        this._loseBg.alpha = tween;
+
+        //Scrolling end text
+        let endText = "NAAAAAHHHHHHH";
+        let tween2 = Math.pow(Math.min(now / 3000, 1.0), 2);
+        tween2 = Math.floor(tween2 * endText.length) + 1;
+        this._loseText.text = endText.slice(0,tween2);
+
+        if(now > 10000) {
+          this._loseText.text = "D:";
+        }
+      }
+    }
+  }
+
+  get won() {
+    return this._stopped ? this._won : undefined;
   }
 }
 
@@ -247,6 +390,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
 PIXI.loader
   .add("key", "images/key.png")
   .add("star", "images/star.png")
+  .add("arrow", "images/arrow.png")
   .load(()=>{
     //WIRE UP THE APP
     const app = new KeyFlipGameApp({
@@ -260,5 +404,12 @@ PIXI.loader
     setInterval(()=>{
       physicsLoop(app.stage);
     }, 10);
+
+    let raf;
+    const loop = ()=>{
+      app.onUpdate();
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
   });
 });

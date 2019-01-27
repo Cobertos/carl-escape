@@ -186,7 +186,7 @@ class KeyFlipGame extends PIXI.Container {
             texture: PIXI.loader.resources.line.texture,
             size: 10,
             sizeVariance: 20,
-            tint: 0x777777,
+            tint: 0x333333,
             emitTime: 100,
             lifeTime: 200,
             lifeTimeVariance: 500,
@@ -279,11 +279,11 @@ class KeyFlipGame extends PIXI.Container {
     }
     this._landingArea = new KeyHole();
     this._landingArea.beginFill(0xFFFF55);
-    let lockHeightOffset = 740*this.intrinsicHeight/1500;
-    let lockHeight = 81*this.intrinsicHeight/1500;
+    let lockHeightOffset = 780*this.intrinsicHeight/1500;
+    let lockHeight = 2*this.intrinsicHeight/1500;
     this._landingArea.drawRect(this.intrinsicWidth-(380*this._doorImage.width/681), lockHeightOffset, 20, lockHeight);
     this._landingArea.endFill();
-    //this._landingArea.visible = false;
+    this._landingArea.visible = false;
     this.addChild(this._landingArea);
 
     class Wall extends WithPhysics(PIXI.Graphics) {
@@ -413,8 +413,8 @@ class KeyFlipGame extends PIXI.Container {
       }
       this._timeText.text = Math.floor(timeLeft)+"";
       this._timeText.position.set(
-        this._timeText._initialPosition.x + (Math.random()-0.5)*2*Math.max(timeToGo-10,0),
-        this._timeText._initialPosition.y + (Math.random()-0.5)*2*Math.max(timeToGo-10,0));
+        this._timeText._initialPosition.x + (Math.random()-0.5)*2*Math.max(timeToGo-COUNTDOWN_LENGTH/2,0),
+        this._timeText._initialPosition.y + (Math.random()-0.5)*2*Math.max(timeToGo-COUNTDOWN_LENGTH/2,0));
     }
     else {
       let now = Date.now() - this._stoppedTime;
@@ -439,6 +439,11 @@ class KeyFlipGame extends PIXI.Container {
         if(now > 10000) {
           this._loseText.text = "D:";
         }
+      }
+
+      if(now > 3000 && !this._ended) {
+        this._ended = true;
+        this.emit("ended", { won: this._won});
       }
     }
   }

@@ -44613,7 +44613,7 @@ function (_PIXI$Container) {
             texture: pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.line.texture,
             size: 10,
             sizeVariance: 20,
-            tint: 0x777777,
+            tint: 0x333333,
             emitTime: 100,
             lifeTime: 200,
             lifeTimeVariance: 500,
@@ -44745,13 +44745,14 @@ function (_PIXI$Container) {
 
     _this._landingArea.beginFill(0xFFFF55);
 
-    var lockHeightOffset = 740 * _this.intrinsicHeight / 1500;
-    var lockHeight = 81 * _this.intrinsicHeight / 1500;
+    var lockHeightOffset = 780 * _this.intrinsicHeight / 1500;
+    var lockHeight = 2 * _this.intrinsicHeight / 1500;
 
     _this._landingArea.drawRect(_this.intrinsicWidth - 380 * _this._doorImage.width / 681, lockHeightOffset, 20, lockHeight);
 
-    _this._landingArea.endFill(); //this._landingArea.visible = false;
+    _this._landingArea.endFill();
 
+    _this._landingArea.visible = false;
 
     _this.addChild(_this._landingArea);
 
@@ -44966,7 +44967,7 @@ function (_PIXI$Container) {
 
         this._timeText.text = Math.floor(timeLeft) + "";
 
-        this._timeText.position.set(this._timeText._initialPosition.x + (Math.random() - 0.5) * 2 * Math.max(timeToGo - 10, 0), this._timeText._initialPosition.y + (Math.random() - 0.5) * 2 * Math.max(timeToGo - 10, 0));
+        this._timeText.position.set(this._timeText._initialPosition.x + (Math.random() - 0.5) * 2 * Math.max(timeToGo - COUNTDOWN_LENGTH / 2, 0), this._timeText._initialPosition.y + (Math.random() - 0.5) * 2 * Math.max(timeToGo - COUNTDOWN_LENGTH / 2, 0));
       } else {
         var _now2 = Date.now() - this._stoppedTime;
 
@@ -44990,6 +44991,13 @@ function (_PIXI$Container) {
           if (_now2 > 10000) {
             this._loseText.text = "D:";
           }
+        }
+
+        if (_now2 > 3000 && !this._ended) {
+          this._ended = true;
+          this.emit("ended", {
+            won: this._won
+          });
         }
       }
     }

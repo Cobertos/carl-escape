@@ -154,7 +154,7 @@ class DialogSceneApp extends PIXI.Application {
   }
 
   isGameAction(action){
-    let gameActions = ["PlayGame1", "PlayGame2", "PlayGame3"];
+    let gameActions = ["PlayGameEasy", "PlayGameNormal", "PlayGameHard", "PlayGameKey"];
     if(gameActions.indexOf(action) > -1){
       return true;
     }
@@ -162,8 +162,26 @@ class DialogSceneApp extends PIXI.Application {
   }
 
   playGame(action){
-    if(action === "PlayGame1"){
-      let gameApp1 = new PowerMeterGame({
+    if(action === "PlayGameEasy"){
+      this.powerMeterGame();
+    }
+    if(action === "PlayGameNormal"){
+      console.log("Playing game 2");
+      this.powerMeterGame();
+      //this.actions.push("WinGame2");
+    }
+    if(action === "PlayGameHard"){
+      console.log("Playing game 3");
+      this.powerMeterGame();
+      //this.actions.push("WinGame3");
+    }
+    if(action === "PlayGameKey"){
+      console.log("Key game not implemented");
+    }
+  }
+
+  powerMeterGame(){
+    let gameApp1 = new PowerMeterGame({
         width: this._dialogBox.getBounds().width,
         height: this._dialogBox.getBounds().height,
         //oscillationTime: 1000,
@@ -192,15 +210,6 @@ class DialogSceneApp extends PIXI.Application {
       gameApp1.on("ended", (e)=>{
         console.log(e); //there's a .won with whether they won or not
       });
-    }
-    if(action === "PlayGame2"){
-      console.log("Playing game 2");
-      this.actions.push("WinGame2");
-    }
-    if(action === "PlayGame3"){
-      console.log("Playing game 3");
-      this.actions.push("WinGame3");
-    }
   }
 
   startTyping(){
@@ -263,7 +272,7 @@ Promise.all([
     antialias: true,
     width: window.innerWidth,
     height: window.innerHeight
-  }, Dialogue.loadJsonFile("testTree"));
+  }, Dialogue.loadJsonFile("mainTree"));
   document.body.appendChild(app.view);
 
   //lock for mobile devices (throws if device doesn't support)

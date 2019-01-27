@@ -544,7 +544,7 @@ export default {
             id : 28,
             prompt : "[Carl looks upset that you denied him. He's reaching for your arm...]",
             speaker: "",
-            background : "frontyard",
+            background : "frontyardSide",
             options : [
                 {
                     destination : 30,
@@ -559,7 +559,7 @@ export default {
             id : 29,
             prompt : "[Carl looks upset about your tone of voice, and is reaching for your arm...]",
             speaker: "",
-            background : "frontyard",
+            background : "frontyardSide",
             options : [
                 {
                     destination : 30,

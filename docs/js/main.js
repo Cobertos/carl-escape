@@ -48068,6 +48068,8 @@ function (_PIXI$Container) {
 
     _this._floor.endFill();
 
+    _this._floor.visible = false;
+
     _this.addChild(_this._floor); //Win loss stuff
 
 
@@ -48121,7 +48123,8 @@ function (_PIXI$Container) {
 
     _this._loseBg.alpha = 0.0; //fades in
 
-    _this._loseBg.drawRect(0, 0, _this.intrinsicWidth, _this.intrinsicHeight);
+    _this._loseBg.drawRect(0, 0, _this.intrinsicWidth * 5, _this.intrinsicHeight * 5); //cover whole screen
+
 
     _this._loseBg.endFill();
 
@@ -48812,15 +48815,17 @@ function (_PIXI$Application) {
       if (action === "PlayGameKey") {
         game = new _BottleFlipGame_js__WEBPACK_IMPORTED_MODULE_11__["KeyFlipGame"]({
           intrinsicWidth: 3 * this.screen.width / 4,
-          intrinsicHeight: 3 * this.screen.height / 4
+          intrinsicHeight: this.screen.height
         });
         game.position.x = this.screen.width / 4;
         game.position.y = 0;
+        this._rightFace.visible = false;
         var interval = setInterval(function () {
           Object(_engine_WithPhysics_js__WEBPACK_IMPORTED_MODULE_12__["physicsLoop"])(game);
         }, 10);
 
         teardown = function teardown() {
+          _this3._rightFace.visible = true;
           clearInterval(interval);
         };
       }
@@ -50073,7 +50078,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 28,
     prompt: "[Carl looks upset that you denied him. He's reaching for your arm...]",
     speaker: "",
-    background: "frontyard",
+    background: "frontyardSide",
     options: [{
       destination: 30,
       text: "Put your key in the lock and get into your house.",
@@ -50084,7 +50089,7 @@ __webpack_require__.r(__webpack_exports__);
     id: 29,
     prompt: "[Carl looks upset about your tone of voice, and is reaching for your arm...]",
     speaker: "",
-    background: "frontyard",
+    background: "frontyardSide",
     options: [{
       destination: 30,
       text: "Put your key in the lock and get into your house.",

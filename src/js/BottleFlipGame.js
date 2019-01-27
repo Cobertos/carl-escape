@@ -320,6 +320,7 @@ export class KeyFlipGame extends PIXI.Container {
       0, this.intrinsicHeight-20, this.intrinsicWidth, 20);
     this._floor.drawRectBound();
     this._floor.endFill();
+    this._floor.visible = false;
     this.addChild(this._floor);
 
     //Win loss stuff
@@ -355,7 +356,7 @@ export class KeyFlipGame extends PIXI.Container {
     this._loseBg = new PIXI.Graphics();
     this._loseBg.beginFill(0xFF0000);
     this._loseBg.alpha = 0.0; //fades in
-    this._loseBg.drawRect(0, 0, this.intrinsicWidth, this.intrinsicHeight);
+    this._loseBg.drawRect(0, 0, this.intrinsicWidth*5, this.intrinsicHeight*5); //cover whole screen
     this._loseBg.endFill();
     this._loseBg.visible = false;
     this.addChild(this._loseBg);

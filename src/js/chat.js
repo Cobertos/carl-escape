@@ -254,14 +254,16 @@ class DialogSceneApp extends PIXI.Application {
     if(action === "PlayGameKey"){
       game = new KeyFlipGame({
         intrinsicWidth: 3*this.screen.width/4, 
-        intrinsicHeight: 3*this.screen.height/4, 
+        intrinsicHeight: this.screen.height, 
       });
       game.position.x = this.screen.width/4;
       game.position.y = 0;
+      this._rightFace.visible = false;
       let interval = setInterval(()=>{
         physicsLoop(game);
       }, 10);
       teardown = ()=>{
+        this._rightFace.visible = true;
         clearInterval(interval);
       };
     }

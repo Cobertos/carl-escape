@@ -48532,7 +48532,8 @@ var TYPING_SPEED = 10; //ms between letter
 var SCREEN_PADDING = 20;
 var BACKGROUND_TO_URL = {
   "bedroom": "images/bedroom.png",
-  "frontyard": "images/frontyard.png"
+  "frontyard": "images/frontyard.png",
+  "frontyardSide": "images/frontyardSide.png"
 };
 
 var DialogSceneApp =
@@ -48573,7 +48574,7 @@ function (_PIXI$Application) {
 
     _this.stage.addChild(_this._dialogBox);
 
-    _this._dialogFrame = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.dialogFrame.texture, 117, 117, 117, 117);
+    _this._dialogFrame = new pixi_js__WEBPACK_IMPORTED_MODULE_7__["mesh"].NineSlicePlane(pixi_js__WEBPACK_IMPORTED_MODULE_7__["loader"].resources.dialogFrame.texture, 66, 66, 66, 66);
 
     _this._dialogBox.addChild(_this._dialogFrame);
 
@@ -48666,12 +48667,12 @@ function (_PIXI$Application) {
       this._dialogFrame.width = this._dialogBox.width;
       this._dialogFrame.height = this._dialogBox.height;
       this._dialogName.style.fontSize = 24 * crems;
-      this._dialogName.position.x = 140 / 2;
-      this._dialogName.position.y = 117 / 2;
+      this._dialogName.position.x = 45;
+      this._dialogName.position.y = 45;
       this._dialogText.style.fontSize = 24 * crems;
-      this._dialogText.style.wordWrapWidth = this._dialogBox.width - 117;
-      this._dialogText.position.x = 140 / 2;
-      this._dialogText.position.y = 117 / 2 + 30;
+      this._dialogText.style.wordWrapWidth = this._dialogBox.width - 40 * 2;
+      this._dialogText.position.x = 45;
+      this._dialogText.position.y = 45 + 30 * crems;
       this._dialogName.text = name; //options
 
       var options = this.dialogTree.options(this.actions);

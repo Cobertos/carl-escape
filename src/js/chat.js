@@ -12,7 +12,8 @@ const SCREEN_PADDING = 20;
 
 const BACKGROUND_TO_URL = {
   "bedroom": "images/bedroom.png",
-  "frontyard": "images/frontyard.png"
+  "frontyard": "images/frontyard.png",
+  "frontyardSide": "images/frontyardSide.png"
 };
 
 class DialogSceneApp extends PIXI.Application {
@@ -40,7 +41,7 @@ class DialogSceneApp extends PIXI.Application {
 
     this._dialogBox = new PIXI.Container();
     this.stage.addChild(this._dialogBox);
-    this._dialogFrame = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.dialogFrame.texture, 117, 117, 117, 117);
+    this._dialogFrame = new PIXI.mesh.NineSlicePlane(PIXI.loader.resources.dialogFrame.texture, 66, 66, 66, 66);
     this._dialogBox.addChild(this._dialogFrame);
 
     this._dialogName = new PIXI.Text("NAME", {fontFamily : 'Arial', fontSize: 24, fill : 0x000000, align : 'left', fontWeight: "bold"});
@@ -116,12 +117,12 @@ class DialogSceneApp extends PIXI.Application {
     this._dialogFrame.width = this._dialogBox.width;
     this._dialogFrame.height = this._dialogBox.height;
     this._dialogName.style.fontSize = 24*crems;
-    this._dialogName.position.x = 140/2;
-    this._dialogName.position.y = 117/2;
+    this._dialogName.position.x = 45;
+    this._dialogName.position.y = 45;
     this._dialogText.style.fontSize = 24*crems;
-    this._dialogText.style.wordWrapWidth = this._dialogBox.width - 117;
-    this._dialogText.position.x = 140/2;
-    this._dialogText.position.y = 117/2+30;
+    this._dialogText.style.wordWrapWidth = this._dialogBox.width - 40*2;
+    this._dialogText.position.x = 45;
+    this._dialogText.position.y = 45+30*crems;
 
     this._dialogName.text = name;
 

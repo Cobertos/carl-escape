@@ -356,7 +356,7 @@ export class KeyFlipGame extends PIXI.Container {
     this._loseBg = new PIXI.Graphics();
     this._loseBg.beginFill(0xFF0000);
     this._loseBg.alpha = 0.0; //fades in
-    this._loseBg.drawRect(-this.intrinsicWidth*5, -this.intrinsicWidth*5, this.intrinsicWidth*5, this.intrinsicHeight*5); //cover whole screen
+    this._loseBg.drawRect(-this.intrinsicWidth, -this.intrinsicHeight, this.intrinsicWidth*3, this.intrinsicHeight*3); //cover whole screen
     this._loseBg.endFill();
     this._loseBg.visible = false;
     this.addChild(this._loseBg);

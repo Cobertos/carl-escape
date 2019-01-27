@@ -27,6 +27,14 @@ class DialogSceneApp extends PIXI.Application {
     window.addEventListener("resize", ()=>{
       this.renderer.resize(window.innerWidth, window.innerHeight);
       this.updateUI();
+      this.updateUI();
+      this.updateUI();
+    });
+    window,addEventListener("deviceorientation", ()=>{
+      this.renderer.resize(window.innerWidth, window.innerHeight);
+      this.updateUI();
+      this.updateUI();
+      this.updateUI();
     });
     this.optionButtons = [];
     this.actions = [];
@@ -74,15 +82,14 @@ class DialogSceneApp extends PIXI.Application {
     });
 
     this.nextScene();
-    this.render();
-    setTimeout(this.render(),200);
+    this.updateUI();
+    this.updateUI();
   }
 
   updateUI() {
     let { speaker : name, background } = this._currentNode;
 
     let heightMul = Math.min(1, Math.max(0.5, this.screen.height/900)); //Scale down if less than 900
-    console.log(heightMul, this.screen.height);
 
     //at a screen size of 1400 will start decreasing
     //at a screen size of 600
@@ -113,6 +120,7 @@ class DialogSceneApp extends PIXI.Application {
     this._rightFace.position.x = this.screen.width-this._rightFace.width-SCREEN_PADDING;
     this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
 
+    console.log(this.screen.width, this.screen.height);
     console.log(crems);
     this._dialogBox.width = cremsStart/2*crems;
     this._dialogBox.height = 300*crems;
@@ -393,10 +401,11 @@ Promise.all([
   }, Dialogue.loadJsonFile("mainTree"));
   app.view.classList.add("renderer");
   document.body.appendChild(app.view);
-  //app.playSound("audio/Unsettle1.wav");
-  //lock for mobile devices (throws if device doesn't support)
-  /*try {
-    screen.orientation.lock('landscape');
-  }
-  catch(e) {}*/
+  app.playSound("audio/Unsettle1.wav");
+  
+});
+
+screen.orientation.lock('landscape').catch((e)=>{
+  console.error(e);
+  return Promise.resolve(); //Ignore errors
 });

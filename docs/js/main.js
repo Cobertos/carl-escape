@@ -48123,7 +48123,7 @@ function (_PIXI$Container) {
 
     _this._loseBg.alpha = 0.0; //fades in
 
-    _this._loseBg.drawRect(-_this.intrinsicWidth * 5, -_this.intrinsicWidth * 5, _this.intrinsicWidth * 5, _this.intrinsicHeight * 5); //cover whole screen
+    _this._loseBg.drawRect(-_this.intrinsicWidth, -_this.intrinsicHeight, _this.intrinsicWidth * 3, _this.intrinsicHeight * 3); //cover whole screen
 
 
     _this._loseBg.endFill();
@@ -48563,6 +48563,19 @@ function (_PIXI$Application) {
       _this.renderer.resize(window.innerWidth, window.innerHeight);
 
       _this.updateUI();
+
+      _this.updateUI();
+
+      _this.updateUI();
+    });
+    window, addEventListener("deviceorientation", function () {
+      _this.renderer.resize(window.innerWidth, window.innerHeight);
+
+      _this.updateUI();
+
+      _this.updateUI();
+
+      _this.updateUI();
     });
     _this.optionButtons = [];
     _this.actions = [];
@@ -48626,9 +48639,10 @@ function (_PIXI$Application) {
 
     _this.nextScene();
 
-    _this.render();
+    _this.updateUI();
 
-    setTimeout(_this.render(), 200);
+    _this.updateUI();
+
     return _this;
   }
 
@@ -48641,8 +48655,7 @@ function (_PIXI$Application) {
           name = _this$_currentNode.speaker,
           background = _this$_currentNode.background;
       var heightMul = Math.min(1, Math.max(0.5, this.screen.height / 900)); //Scale down if less than 900
-
-      console.log(heightMul, this.screen.height); //at a screen size of 1400 will start decreasing
+      //at a screen size of 1400 will start decreasing
       //at a screen size of 600
       //at a screen size of 400
 
@@ -48669,6 +48682,7 @@ function (_PIXI$Application) {
       this._rightFace.position.y = SCREEN_PADDING;
       this._rightFace.position.x = this.screen.width - this._rightFace.width - SCREEN_PADDING;
       this._rightFace.tint = placement === "left" ? 0x444444 : 0xFFFFFF;
+      console.log(this.screen.width, this.screen.height);
       console.log(crems);
       this._dialogBox.width = cremsStart / 2 * crems;
       this._dialogBox.height = 300 * crems;
@@ -48966,13 +48980,12 @@ Promise.all([new Promise(function (resolve, reject) {
     transparent: true
   }, _dialogue_node_js__WEBPACK_IMPORTED_MODULE_9__["loadJsonFile"]("mainTree"));
   app.view.classList.add("renderer");
-  document.body.appendChild(app.view); //app.playSound("audio/Unsettle1.wav");
-  //lock for mobile devices (throws if device doesn't support)
-
-  /*try {
-    screen.orientation.lock('landscape');
-  }
-  catch(e) {}*/
+  document.body.appendChild(app.view);
+  app.playSound("audio/Unsettle1.wav");
+});
+screen.orientation.lock('landscape').catch(function (e) {
+  console.error(e);
+  return Promise.resolve(); //Ignore errors
 });
 
 /***/ }),
@@ -49695,7 +49708,7 @@ __webpack_require__.r(__webpack_exports__);
     }, {
       destination: 2,
       text: 'Hit the snooze button',
-      actions: [],
+      actions: ["Casual"],
       checks: []
     }]
   }, {
@@ -49742,7 +49755,7 @@ __webpack_require__.r(__webpack_exports__);
       checks: []
     }, {
       destination: 6,
-      text: "You'll pick up something on your lunch break.",
+      text: "You'll grab fast food on break.",
       actions: [],
       checks: []
     }]
@@ -49802,12 +49815,12 @@ __webpack_require__.r(__webpack_exports__);
     }]
   }, {
     id: 8,
-    prompt: " ",
-    speaker: "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
+    prompt: "You get into your car. Just as you put your key in the ignition, a voice says 'I've been waiting for you'.",
+    speaker: "",
     background: "frontyard",
     options: [{
       destination: 10,
-      text: "I told you to go home when I saw you in my bushes two days ago, Carl.",
+      text: "You've been in my bushes for two days.",
       actions: [],
       checks: []
     }]
@@ -49818,7 +49831,7 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyard",
     options: [{
       destination: 10,
-      text: "I told you to go home when I saw you in my bushes two days ago, Carl.",
+      text: "You've been in my bushes for two days.",
       actions: [],
       checks: []
     }]
@@ -49829,7 +49842,7 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyard",
     options: [{
       destination: 11,
-      text: "Ok, but I didn't want you here in the first place",
+      text: "I didn't want you here in the first place",
       actions: [],
       checks: []
     }, {
@@ -49882,7 +49895,7 @@ __webpack_require__.r(__webpack_exports__);
       checks: []
     }, {
       destination: 15,
-      text: "Hmmm, looks like I'll have to work from home today.",
+      text: "Looks like I have to work at home today.",
       actions: [],
       checks: []
     }]
@@ -49904,7 +49917,7 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyard",
     options: [{
       destination: 16,
-      text: "Ummm, that's not necessary. [Get out of your car.]",
+      text: "That's not necessary. [Get out of your car.]",
       actions: ["PlayGameEasy"],
       checks: []
     }]
@@ -49915,12 +49928,12 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyard",
     options: [{
       destination: 17,
-      text: "You safely exit your car and put a little distance between Carl and yourself.",
+      text: "You exit your car.",
       actions: [],
       checks: ["WinGameEasy"]
     }, {
       destination: 17,
-      text: "You fumble with the handle, stumble out of the vehicle, and notice Carl directly behind you. 'Gotta be faster than that'.",
+      text: "Carl follows closely.",
       actions: [],
       checks: ["LoseGameEasy"]
     }]
@@ -50001,12 +50014,12 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyard",
     options: [{
       destination: 24,
-      text: "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
+      text: "[You retreat to your front door.]",
       actions: [],
       checks: ["WinGameNormal"]
     }, {
       destination: 25,
-      text: "[Carl noticed you trying to reach your front door. He's standing uncomfortably close to you.]",
+      text: "[Carl noticed. He's uncomfortably close.]",
       actions: [],
       checks: ["LoseGameNormal"]
     }]
@@ -50017,12 +50030,12 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyard",
     options: [{
       destination: 24,
-      text: "[You back away until you are at your front door again. Escape from this awkward encounter is within reach.]",
+      text: "[You retreat to your front door.]",
       actions: ["WinGameNormal"],
       checks: []
     }, {
       destination: 25,
-      text: "[Carl noticed you trying to reach your front door. He's standing uncomfortably close to you.]",
+      text: "[Carl noticed. He's uncomfortably close.]",
       actions: ["LoseGameNormal"],
       checks: []
     }]
@@ -50033,39 +50046,39 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyard",
     options: [{
       destination: 26,
-      text: "[Discretely fish your key out of your pocket.]",
+      text: "[Fish your key out of your pocket.]",
       actions: [],
       checks: []
     }, {
-      destination: 25,
+      destination: 27,
       text: "[Ask Carl to go home.]",
       actions: [],
       checks: []
     }]
   }, {
     id: 25,
-    prompt: "Oh, are you trying to invite me inside? owo I suppose I could come in for a bit.",
+    prompt: "Oh, are you trying to invite me inside? owo",
     speaker: "Carl",
     background: "frontyard",
     options: [{
       destination: 28,
-      text: "Wha-nonononono, that's not what I meant.",
+      text: "Wha-nononono, that's not what I meant.",
       actions: [],
       checks: []
     }, {
       destination: 28,
-      text: "Actually, I have some work I need to get done on my own.",
+      text: "I have some work I need to get done...",
       actions: [],
       checks: []
     }]
   }, {
     id: 26,
-    prompt: "Hey, watcha doin'? Trying to get me to come in for a drink? Well, if you insist.",
+    prompt: "Trying to get me to come in for a drink~?",
     speaker: "Carl",
     background: "frontyard",
     options: [{
       destination: 28,
-      text: "Actually, I have some work that I need to get done on my own.",
+      text: "I have some work I need to do...",
       actions: [],
       checks: []
     }, {
@@ -50076,17 +50089,17 @@ __webpack_require__.r(__webpack_exports__);
     }]
   }, {
     id: 27,
-    prompt: "I did go home. I mean, I went to your home, anyway. That's better~",
+    prompt: "I went to your home. That's better~",
     speaker: "Carl",
     background: "frontyard",
     options: [{
       destination: 29,
-      text: "No, go to your actual place of living.",
+      text: "No, go to your actual house.",
       actions: [],
       checks: []
     }, {
       destination: 29,
-      text: "Listen, I don't care where you go, as long as you leave my property.",
+      text: "Please just leave, Carl.",
       actions: [],
       checks: []
     }]
@@ -50097,7 +50110,7 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyardSide",
     options: [{
       destination: 30,
-      text: "Put your key in the lock and get into your house.",
+      text: "Unlock your front door!",
       actions: ["PlayGameKey"],
       checks: []
     }]
@@ -50108,7 +50121,7 @@ __webpack_require__.r(__webpack_exports__);
     background: "frontyardSide",
     options: [{
       destination: 30,
-      text: "Put your key in the lock and get into your house.",
+      text: "Unlock your front door!",
       actions: ["PlayGameKey"],
       checks: []
     }]
@@ -50119,12 +50132,12 @@ __webpack_require__.r(__webpack_exports__);
     background: "bedroom",
     options: [{
       destination: 31,
-      text: "You did it! You now have a door between yourself and Carl.",
+      text: "You did it! You're back inside.",
       actions: [],
       checks: ["WinGameKey"]
     }, {
       destination: 32,
-      text: "You feel Carl's arms slip around you from behind in an intimately awkward hug.",
+      text: "Carl's arms slip around you in a hug.",
       actions: [],
       checks: ["LoseGameKey"]
     }]
@@ -50135,7 +50148,7 @@ __webpack_require__.r(__webpack_exports__);
     background: "bedroom",
     options: [{
       destination: 33,
-      text: "Ignore him",
+      text: "Ignore him.",
       actions: [],
       checks: []
     }]
@@ -50157,7 +50170,7 @@ __webpack_require__.r(__webpack_exports__);
     background: "bedroom",
     options: [{
       destination: -1,
-      text: "Put some headphones in and enjoy the rest of your day home.",
+      text: "You're safe in your home... For now.",
       actions: [],
       checks: []
     }]
@@ -50168,23 +50181,23 @@ __webpack_require__.r(__webpack_exports__);
     background: "bedroom",
     options: [{
       destination: 31,
-      text: "[You break free long enough to unlock your door and separate yourself from Carl.]",
+      text: "[You're free long enough to unlock your door.]",
       actions: [],
       checks: ["WinGameHard"]
     }, {
-      destination: -1,
+      destination: 35,
       text: "[Carl tells you how soft your skin is.]",
       actions: [],
       checks: ["LoseGameHard"]
     }]
   }, {
     id: 35,
-    prompt: "[You are trapped in a seemingly endless hug from Carl. There is no escape.]",
+    prompt: "[There is no escape.]",
     speaker: "",
     background: "bedroom",
     options: [{
       destination: -1,
-      text: "[Wait for Carl to get tired so you can go back inside.]",
+      text: "[You've lost the safety of your home. :()]",
       actions: [],
       checks: []
     }]

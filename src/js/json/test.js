@@ -75,7 +75,7 @@ export default {
             id : 4,
             prompt : "TEST",
             speaker: "carl",
-            background : "background.png",
+            background : "frontyard.png",
             options : [
                 {
                     destination : -1,
@@ -85,8 +85,8 @@ export default {
                 },
                 {
                     destination : -1,
-                    text : '<PlayGameMedium>',
-                    actions : ["PlayGameMedium"],
+                    text : '<PlayGameNormal>',
+                    actions : ["PlayGameNormal"],
                     checks : [],
                 },
                 {

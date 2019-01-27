@@ -160,68 +160,66 @@ class DialogSceneApp extends PIXI.Application {
   }
 
   playGame(action){
-    if(action === "PlayGameEasy"){
-      this.powerMeterGame();
-    }
-    if(action === "PlayGameNormal"){
-      console.log("Playing game 2");
-      this.powerMeterGame();
-      //this.actions.push("WinGame2");
-    }
-    if(action === "PlayGameHard"){
-      console.log("Playing game 3");
-      this.powerMeterGame();
-      //this.actions.push("WinGame3");
+    let game;
+    let teardown;
+    if(action === "PlayGameEasy" || action === "PlayGameNormal" || action === "PlayGameHard"){
+      let extraOptions;
+      if(action === "PlayGameEasy") {
+        extraOptions = {
+          oscillationTime: 1000,
+          greenAreaWidth: 0.4
+        };
+      }
+      else if(action === "PlayGameNormal") {
+        extraOptions = {
+          oscillationTime: 700,
+          greenAreaWidth: 0.3
+        };
+      }
+      else if(action === "PlayGameHard") {
+        extraOptions = {
+          oscillationTime: 400,
+          greenAreaWidth: 0.2
+        };
+      }
+      game = new PowerMeterGame({
+        width: this._dialogBox.getBounds().width,
+        height: this._dialogBox.getBounds().height,
+        //oscillationTime: 1000,
+        //greenAreaWidth: 0.4
+        ...extraOptions
+      });
+      game.position.x = SCREEN_PADDING;
+      game.position.y = this.screen.height - 200 - SCREEN_PADDING;
+      let listener1 = game.stop.bind(game);
+      let listener2 = (e)=>{
+        if(e.key === " ") {
+          game.stop();
+          e.preventDefault(); //Stop the scrolling  
+        }
+      };
+      this.view.addEventListener("pointerdown", listener1);
+      window.addEventListener("keydown", listener2);
+      teardown = ()=>{
+        this.view.removeEventListener("pointerdown", listener1);
+        window.removeEventListener("keydown", listener2);
+      };
     }
     if(action === "PlayGameKey"){
-      this.keyFlipGame();
+      game = new KeyFlipGame({
+        intrinsicWidth: 3*this.screen.width/4, 
+        intrinsicHeight: 3*this.screen.height/4, 
+      });
+      game.position.x = this.screen.width/4;
+      game.position.y = 0;
+      let interval = setInterval(()=>{
+        physicsLoop(game);
+      }, 10);
+      teardown = ()=>{
+        clearInterval(interval);
+      };
     }
-  }
-
-  powerMeterGame(){
-    let gameApp1 = new PowerMeterGame({
-      width: this._dialogBox.getBounds().width,
-      height: this._dialogBox.getBounds().height,
-      //oscillationTime: 1000,
-      //greenAreaWidth: 0.4
-    });
-    gameApp1.position.x = SCREEN_PADDING;
-    gameApp1.position.y = this.screen.height - 200 - SCREEN_PADDING;
-    let raf;
-    const loop = ()=>{
-      gameApp1.onUpdate();
-      raf = requestAnimationFrame(loop);
-    };
-    raf = requestAnimationFrame(loop);
-
-    this.view.addEventListener("pointerdown", ()=>{
-      gameApp1.stop();
-    });
-    window.addEventListener("keydown", (e)=>{
-      if(e.key === " ") {
-        gameApp1.stop();
-        e.preventDefault(); //Stop the scrolling  
-      }
-    });
-    this.stage.addChild(gameApp1);
-
-    gameApp1.on("ended", (e)=>{
-      console.log(e); //there's a .won with whether they won or not
-    });
-  }
-
-  keyFlipGame(){
-    let game = new KeyFlipGame({
-      intrinsicWidth: 3*this.screen.width/4, 
-      intrinsicHeight: 3*this.screen.height/4, 
-    });
-    game.position.x = this.screen.width/4;
-    game.position.y = 0;
     this.stage.addChild(game);
-
-    setInterval(()=>{
-      physicsLoop(game);
-    }, 10);
 
     let raf;
     const loop = ()=>{
@@ -232,6 +230,8 @@ class DialogSceneApp extends PIXI.Application {
 
     game.on("ended", (e)=>{
       console.log(e);
+      teardown();
+      this.stage.removeChild(game);
     });
   }
 
@@ -278,6 +278,7 @@ Promise.all([
     PIXI.loader
       //Backgrounds
       .add("bedroom", "images/bedroom.png")
+      .add("frontyard", "images/frontyard.png")
       //Characters
       .add("carl", "images/crepycarl-clothed.png")
       .add("mc", "images/mc-clothed.png")

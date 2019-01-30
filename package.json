@@ -5,6 +5,23 @@
     "email": "me@cobertos.com",
     "url": "http://cobertos.com"
   },
+  "contributors": [{
+    "name": "Blukat",
+    "email": "blukatstudios@gmail.com",
+    "url": "https://github.com/blukatstudios"
+  },{
+    "name": "jabberjaws",
+    "email": "smith1421j@gmail.com",
+    "url":""
+  },{
+    "name": "JD",
+    "email": "jefferybigger@gmail.com",
+    "url":""
+  },{
+    "name": "BearAxe",
+    "email": "",
+    "url":""
+  }],
   "private": "true",
   "version": "1.0.0",
   "description": "HOLY SHIT OTHER PEOPLE CONTRBITUED ITS NOT JUST ME I JUST NEED TO ADD THEM",
